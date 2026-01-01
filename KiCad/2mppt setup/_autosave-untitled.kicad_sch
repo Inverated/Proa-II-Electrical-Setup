@@ -1,0 +1,448 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "ccc0497f-6194-408d-afc4-755b028e3afc")
+	(paper "A4")
+	(lib_symbols
+		(symbol "Proa:SmartSolar_MPPT_150_45"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SmartSolar_MPPT_150_45"
+				(at 2.54 11.938 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at -431.8 127 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -431.8 127 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at -431.8 127 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at -431.8 127 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SmartSolar_MPPT_150_45_1_1"
+				(rectangle
+					(start -10.16 10.16)
+					(end 10.16 -21.59)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(pin power_out line
+					(at -12.7 6.35 0)
+					(length 2.54)
+					(name "BATTERY+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at -12.7 3.81 0)
+					(length 2.54)
+					(name "BATTERY-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 0 0)
+					(length 2.54)
+					(name "PV-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -2.54 0)
+					(length 2.54)
+					(name "PV+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin no_connect line
+					(at -12.7 -7.62 0)
+					(length 2.54)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at -12.7 -11.43 0)
+					(length 2.54)
+					(name "VE.Direct-TX"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin no_connect line
+					(at -12.7 -13.97 0)
+					(length 2.54)
+					(name "VE.Direct-RX"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -17.78 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(wire
+		(pts
+			(xy 139.7 85.09) (xy 134.62 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "00173ae1-3b63-4f74-9f76-8e75111f8500")
+	)
+	(wire
+		(pts
+			(xy 139.7 91.44) (xy 134.62 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a618df9d-6562-4549-9920-8c83e28676e7")
+	)
+	(wire
+		(pts
+			(xy 139.7 93.98) (xy 134.62 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d37140b8-917e-4e3f-b5b3-fc4acacd68fa")
+	)
+	(wire
+		(pts
+			(xy 139.7 109.22) (xy 134.62 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e733ec08-f989-417b-ac24-b5eb809ab6a6")
+	)
+	(wire
+		(pts
+			(xy 139.7 102.87) (xy 134.62 102.87)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f3875c90-6c50-4a85-bf51-fea27bbd9db7")
+	)
+	(wire
+		(pts
+			(xy 139.7 87.63) (xy 134.62 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f74663b0-74ed-4391-948b-6a1bb2ee90ed")
+	)
+	(hierarchical_label "PV+"
+		(shape input)
+		(at 134.62 93.98 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "038e2a0c-27c8-48aa-a772-6207af10219c")
+	)
+	(hierarchical_label "PV-"
+		(shape input)
+		(at 134.62 91.44 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "7906373d-154c-4eaa-9965-156a633b4e06")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 134.62 109.22 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "b9d9c455-87c9-4a5c-bf80-2e641361fcb0")
+	)
+	(hierarchical_label "TX"
+		(shape input)
+		(at 134.62 102.87 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c5280697-d116-4680-9bba-11ea741274c0")
+	)
+	(hierarchical_label "Battery+"
+		(shape input)
+		(at 134.62 85.09 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "cc92764b-88a6-412b-8316-9bf99945eb63")
+	)
+	(hierarchical_label "Battery-"
+		(shape input)
+		(at 134.62 87.63 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "ef29218d-b940-4f61-a5c6-fdcd6b7fb1dd")
+	)
+	(symbol
+		(lib_id "Proa:SmartSolar_MPPT_150_45")
+		(at 152.4 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "1effd1fd-e1d4-4b36-85fa-70cbe1723302")
+		(property "Reference" "SmartSolar_MPPT_150_1"
+			(at 161.798 79.248 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "~"
+			(at 151.1301 114.3 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at -279.4 -35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at -279.4 -35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at -279.4 -35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "179c5f2b-e61b-4c87-9872-c8f9742513c0")
+		)
+		(pin "6"
+			(uuid "c4630dd7-e9d1-4354-9749-196dae5678ba")
+		)
+		(pin "5"
+			(uuid "8db3ddd9-ae10-47d7-bc2a-c7f2c8f42b63")
+		)
+		(pin "1"
+			(uuid "209c931a-52aa-4c79-8fde-0026743a1a71")
+		)
+		(pin "4"
+			(uuid "8207bfb1-ab25-4f2c-8e96-572aba61bfd9")
+		)
+		(pin "7"
+			(uuid "259ce0c6-d20b-4840-a503-af0e1a736fb2")
+		)
+		(pin "2"
+			(uuid "1b07ec63-126b-4248-99e0-822d40a0a24a")
+		)
+		(pin "8"
+			(uuid "1f2e1c81-9fb0-479b-86a4-24fef32fbbed")
+		)
+		(instances
+			(project ""
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/3ef1e227-1947-4255-93ac-f939fee5385c"
+					(reference "SmartSolar_MPPT_150_2")
+					(unit 1)
+				)
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/5c90004e-845d-4999-8ab5-0ca9dd600da9"
+					(reference "SmartSolar_MPPT_150_5")
+					(unit 1)
+				)
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/64bf5e14-53d9-449d-8f7a-ff56b23bc2ab"
+					(reference "SmartSolar_MPPT_150_4")
+					(unit 1)
+				)
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/883227c1-d3ab-479d-b77c-fbb903e126a8"
+					(reference "SmartSolar_MPPT_150_1")
+					(unit 1)
+				)
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/c58e903c-f250-4333-8405-fde7b4ac0826"
+					(reference "SmartSolar_MPPT_150_6")
+					(unit 1)
+				)
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/f9a2d229-7a7a-456f-a666-a34912e9d69f"
+					(reference "SmartSolar_MPPT_150_3")
+					(unit 1)
+				)
+			)
+		)
+	)
+)
