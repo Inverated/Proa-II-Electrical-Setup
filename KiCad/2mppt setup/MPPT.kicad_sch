@@ -200,7 +200,7 @@
 						(type background)
 					)
 				)
-				(pin power_out line
+				(pin passive line
 					(at -12.7 6.35 0)
 					(length 2.54)
 					(name "BATTERY+"
@@ -218,7 +218,7 @@
 						)
 					)
 				)
-				(pin power_out line
+				(pin passive line
 					(at -12.7 3.81 0)
 					(length 2.54)
 					(name "BATTERY-"
@@ -368,16 +368,6 @@
 	)
 	(wire
 		(pts
-			(xy 139.7 85.09) (xy 134.62 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "00173ae1-3b63-4f74-9f76-8e75111f8500")
-	)
-	(wire
-		(pts
 			(xy 165.1 109.22) (xy 172.72 109.22)
 		)
 		(stroke
@@ -388,7 +378,7 @@
 	)
 	(wire
 		(pts
-			(xy 127 85.09) (xy 124.46 85.09)
+			(xy 125.73 85.09) (xy 124.46 85.09)
 		)
 		(stroke
 			(width 0)
@@ -408,6 +398,16 @@
 	)
 	(wire
 		(pts
+			(xy 124.46 87.63) (xy 139.7 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b861dec1-af50-42ad-9f4e-4c9af611f770")
+	)
+	(wire
+		(pts
 			(xy 139.7 93.98) (xy 124.46 93.98)
 		)
 		(stroke
@@ -415,6 +415,16 @@
 			(type default)
 		)
 		(uuid "d37140b8-917e-4e3f-b5b3-fc4acacd68fa")
+	)
+	(wire
+		(pts
+			(xy 133.35 85.09) (xy 139.7 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e65729f8-5a1a-40be-96de-62d6a71186f3")
 	)
 	(wire
 		(pts
@@ -435,16 +445,6 @@
 			(type default)
 		)
 		(uuid "f3875c90-6c50-4a85-bf51-fea27bbd9db7")
-	)
-	(wire
-		(pts
-			(xy 139.7 87.63) (xy 124.46 87.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f74663b0-74ed-4391-948b-6a1bb2ee90ed")
 	)
 	(hierarchical_label "PV+"
 		(shape input)
@@ -619,7 +619,7 @@
 	)
 	(symbol
 		(lib_id "Device:Fuse")
-		(at 130.81 85.09 90)
+		(at 129.54 85.09 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -627,7 +627,7 @@
 		(dnp no)
 		(uuid "cdd373d7-3d39-4ab0-9824-eaeed8378942")
 		(property "Reference" "F4"
-			(at 129.5399 82.55 0)
+			(at 128.2699 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -637,7 +637,7 @@
 			)
 		)
 		(property "Value" "F1"
-			(at 132.842 82.804 90)
+			(at 131.572 82.804 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -646,7 +646,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 130.81 86.868 90)
+			(at 129.54 86.868 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -655,7 +655,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 130.81 85.09 0)
+			(at 129.54 85.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -664,7 +664,7 @@
 			)
 		)
 		(property "Description" "Fuse"
-			(at 130.81 85.09 0)
+			(at 129.54 85.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -673,7 +673,7 @@
 			)
 		)
 		(property "Rating" "150% 100A = 150A"
-			(at 119.38 80.518 90)
+			(at 109.22 80.518 90)
 			(show_name yes)
 			(effects
 				(font

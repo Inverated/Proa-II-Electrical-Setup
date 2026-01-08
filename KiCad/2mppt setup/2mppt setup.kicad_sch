@@ -64,10 +64,10 @@
 						(type background)
 					)
 				)
-				(pin power_in line
+				(pin passive line
 					(at -8.89 1.27 0)
 					(length 2.54)
-					(name "-in"
+					(name "e"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -82,7 +82,7 @@
 						)
 					)
 				)
-				(pin power_in line
+				(pin passive line
 					(at -8.89 -1.27 0)
 					(length 2.54)
 					(name "+in"
@@ -12902,7 +12902,7 @@
 	)
 	(symbol
 		(lib_id "Proa:DC-DC_Buck_Converter")
-		(at 140.97 69.85 0)
+		(at 138.43 69.85 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12918,7 +12918,7 @@
 			)
 		)
 		(property "Value" "~"
-			(at 139.446 69.85 0)
+			(at 139.954 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12927,7 +12927,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 143.51 68.58 0)
+			(at 135.89 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12936,7 +12936,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 143.51 68.58 0)
+			(at 135.89 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12945,7 +12945,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 143.51 68.58 0)
+			(at 135.89 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)

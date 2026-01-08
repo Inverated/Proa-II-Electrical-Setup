@@ -17,6 +17,7 @@ bool messageSent;
 
 unsigned long initialTime;
 
+// use global var, update using onDataSend and in loop check the var to do led
 
 void ledSignal(int state) { //what led do every second
   if (state == 0) { //esp now not connected
@@ -75,7 +76,7 @@ void setup() {
   //run this fn on each sent
   esp_now_register_send_cb(OnDataSent);
   //send to this controller
-  esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
+  esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 0, NULL, 0);
   
   initialTime = millis();
 }

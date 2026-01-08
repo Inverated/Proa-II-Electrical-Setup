@@ -31,7 +31,6 @@ void onDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   
   Serial.print("Time passed: ");
   Serial.println(message.time_since_started);
-  Serial.println(message.dummy);
 
   lcd.clear();
   lcd.setCursor(0, 0);

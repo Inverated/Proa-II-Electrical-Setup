@@ -61,10 +61,10 @@
 					(type background)
 				)
 			)
-			(pin power_in line
+			(pin passive line
 				(at -8.89 1.27 0)
 				(length 2.54)
-				(name "-in"
+				(name "e"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -79,7 +79,7 @@
 					)
 				)
 			)
-			(pin power_in line
+			(pin passive line
 				(at -8.89 -1.27 0)
 				(length 2.54)
 				(name "+in"
@@ -230,7 +230,7 @@
 			(pin power_in line
 				(at -16.51 -16.51 0)
 				(length 2.54)
-				(name "GND"
+				(name "GND_(In)"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -371,10 +371,10 @@
 					)
 				)
 			)
-			(pin power_in line
+			(pin power_out line
 				(at 12.7 -16.51 180)
 				(length 2.54)
-				(name "GND"
+				(name "GND_(Out)"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -854,7 +854,7 @@
 			)
 		)
 		(symbol "Li-ion_with_data_ports_1_1"
-			(pin input line
+			(pin passive line
 				(at -11.43 7.62 0)
 				(length 2.54)
 				(name "Data_Female"
@@ -872,7 +872,7 @@
 					)
 				)
 			)
-			(pin input line
+			(pin passive line
 				(at -11.43 5.08 0)
 				(length 2.54)
 				(name "Data_Male"
@@ -890,7 +890,7 @@
 					)
 				)
 			)
-			(pin input line
+			(pin passive line
 				(at -7.62 -7.62 90)
 				(length 2.54)
 				(name "Charge-"
@@ -908,7 +908,7 @@
 					)
 				)
 			)
-			(pin input line
+			(pin passive line
 				(at -5.08 -7.62 90)
 				(length 2.54)
 				(name "Load-"
@@ -926,7 +926,7 @@
 					)
 				)
 			)
-			(pin input line
+			(pin output line
 				(at 5.08 -7.62 90)
 				(length 2.54)
 				(name "Load+"
@@ -944,7 +944,7 @@
 					)
 				)
 			)
-			(pin input line
+			(pin output line
 				(at 7.62 -7.62 90)
 				(length 2.54)
 				(name "Charge+"
@@ -1339,7 +1339,7 @@
 					(type background)
 				)
 			)
-			(pin power_out line
+			(pin passive line
 				(at -12.7 6.35 0)
 				(length 2.54)
 				(name "BATTERY+"
@@ -1357,7 +1357,7 @@
 					)
 				)
 			)
-			(pin power_out line
+			(pin passive line
 				(at -12.7 3.81 0)
 				(length 2.54)
 				(name "BATTERY-"
