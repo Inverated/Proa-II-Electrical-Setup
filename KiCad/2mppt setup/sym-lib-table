@@ -1,4 +1,4 @@
 (sym_lib_table
   (version 7)
-  (lib (name "Proa")(type "KiCad")(uri "F:/Github/Proa-II-Electrical-Setup/KiCad/Proa.kicad_sym")(options "")(descr ""))
+  (lib (name "Proa")(type "KiCad")(uri "C:/Program Files/KiCad/9.0/lib/proa2/Proa.kicad_sym")(options "")(descr ""))
 )
