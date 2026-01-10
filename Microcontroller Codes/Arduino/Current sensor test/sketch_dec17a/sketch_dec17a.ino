@@ -5,7 +5,7 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 int HESensorPin = A0;
 
-int ZERO_READING = 0;
+int ZERO_READING = 21;
 float INTERVAL_PER_AMP = 25/5;
 
 unsigned long start_time;
