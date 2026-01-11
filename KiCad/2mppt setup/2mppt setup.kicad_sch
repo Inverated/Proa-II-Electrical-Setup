@@ -395,7 +395,7 @@
 		)
 	)
 	(text "https://www.youtube.com/watch?v=5Tzxd2UQoDM"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 241.3 98.806 0)
 		(effects
 			(font
@@ -405,7 +405,7 @@
 		(uuid "74150e89-c86b-4fed-918c-488943eec63c")
 	)
 	(text "High Voltage, Low current -> Less power loss over long distance\n"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 154.686 39.37 0)
 		(effects
 			(font

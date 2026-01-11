@@ -814,7 +814,7 @@
 		(uuid 95facca0-c7a5-42b6-b0f6-5b6456b525de)
 	)
 	(text "https://github.com/physee/Victron.Arduino-ESP8266/blob/master/SerialRead.ino"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 230.886 117.094 0)
 		(effects
 			(font
@@ -824,7 +824,7 @@
 		(uuid "596c9c7d-771a-4c72-8797-506276cb5bfd")
 	)
 	(text "https://github.com/winginitau/VictronVEDirectArduino"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 216.916 114.808 0)
 		(effects
 			(font
@@ -834,7 +834,7 @@
 		(uuid "74302796-fdfb-416f-9ff1-bf986fe2b748")
 	)
 	(text "Possible connection\n- Star topology (Seperate wire for each, more wire)\n- Share common wire (Harder to wire)\n- External power distribution module (Extra cost)"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 150.114 75.438 0)
 		(effects
 			(font

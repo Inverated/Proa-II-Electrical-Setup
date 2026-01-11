@@ -259,8 +259,8 @@
 			(embedded_fonts no)
 		)
 	)
-	(text "Solar Panel Array\nMax Voltage: 	45V * 2 = 90V\nMax Current: 	10.11A * 2 = 20.22A\nMax Power: 		90V * 20.22A = 1819.8W\n				(455W + 5W) * 4 = 1840W\n\nAdditional Safety\nShort Circuit:	10.77A * 2 = 21.54A"
-		(exclude_from_sim no)
+	(text "Solar Panel Array\nMax Voltage: 	45V = 45V\nMax Current: 	10.11A * 3 = 30.33A\nMax Power: 		45V * 30.33A = 1364.85W\n				(455W + 5W) * 3 = 1380W\n\nAdditional Safety\nShort Circuit:	10.77A * 3 = 32.31A\n"
+		(exclude_from_sim yes)
 		(at 120.65 54.102 0)
 		(effects
 			(font
@@ -271,36 +271,38 @@
 		(uuid "313e5acc-a277-4de3-bd83-5e64466ef7a5")
 	)
 	(junction
+		(at 139.7 82.55)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "015fc307-3191-499c-9bff-c387fd0cdc34")
+	)
+	(junction
+		(at 104.14 82.55)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1821dc57-3430-483d-9214-6c042acdb05c")
+	)
+	(junction
+		(at 104.14 64.77)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1b5edfc8-37cf-428e-9947-673688a9df41")
+	)
+	(junction
 		(at 139.7 64.77)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "53377360-dbcc-4997-b04c-a28b87687252")
 	)
-	(junction
-		(at 139.7 95.25)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b7d699a4-46b1-4387-b90d-8a27ce096513")
-	)
 	(wire
 		(pts
-			(xy 104.14 95.25) (xy 139.7 95.25)
+			(xy 71.12 71.12) (xy 71.12 64.77)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "072a5aee-b7e4-4618-acc4-e43966cdf44e")
-	)
-	(wire
-		(pts
-			(xy 104.14 90.17) (xy 104.14 95.25)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "129c1eb4-e620-4133-a56e-e4955830117c")
+		(uuid "12382c10-8ecf-4f56-8570-ec0a4def8953")
 	)
 	(wire
 		(pts
@@ -324,13 +326,13 @@
 	)
 	(wire
 		(pts
-			(xy 139.7 95.25) (xy 177.8 95.25)
+			(xy 71.12 64.77) (xy 104.14 64.77)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "8fd84972-4413-475f-9c69-fa4acc91e3ad")
+		(uuid "82a78099-24eb-4b06-83dc-55d3bae8cc8d")
 	)
 	(wire
 		(pts
@@ -341,6 +343,26 @@
 			(type default)
 		)
 		(uuid "93625e56-b88e-47a4-abf0-b13433bbad50")
+	)
+	(wire
+		(pts
+			(xy 139.7 82.55) (xy 177.8 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a149dbc7-f75d-4028-be12-6b99568fd228")
+	)
+	(wire
+		(pts
+			(xy 71.12 78.74) (xy 71.12 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a7c7c761-ec03-4cc0-8eb7-14edfe82dc47")
 	)
 	(wire
 		(pts
@@ -364,6 +386,16 @@
 	)
 	(wire
 		(pts
+			(xy 71.12 82.55) (xy 104.14 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d5c44314-ff51-409c-8aa2-45ebed34a3f1")
+	)
+	(wire
+		(pts
 			(xy 104.14 77.47) (xy 104.14 82.55)
 		)
 		(stroke
@@ -374,13 +406,13 @@
 	)
 	(wire
 		(pts
-			(xy 139.7 95.25) (xy 139.7 90.17)
+			(xy 104.14 82.55) (xy 139.7 82.55)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "fef8c01d-2ee0-48f6-8240-d039c61b4bff")
+		(uuid "f8c7d18d-14af-41fe-ab84-8bbb87e96589")
 	)
 	(hierarchical_label "Panel+"
 		(shape input)
@@ -395,7 +427,7 @@
 	)
 	(hierarchical_label "Panel-"
 		(shape input)
-		(at 177.8 95.25 0)
+		(at 177.8 82.55 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -406,7 +438,7 @@
 	)
 	(symbol
 		(lib_id "Proa:Solar_Cell")
-		(at 139.7 87.63 0)
+		(at 71.12 76.2 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -415,7 +447,7 @@
 		(fields_autoplaced yes)
 		(uuid "2d6ca9bd-59ed-4f68-b1cb-7642801fc900")
 		(property "Reference" "TSM-NEG9R.28_Panel4"
-			(at 143.51 81.6609 0)
+			(at 74.93 70.2309 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -424,7 +456,7 @@
 			)
 		)
 		(property "Value" "455W"
-			(at 143.51 86.7409 0)
+			(at 74.93 75.3109 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -434,7 +466,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 139.7 86.106 90)
+			(at 71.12 74.676 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -443,7 +475,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 139.7 86.106 90)
+			(at 71.12 74.676 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -452,7 +484,7 @@
 			)
 		)
 		(property "Description" "Single solar cell"
-			(at 139.7 87.63 0)
+			(at 71.12 76.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -461,7 +493,7 @@
 			)
 		)
 		(property "Max Power" "455W + 5W"
-			(at 143.51 84.2009 0)
+			(at 74.93 72.7709 0)
 			(show_name yes)
 			(effects
 				(font
@@ -471,7 +503,7 @@
 			)
 		)
 		(property "Max Voltage" "45V"
-			(at 143.51 86.7409 0)
+			(at 74.93 75.3109 0)
 			(show_name yes)
 			(effects
 				(font
@@ -481,7 +513,7 @@
 			)
 		)
 		(property "Max Current" "10.11A"
-			(at 143.51 89.2809 0)
+			(at 74.93 77.8509 0)
 			(show_name yes)
 			(effects
 				(font
@@ -503,7 +535,7 @@
 					(unit 1)
 				)
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cebab42b-7f95-493f-a532-afa591df43ce"
-					(reference "TSM-NEG9R.28_Panel7")
+					(reference "TSM-NEG9R.28_Panel1")
 					(unit 1)
 				)
 			)
@@ -609,111 +641,6 @@
 				)
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cebab42b-7f95-493f-a532-afa591df43ce"
 					(reference "TSM-NEG9R.28_Panel6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Proa:Solar_Cell")
-		(at 104.14 87.63 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d1af09e7-8529-477d-a228-79d4bc37b9dd")
-		(property "Reference" "TSM-NEG9R.28_Panel1"
-			(at 107.95 81.6609 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "455W"
-			(at 107.95 86.7409 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 104.14 86.106 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 104.14 86.106 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Single solar cell"
-			(at 104.14 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Max Power" "455W + 5W"
-			(at 107.95 84.2009 0)
-			(show_name yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Max Voltage" "45V"
-			(at 107.95 86.7409 0)
-			(show_name yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Max Current" "10.11A"
-			(at 107.95 89.2809 0)
-			(show_name yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(pin "2"
-			(uuid "a5f394e8-006b-49ea-b9fd-f56494a4a219")
-		)
-		(pin "1"
-			(uuid "6836e6db-ef0a-418d-b2cf-3a24f8faf705")
-		)
-		(instances
-			(project "2mppt setup"
-				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/883227c1-d3ab-479d-b77c-fbb903e126a8"
-					(reference "TSM-NEG9R.28_Panel1")
-					(unit 1)
-				)
-				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cebab42b-7f95-493f-a532-afa591df43ce"
-					(reference "TSM-NEG9R.28_Panel5")
 					(unit 1)
 				)
 			)

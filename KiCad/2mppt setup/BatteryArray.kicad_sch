@@ -333,7 +333,7 @@
 		)
 	)
 	(text "Dataport to negative terminal??\n"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 183.134 85.598 0)
 		(effects
 			(font
@@ -343,7 +343,7 @@
 		(uuid "14fee87e-aee6-4cf5-a412-0d2e7ddfb4de")
 	)
 	(text "Battery Array For Li-ion\n\nDischarge Voltage:	 	25.9V*2=51.8V\nMax Charging Voltage: 	29.05V*2=58.1V \nMax Current Discharge: 	180A\nMax Current Charge: 	100A"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 86.106 25.908 0)
 		(effects
 			(font
@@ -354,7 +354,7 @@
 		(uuid "50c1fc6f-9fcb-4c59-a35f-4fbec7b249ef")
 	)
 	(text "M12 Nut/WingNut\n"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 240.792 72.39 0)
 		(effects
 			(font
@@ -364,7 +364,7 @@
 		(uuid "86dd07b6-2aaa-4f86-9dd6-085b56cbf5cc")
 	)
 	(text "(Battery) Pole clamp. Size 17.9mm to 19.5mm?\n"
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(at 258.826 79.502 0)
 		(effects
 			(font

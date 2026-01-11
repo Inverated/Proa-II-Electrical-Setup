@@ -1,0 +1,27 @@
+* Ideal Buck Converter (Averaged Model)
+* Pins: Vin+ Vin- Vout+ Vout-
+* Parameters:
+*   VIN_MIN  = minimum input voltage
+*   VIN_MAX  = maximum input voltage
+*   VOUT     = regulated output voltage
+*   IOUT_MAX = max output current
+
+.SUBCKT BUCK_IDEAL VINP VINN VOUTP VOUTN
++ PARAMS: VIN_MIN=6 VIN_MAX=40 VOUT=5 IOUT_MAX=2
+
+* Measure input voltage
+E_VIN VIN_MEAS 0 VALUE = { V(VINP, VINN) }
+
+* Enable only if input voltage is within range
+E_EN EN 0 VALUE = { (V(VIN_MEAS) > VIN_MIN) && (V(VIN_MEAS) < VIN_MAX) }
+
+* Ideal regulated output voltage
+E_VOUT VREG 0 VALUE = { VOUT * V(EN) }
+
+* Series output resistance for current limiting
+R_LIMIT VREG VOUTP { VOUT / IOUT_MAX }
+
+* Output reference
+R_GND VOUTN 0 1u
+
+.ENDS BUCK_IDEAL
