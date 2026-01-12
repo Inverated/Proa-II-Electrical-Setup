@@ -2,47 +2,10 @@
   (version "D")
   (design
     (source "top.py")
-    (date "01/12/2026 01:17 PM")
+    (date "01/12/2026 10:15 PM")
     (tool "SKiDL (2.2.1)")
     (sheet
       (number 1)
-      (name "/BatteryParallel1/")
-      (tstamps "/caa9e419-ca06-5f88-a3a7-347eb6a7dfe1/")
-      (title_block
-        (title)
-        (company)
-        (rev)
-        (date)
-        (source "top.py")
-        (comment
-          (number "1")
-          (value ""))
-        (comment
-          (number "2")
-          (value ""))
-        (comment
-          (number "3")
-          (value ""))
-        (comment
-          (number "4")
-          (value ""))
-        (comment
-          (number "5")
-          (value ""))
-        (comment
-          (number "6")
-          (value ""))
-        (comment
-          (number "7")
-          (value ""))
-        (comment
-          (number "8")
-          (value ""))
-        (comment
-          (number "9")
-          (value ""))))
-    (sheet
-      (number 2)
       (name "/")
       (tstamps "/")
       (title_block
@@ -80,83 +43,120 @@
           (value "")))))
   (components
     (comp
-      (ref "BT1")
-      (value "9V")
-      (description "Multiple-cell battery")
-      (footprint "Battery_SMD:Battery_9V")
+      (ref "SC1")
+      (value "Solar")
+      (description "Single solar cell")
+      (footprint "")
       (fields
         (field
-          (name "F0") "BT")
+          (name "F0") "SC")
         (field
-          (name "F1") "Battery")
+          (name "F1") "Solar_Cell")
         (field
           (name "F2"))
         (field
           (name "F3"))
         (field
-          (name "Description") "Multiple-cell battery")
+          (name "Description") "Single solar cell")
         (field
-          (name "Footprint") "Battery_SMD:Battery_9V")
+          (name "Footprint"))
         (field
           (name "Datasheet") "~")
         (field
-          (name "SKiDL Tag") "7AO_PFoFn9")
+          (name "SKiDL Tag") "AJhewomT0w")
         (field
-          (name "SKiDL Line") "top.py:37"))
+          (name "SKiDL Line") "top.py:26"))
       (libsource
         (lib "Device")
-        (part "Battery"))
+        (part "Solar_Cell"))
       (sheetpath
-        (names "/BatteryParallel1/")
-        (tstamps "/caa9e419-ca06-5f88-a3a7-347eb6a7dfe1/"))
-      (tstamps "36d42dc6-dac4-5ac1-a080-544d491dcc06"))
+        (names "/")
+        (tstamps "/"))
+      (tstamps "b83539ca-52fd-5f06-bc9c-8f2353a3b5f8"))
     (comp
-      (ref "BT2")
-      (value "9V")
-      (description "Multiple-cell battery")
-      (footprint "Battery_SMD:Battery_9V")
+      (ref "SC2")
+      (value "Solar")
+      (description "Single solar cell")
+      (footprint "")
       (fields
         (field
-          (name "F0") "BT")
+          (name "F0") "SC")
         (field
-          (name "F1") "Battery")
+          (name "F1") "Solar_Cell")
         (field
           (name "F2"))
         (field
           (name "F3"))
         (field
-          (name "Description") "Multiple-cell battery")
+          (name "Description") "Single solar cell")
         (field
-          (name "Footprint") "Battery_SMD:Battery_9V")
+          (name "Footprint"))
         (field
           (name "Datasheet") "~")
         (field
-          (name "SKiDL Tag") "cN6eO4CUYz")
+          (name "SKiDL Tag") "G75gXMX7Le")
         (field
-          (name "SKiDL Line") "top.py:38"))
+          (name "SKiDL Line") "top.py:26"))
       (libsource
         (lib "Device")
-        (part "Battery"))
+        (part "Solar_Cell"))
       (sheetpath
-        (names "/BatteryParallel1/")
-        (tstamps "/caa9e419-ca06-5f88-a3a7-347eb6a7dfe1/"))
-      (tstamps "3efacd0f-5bfe-524c-bb2c-ffd655b4dd99")))
+        (names "/")
+        (tstamps "/"))
+      (tstamps "b4884f27-500d-5c0c-9728-b25ef4a5806d"))
+    (comp
+      (ref "SC3")
+      (value "Solar")
+      (description "Single solar cell")
+      (footprint "")
+      (fields
+        (field
+          (name "F0") "SC")
+        (field
+          (name "F1") "Solar_Cell")
+        (field
+          (name "F2"))
+        (field
+          (name "F3"))
+        (field
+          (name "Description") "Single solar cell")
+        (field
+          (name "Footprint"))
+        (field
+          (name "Datasheet") "~")
+        (field
+          (name "SKiDL Tag") "fnTkTcpGe4")
+        (field
+          (name "SKiDL Line") "top.py:26"))
+      (libsource
+        (lib "Device")
+        (part "Solar_Cell"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "44b23825-f513-506f-86d8-7849f22a8851")))
   (nets
     (net
       (code 1)
-      (name "GND_TOP")
+      (name "GND")
       (node
-        (ref "BT1")
+        (ref "SC1")
         (pin "2"))
       (node
-        (ref "BT2")
+        (ref "SC2")
+        (pin "2"))
+      (node
+        (ref "SC3")
         (pin "2")))
     (net
       (code 2)
-      (name "VPLUS_TOP")
+      (name "VPLUS")
       (node
-        (ref "BT1")
+        (ref "SC1")
         (pin "1"))
       (node
-        (ref "BT2")
+        (ref "SC2")
+        (pin "1"))
+      (node
+        (ref "SC3")
         (pin "1")))))

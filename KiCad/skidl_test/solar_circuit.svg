@@ -1,0 +1,16 @@
+digraph {
+	rankdir=LR
+	GND0 [shape=point xlabel=GND]
+	SC1 -> GND0 [arrowhead=none taillabel="-"]
+	GND1 [shape=point xlabel=GND]
+	SC3 -> GND1 [arrowhead=none taillabel="-"]
+	GND2 [shape=point xlabel=GND]
+	SC2 -> GND2 [arrowhead=none taillabel="-"]
+	VPLUS [shape=point xlabel=VPLUS]
+	SC1 -> VPLUS [arrowhead=none taillabel="+"]
+	SC2 -> VPLUS [arrowhead=none taillabel="+"]
+	SC3 -> VPLUS [arrowhead=none taillabel="+"]
+	SC1 [shape=rectangle xlabel=Solar]
+	SC2 [shape=rectangle xlabel=Solar]
+	SC3 [shape=rectangle xlabel=Solar]
+}

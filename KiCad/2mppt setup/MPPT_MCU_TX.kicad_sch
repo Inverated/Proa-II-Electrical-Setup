@@ -391,20 +391,20 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Proa:DC-DC_Buck_Converter"
+		(symbol "Proa:BUCK_24V_5V_5A"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "DC-DC_Buck_Converter"
-				(at 2.032 6.858 0)
+			(property "Reference" "U?"
+				(at 0.508 7.112 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Value" ""
-				(at 2.54 1.27 0)
+			(property "Value" "BUCK_24V_5V_5A"
+				(at 0 4.826 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -412,7 +412,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 2.54 1.27 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -421,7 +421,7 @@
 				)
 			)
 			(property "Datasheet" ""
-				(at 2.54 1.27 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -430,7 +430,7 @@
 				)
 			)
 			(property "Description" ""
-				(at 2.54 1.27 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -438,22 +438,48 @@
 					(hide yes)
 				)
 			)
-			(symbol "DC-DC_Buck_Converter_1_1"
+			(symbol "BUCK_24V_5V_5A_0_1"
 				(rectangle
-					(start -6.35 2.54)
-					(end 3.81 -2.54)
+					(start -8.89 3.81)
+					(end 8.89 -3.81)
 					(stroke
 						(width 0)
-						(type solid)
+						(type default)
 					)
 					(fill
-						(type background)
+						(type none)
+					)
+				)
+			)
+			(symbol "BUCK_24V_5V_5A_1_1"
+				(text "24V→5V\n"
+					(at -0.762 0 0)
+					(effects
+						(font
+							(size 1.016 1.016)
+						)
+					)
+				)
+				(text "5A"
+					(at -0.508 -1.778 0)
+					(effects
+						(font
+							(size 1.016 1.016)
+						)
+					)
+				)
+				(text private "#SIM_MODEL=BUCK_24V_5V_5A"
+					(at 0 13.462 0)
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
 					)
 				)
 				(pin passive line
-					(at -8.89 1.27 0)
+					(at -11.43 1.27 0)
 					(length 2.54)
-					(name "e"
+					(name "Vin+"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -469,9 +495,9 @@
 					)
 				)
 				(pin passive line
-					(at -8.89 -1.27 0)
+					(at -11.43 -1.27 0)
 					(length 2.54)
-					(name "+in"
+					(name "Vin-"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -487,9 +513,9 @@
 					)
 				)
 				(pin power_out line
-					(at 6.35 1.27 180)
+					(at 11.43 1.27 180)
 					(length 2.54)
-					(name "-out"
+					(name "Vout+"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -505,9 +531,9 @@
 					)
 				)
 				(pin power_out line
-					(at 6.35 -1.27 180)
+					(at 11.43 -1.27 180)
 					(length 2.54)
-					(name "+out"
+					(name "Vout-"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -763,7 +789,7 @@
 				(pin power_out line
 					(at 12.7 -16.51 180)
 					(length 2.54)
-					(name "GND_(Out)"
+					(name "GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -815,7 +841,7 @@
 	)
 	(text "https://github.com/physee/Victron.Arduino-ESP8266/blob/master/SerialRead.ino"
 		(exclude_from_sim yes)
-		(at 230.886 117.094 0)
+		(at 236.728 119.126 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -825,7 +851,7 @@
 	)
 	(text "https://github.com/winginitau/VictronVEDirectArduino"
 		(exclude_from_sim yes)
-		(at 216.916 114.808 0)
+		(at 222.758 116.84 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -843,6 +869,12 @@
 			(justify left)
 		)
 		(uuid "7792178c-f2f7-456f-b34e-b3c2cef789e3")
+	)
+	(junction
+		(at 60.96 130.81)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2a8ea44f-58e3-465b-9b76-d6db25de0dc9")
 	)
 	(junction
 		(at 144.78 95.25)
@@ -863,16 +895,16 @@
 		(uuid "6f3ecc3c-7170-4270-9f52-96688ff680d9")
 	)
 	(junction
-		(at 81.28 115.57)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b2c2a271-c411-4aab-b5c0-63ec56327e87")
-	)
-	(junction
 		(at 93.98 97.79)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b811c0d8-a8d6-4fba-91be-931b2acdc928")
+	)
+	(junction
+		(at 81.28 113.03)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "bc244811-ad79-4b93-ba6b-9c4730facb42")
 	)
 	(junction
 		(at 187.96 105.41)
@@ -958,6 +990,36 @@
 	)
 	(wire
 		(pts
+			(xy 81.28 113.03) (xy 81.28 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "16ab051d-e69c-4e1a-9585-4746b979b317")
+	)
+	(wire
+		(pts
+			(xy 60.96 130.81) (xy 71.12 130.81)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2553eed2-7597-4c60-8b29-428053679316")
+	)
+	(wire
+		(pts
+			(xy 60.96 113.03) (xy 81.28 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2e8018e7-8948-40c7-9282-2ffd118a2bc1")
+	)
+	(wire
+		(pts
 			(xy 91.44 125.73) (xy 105.41 125.73)
 		)
 		(stroke
@@ -998,16 +1060,6 @@
 	)
 	(wire
 		(pts
-			(xy 142.24 48.26) (xy 142.24 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4f28ff67-aab2-40ef-a58a-e8ac29e67e03")
-	)
-	(wire
-		(pts
 			(xy 187.96 97.79) (xy 196.85 97.79)
 		)
 		(stroke
@@ -1035,16 +1087,6 @@
 			(type default)
 		)
 		(uuid "571f5fa3-6f87-4df4-91f3-157d273647fb")
-	)
-	(wire
-		(pts
-			(xy 81.28 118.11) (xy 81.28 115.57)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "63ad5e76-78d5-4666-ab69-972f675e3cf8")
 	)
 	(wire
 		(pts
@@ -1148,23 +1190,13 @@
 	)
 	(wire
 		(pts
-			(xy 144.78 45.72) (xy 144.78 55.88)
+			(xy 144.78 45.72) (xy 144.78 48.26)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "a3929c56-8562-4e69-bad0-c2b18d0e5983")
-	)
-	(wire
-		(pts
-			(xy 81.28 115.57) (xy 81.28 97.79)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a5001166-ff61-43a4-87ce-57268dce5c26")
 	)
 	(wire
 		(pts
@@ -1208,7 +1240,17 @@
 	)
 	(wire
 		(pts
-			(xy 60.96 130.81) (xy 71.12 130.81)
+			(xy 81.28 113.03) (xy 81.28 118.11)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c247eb03-88b1-42d7-8e06-3754f8e5d225")
+	)
+	(wire
+		(pts
+			(xy 50.8 130.81) (xy 53.34 130.81)
 		)
 		(stroke
 			(width 0)
@@ -1218,7 +1260,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 123.19) (xy 92.71 115.57)
+			(xy 92.71 123.19) (xy 92.71 113.03)
 		)
 		(stroke
 			(width 0)
@@ -1228,7 +1270,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 115.57) (xy 81.28 115.57)
+			(xy 92.71 113.03) (xy 81.28 113.03)
 		)
 		(stroke
 			(width 0)
@@ -1255,6 +1297,16 @@
 			(type default)
 		)
 		(uuid "eaa54cf5-bd7a-4456-a86a-22288822f3f0")
+	)
+	(wire
+		(pts
+			(xy 60.96 123.19) (xy 60.96 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f455e632-d805-4aa3-9866-2651d88f3f54")
 	)
 	(wire
 		(pts
@@ -1312,7 +1364,7 @@
 	)
 	(hierarchical_label "AIN0"
 		(shape input)
-		(at 60.96 130.81 180)
+		(at 50.8 130.81 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1344,6 +1396,151 @@
 		(uuid "e8292ca1-71c7-41f5-8c02-00a19ee96285")
 	)
 	(symbol
+		(lib_id "Proa:BUCK_24V_5V_5A")
+		(at 143.51 59.69 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "22d1bb08-662a-4657-af00-33a06ecc63b3")
+		(property "Reference" "U2"
+			(at 148.59 58.4199 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "BUCK_24V_5V_5A"
+			(at 148.59 60.9599 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 143.51 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 143.51 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 143.51 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6e79e936-03ff-4a30-b2f0-a1f9fa7dad4e")
+		)
+		(pin "2"
+			(uuid "030b3494-5fad-4300-bec7-157b2f0c3788")
+		)
+		(pin "4"
+			(uuid "d109adac-4227-40f4-bf6e-80d8a9475e0f")
+		)
+		(pin "3"
+			(uuid "482441ec-b1de-4cb1-923a-265a89a4e069")
+		)
+		(instances
+			(project ""
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cf6a1a21-8fc3-4d5a-bc32-aa3af93e7de2"
+					(reference "U2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 57.15 130.81 270)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "232ec597-b00b-4b12-9a1d-f7587f6afa16")
+		(property "Reference" "R6"
+			(at 51.308 126.238 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "5.1k"
+			(at 56.896 130.81 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 57.15 132.588 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 57.15 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 57.15 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7cf9450c-ed9e-44bf-a7bf-0242ed509819")
+		)
+		(pin "2"
+			(uuid "23a36567-f8eb-42fd-9741-c0ee6e170f05")
+		)
+		(instances
+			(project "2mppt setup"
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cf6a1a21-8fc3-4d5a-bc32-aa3af93e7de2"
+					(reference "R6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 187.96 101.6 180)
 		(unit 1)
@@ -1361,7 +1558,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "2.2k"
+		(property "Value" "10k"
 			(at 187.96 101.346 90)
 			(effects
 				(font
@@ -1429,7 +1626,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "1.1k"
+		(property "Value" "5.1k"
 			(at 192.024 105.41 90)
 			(effects
 				(font
@@ -1474,6 +1671,75 @@
 			(project ""
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cf6a1a21-8fc3-4d5a-bc32-aa3af93e7de2"
 					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 60.96 127 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "920abeeb-970b-434e-9d2f-889cb5438737")
+		(property "Reference" "R7"
+			(at 65.532 121.158 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "10k"
+			(at 60.96 126.746 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.182 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 60.96 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 60.96 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "547e21c9-6890-484d-8eba-07db0ca5bec3")
+		)
+		(pin "2"
+			(uuid "ae8a0143-a669-4355-a5ee-a1a5e4b342e6")
+		)
+		(instances
+			(project "2mppt setup"
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cf6a1a21-8fc3-4d5a-bc32-aa3af93e7de2"
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -1689,7 +1955,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "2.2k"
+		(property "Value" "10k"
 			(at 99.06 101.346 90)
 			(effects
 				(font
@@ -1758,7 +2024,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "1.1k"
+		(property "Value" "5.1k"
 			(at 94.996 105.41 90)
 			(effects
 				(font
@@ -1901,80 +2167,6 @@
 			(project "2mppt setup"
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cf6a1a21-8fc3-4d5a-bc32-aa3af93e7de2"
 					(reference "A2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Proa:DC-DC_Buck_Converter")
-		(at 143.51 64.77 90)
-		(mirror x)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "de0188df-6259-4484-8426-e4d688e7b952")
-		(property "Reference" "DC-DC_Buck_Converter1"
-			(at 158.496 59.436 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "~"
-			(at 138.43 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 142.24 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 142.24 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 142.24 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "3bde8733-dc2d-46bb-b96c-93b58e1e5fca")
-		)
-		(pin "2"
-			(uuid "0a24d658-e3fc-48d6-ae28-adc836ec6ca9")
-		)
-		(pin "1"
-			(uuid "3e9ebcbe-8bc4-4677-ba32-ac293d778f62")
-		)
-		(pin "4"
-			(uuid "81e9f02f-e2f3-4619-8723-164e0d82e575")
-		)
-		(instances
-			(project ""
-				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/cf6a1a21-8fc3-4d5a-bc32-aa3af93e7de2"
-					(reference "DC-DC_Buck_Converter1")
 					(unit 1)
 				)
 			)

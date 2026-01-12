@@ -629,6 +629,10 @@
       "Solar Panel Array"
     ],
     [
+      "3557b8e6-13fd-4121-8a05-5ebfb3204dff",
+      "Smaller batteries in series"
+    ],
+    [
       "f9a2d229-7a7a-456f-a666-a34912e9d69f",
       "SolarCharge150_45_MPPT"
     ],
@@ -641,12 +645,12 @@
       "Power 26-104"
     ],
     [
-      "a58f552f-cf66-49e5-8c34-50048acf4dbb",
-      "SolarCharge150_45_MPPT1"
-    ],
-    [
       "cf6a1a21-8fc3-4d5a-bc32-aa3af93e7de2",
       "MCU_TX_Receiver"
+    ],
+    [
+      "a58f552f-cf66-49e5-8c34-50048acf4dbb",
+      "SolarCharge150_45_MPPT1"
     ],
     [
       "283e2534-b082-46e4-b7b5-226084d490ae",

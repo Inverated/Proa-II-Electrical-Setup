@@ -344,7 +344,7 @@
 	)
 	(text "Battery Array For Li-ion\n\nDischarge Voltage:	 	25.9V*2=51.8V\nMax Charging Voltage: 	29.05V*2=58.1V \nMax Current Discharge: 	180A\nMax Current Charge: 	100A"
 		(exclude_from_sim yes)
-		(at 86.106 25.908 0)
+		(at 85.852 34.29 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -8415,7 +8415,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "077162a8-2bc2-4bc1-904c-1762c558702c")
-		(property "Reference" "Li_ion(LiNMC)_Battery2"
+		(property "Reference" "Li_ion(LiNMC)_Battery4"
 			(at 127 48.26 0)
 			(effects
 				(font
@@ -8477,25 +8477,29 @@
 			)
 		)
 		(pin "1"
-			(uuid "91e33944-f5ed-4b1a-945f-71a132974408")
+			(uuid "b034105b-b5ca-42b7-addb-761e23c9b531")
 		)
 		(pin "4"
-			(uuid "3015f9bf-5ceb-462d-a7e8-ee344fb12d4b")
+			(uuid "1c19e69e-a51b-4336-b81d-78e5020aa8fd")
 		)
 		(pin "6"
-			(uuid "c4fa87ac-c422-4893-91ab-4452882363af")
+			(uuid "6bbe07c3-b57f-4a69-b161-4c1610adb9a6")
 		)
 		(pin "5"
-			(uuid "b24b3a29-e4c2-456a-81b0-0f91deb39368")
+			(uuid "fcec01b0-9adf-4847-9637-4e7f646216c6")
 		)
 		(pin "3"
-			(uuid "5c13a1f8-6630-438a-a171-d3462f583099")
+			(uuid "610dd490-c54e-4e20-b5da-ac5148829c5c")
 		)
 		(pin "2"
-			(uuid "f3bdcf7a-c715-44d3-8bf6-339ad136d7d3")
+			(uuid "d9b3eff5-91a7-47fe-8333-b3988cd0c955")
 		)
 		(instances
 			(project "2mppt setup"
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/3557b8e6-13fd-4121-8a05-5ebfb3204dff"
+					(reference "Li_ion(LiNMC)_Battery4")
+					(unit 1)
+				)
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/5c90004e-845d-4999-8ab5-0ca9dd600da9"
 					(reference "Li_ion(LiNMC)_Battery2")
 					(unit 1)
@@ -8512,7 +8516,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "5f6de0b5-9051-4159-83c0-9aa565b58edf")
-		(property "Reference" "150%*180A=270A_1"
+		(property "Reference" "150%*180A=270A_2"
 			(at 113.538 79.502 0)
 			(effects
 				(font
@@ -8560,13 +8564,17 @@
 			)
 		)
 		(pin "1"
-			(uuid "cbdb670d-1c9e-41bb-85c0-f43d57c8dd47")
+			(uuid "acb8b0bc-f861-4c7e-8ce2-14ab97c5f7f7")
 		)
 		(pin "2"
-			(uuid "b9570706-41fc-450c-b4b9-aa36215a0269")
+			(uuid "0569c848-4fc3-4c70-bdeb-c1f4837e9285")
 		)
 		(instances
-			(project ""
+			(project "2mppt setup"
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/3557b8e6-13fd-4121-8a05-5ebfb3204dff"
+					(reference "150%*180A=270A_2")
+					(unit 1)
+				)
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/5c90004e-845d-4999-8ab5-0ca9dd600da9"
 					(reference "150%*180A=270A_1")
 					(unit 1)
@@ -8584,7 +8592,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "67ebc3c8-2115-4bc8-aae9-81c744f9cfff")
-		(property "Reference" "Li_ion(LiNMC)_Battery1"
+		(property "Reference" "Li_ion(LiNMC)_Battery3"
 			(at 87.63 48.26 0)
 			(effects
 				(font
@@ -8646,25 +8654,29 @@
 			)
 		)
 		(pin "3"
-			(uuid "fbf223c3-38e2-474e-935d-6d7123a46d4b")
+			(uuid "8cc60646-fae3-4473-8285-3c430c7182ed")
 		)
 		(pin "1"
-			(uuid "db64a01f-717c-452c-a2cb-59cf50e013b0")
+			(uuid "9d99088c-37b2-4398-af3b-1a6b2dc12382")
 		)
 		(pin "2"
-			(uuid "a243dfa7-3b0d-461e-855b-111bc952723f")
+			(uuid "9140145b-3735-4e07-8d22-f533b28eade0")
 		)
 		(pin "6"
-			(uuid "60279e6e-5cdf-423d-9db9-84aab9f42bdf")
+			(uuid "a70da268-2160-42c5-ae83-6b7c6b4bd9cb")
 		)
 		(pin "4"
-			(uuid "0e27a212-e9ea-42b1-869f-e2d579c3b195")
+			(uuid "17b155b9-47cd-48c8-87fc-26eae721d806")
 		)
 		(pin "5"
-			(uuid "1abe657c-a2b2-4320-9940-416e5dd76f4c")
+			(uuid "f610642e-f945-44b1-bb6f-9ef5d1c37824")
 		)
 		(instances
-			(project ""
+			(project "2mppt setup"
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/3557b8e6-13fd-4121-8a05-5ebfb3204dff"
+					(reference "Li_ion(LiNMC)_Battery3")
+					(unit 1)
+				)
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/5c90004e-845d-4999-8ab5-0ca9dd600da9"
 					(reference "Li_ion(LiNMC)_Battery1")
 					(unit 1)
@@ -8681,7 +8693,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "7571e8a7-5154-467c-aece-99a464b54716")
-		(property "Reference" "F1"
+		(property "Reference" "F2"
 			(at 129.794 77.724 0)
 			(effects
 				(font
@@ -8727,13 +8739,17 @@
 			)
 		)
 		(pin "2"
-			(uuid "0acf648a-2b74-4c01-9fc6-7520aff0d790")
+			(uuid "4afae9b3-d33b-4f66-8ad3-708c056d5434")
 		)
 		(pin "1"
-			(uuid "4b6d36ca-ad63-4e6b-96e1-19a311a04226")
+			(uuid "4ec02f47-f6ad-4b33-ba12-fa91afb53d54")
 		)
 		(instances
-			(project ""
+			(project "2mppt setup"
+				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/3557b8e6-13fd-4121-8a05-5ebfb3204dff"
+					(reference "F2")
+					(unit 1)
+				)
 				(path "/a5748c52-e651-4363-96d3-c9fc6357a5ef/5c90004e-845d-4999-8ab5-0ca9dd600da9"
 					(reference "F1")
 					(unit 1)

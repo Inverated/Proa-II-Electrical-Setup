@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Proa2_v2")(type "KiCad")(uri "${KIPRJMOD}/power_management_schematics-backups/Proa2_v2.kicad_sym")(options "")(descr ""))
+)
