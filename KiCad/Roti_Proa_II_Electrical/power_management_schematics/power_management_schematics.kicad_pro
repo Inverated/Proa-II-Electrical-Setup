@@ -226,7 +226,28 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [],
+    "erc_exclusions": [
+      [
+        "no_connect_connected|1003300|1066800|0856ef08-4767-462c-86fa-b865b2afc390|e0a0cbfb-5037-42e0-a9ee-f2f9a6f39e91|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/dd51e8e1-f10f-4175-af6e-3c74d8cfb4fb|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/dd51e8e1-f10f-4175-af6e-3c74d8cfb4fb|",
+        ""
+      ],
+      [
+        "no_connect_connected|1066800|1066800|6e924e0a-af63-464b-9f44-68aa4747f6b5|664a4193-c687-4a1f-99d5-71c96735adc8|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/e87975d6-657f-48a9-8a4a-383dcc451976|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/e87975d6-657f-48a9-8a4a-383dcc451976|",
+        ""
+      ],
+      [
+        "no_connect_connected|1485900|1524000|0856ef08-4767-462c-86fa-b865b2afc390|2ed3eaaf-2f48-4d14-8b3e-c18b54fdbed6|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/dd51e8e1-f10f-4175-af6e-3c74d8cfb4fb|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/dd51e8e1-f10f-4175-af6e-3c74d8cfb4fb|",
+        ""
+      ],
+      [
+        "no_connect_connected|1524000|1524000|143408dd-2b35-493c-8e37-a2e3ab1d90a4|e0a0cbfb-5037-42e0-a9ee-f2f9a6f39e91|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/dd51e8e1-f10f-4175-af6e-3c74d8cfb4fb|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/dd51e8e1-f10f-4175-af6e-3c74d8cfb4fb|",
+        ""
+      ],
+      [
+        "pin_to_pin|825500|609600|f9fa39ca-1bd3-4ecf-a1e4-bb7e0d01acd9|d3403174-fec4-4c0c-9542-f3a9c685e5c9|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/e44d3b2e-973c-4a67-a72e-ad2b5da2dd21|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/e44d3b2e-973c-4a67-a72e-ad2b5da2dd21|/2ac0f618-a56d-4d5a-8ee1-064312bcd851/e44d3b2e-973c-4a67-a72e-ad2b5da2dd21",
+        ""
+      ]
+    ],
     "meta": {
       "version": 0
     },
@@ -599,6 +620,14 @@
       "version": 1
     },
     "net_format_name": "",
+    "ngspice": {
+      "fix_include_paths": true,
+      "meta": {
+        "version": 0
+      },
+      "model_mode": 4,
+      "workbook_filename": ""
+    },
     "page_layout_descr_file": "",
     "plot_directory": "",
     "space_save_all_events": true,
@@ -639,6 +668,10 @@
     [
       "af922257-372f-4a51-bb67-1b39fc70496c",
       "ESP_ADC_Node2"
+    ],
+    [
+      "e87975d6-657f-48a9-8a4a-383dcc451976",
+      "By_Parts"
     ]
   ],
   "text_variables": {}

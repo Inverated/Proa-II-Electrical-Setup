@@ -96,6 +96,18 @@
 			)
 			(polyline
 				(pts
+					(xy 0 8.89) (xy 0 7.62)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
 					(xy 0 6.35) (xy 0 3.81)
 				)
 				(stroke
@@ -216,6 +228,18 @@
 			)
 			(polyline
 				(pts
+					(xy 0 -11.43) (xy 0 -8.89)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
 					(xy 3.302 1.778) (xy 4.318 1.778)
 				)
 				(stroke
@@ -241,6 +265,24 @@
 		)
 		(symbol "Battery_2_pole_1_1"
 			(pin passive line
+				(at -2.54 8.89 0)
+				(length 2.54)
+				(name "+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
 				(at -2.54 6.35 0)
 				(length 2.54)
 				(name "+"
@@ -259,16 +301,16 @@
 				)
 			)
 			(pin passive line
-				(at -2.54 3.81 0)
+				(at -2.54 -8.89 0)
 				(length 2.54)
-				(name "Data_F"
+				(name "-"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "5"
+				(number "4"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -277,25 +319,7 @@
 				)
 			)
 			(pin passive line
-				(at 0 10.16 270)
-				(length 2.54)
-				(name "+"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 0 -11.43 90)
+				(at -2.54 -11.43 0)
 				(length 2.54)
 				(name "-"
 					(effects
@@ -305,6 +329,24 @@
 					)
 				)
 				(number "3"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 2.54 3.81 180)
+				(length 2.54)
+				(name "Data_F"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "5"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -323,24 +365,6 @@
 					)
 				)
 				(number "6"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 2.54 -7.62 180)
-				(length 2.54)
-				(name "-"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "4"
 					(effects
 						(font
 							(size 1.27 1.27)

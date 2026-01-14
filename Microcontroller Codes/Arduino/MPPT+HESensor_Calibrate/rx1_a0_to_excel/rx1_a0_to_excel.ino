@@ -1,4 +1,4 @@
-#include <Adafruit_ADS1X15.h>
+String key, value;
 
 // VE.Direct values
 float V = 0;
@@ -10,12 +10,9 @@ int MPPT = 0;
 int ERR = 0;
 String LOAD = "";
 
-//ADS1115 for 5V Analog Sensor (HE Sensor)
-Adafruit_ADS1115 ads;
-
 // HE Sensor pins
 int HESensorReading = 0;
-int HESensorPin = 0;
+int HESensorPin = A0;
 
 //Timing values
 unsigned long start_time;
@@ -24,28 +21,28 @@ unsigned long time_passed = 0;
 
 void setup() {
   Serial.begin(19200);
-
+  Serial1.begin(19200);
   // Print header once
-  Serial.println("Time(ms)\tV(V)\tI(A)\tVPV(V)\tPPV(W)\tCS\tMPPT\tLOAD\tSensor Val");
-  
-  // Use voltage divider before connecting to ADS1115 
-  ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 0.125mV
+  Serial.println("Time(ms)\tV(V)\tI(A)\tVPV(V)\tPPV(W)\tCS\tMPPT\tError\tLOAD\tSensor Val");
 
   start_time = millis();
 }
 
-bool parseMPPT() {    // UART pin for esp8266 = Serial.read, not Serial1 
-  if (!Serial.available()) return false;
+bool parseMPPT() {
+  if (!Serial1.available()) {
+    //Serial.println("Too bad");
+    return false;
+  }
 
-  String line = Serial.readStringUntil('\n');
+  String line = Serial1.readStringUntil('\n');
   line.trim();
   if (line.length() == 0) return false;
 
   int tab = line.indexOf('\t');
   if (tab < 0) return false;
 
-  String key = line.substring(0, tab);
-  String value = line.substring(tab + 1);
+  key = line.substring(0, tab);
+  value = line.substring(tab + 1);
 
   if (key == "V") {
     V = value.toInt();
@@ -73,10 +70,8 @@ bool parseMPPT() {    // UART pin for esp8266 = Serial.read, not Serial1
 }
 
 void readCurrentSensor() {
-  int16_t ADCReading = ads.readADC_SingleEnded(HESensorPin);
-  float volts = ads.computeVolts(ADCReading);
+  HESensorReading = analogRead(HESensorPin);
   // Do calibration here with MPPT data
-  HESensorReading = ADCReading;
 }
 
 void loop() {

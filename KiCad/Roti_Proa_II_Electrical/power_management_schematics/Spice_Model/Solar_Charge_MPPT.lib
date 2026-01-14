@@ -1,0 +1,16 @@
+.SUBCKT 150_45_MPPT PV+ PV- Batt+ Batt-
++ PARAMS: VOUT=48 EFF=0.95 IIN_MAX=10
+
+* --- Output voltage regulation (ideal)
+BREG Batt+ Batt- V = {VOUT}
+
+* --- Measure output current
+B_IOUT IOUT 0 I = V(Batt+, Batt-)/1
+
+* --- Output power
+B_POUT POUT 0 V = V(Batt+, Batt-)*I(IOUT)
+
+* --- Required input current (with efficiency)
+B_IIN PV+ PV- I = LIMIT( V(POUT)/(EFF*V(PV+,PV-)), 0, IIN_MAX )
+
+.ENDS 150_45_MPPT

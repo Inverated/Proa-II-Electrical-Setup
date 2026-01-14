@@ -1,4 +1,9 @@
-String key, value;
+#include <Adafruit_ADS1X15.h>
+#include <SoftwareSerial.h>
+
+//UART (Software) declaration
+SoftwareSerial veSerial(D7, D8); // D4: RX, D5: TX will not be used 
+//**Note: RX pin unable to receive signal across different boards**
 
 // VE.Direct values
 float V = 0;
@@ -10,9 +15,12 @@ int MPPT = 0;
 int ERR = 0;
 String LOAD = "";
 
+//ADS1115 for 5V Analog Sensor (HE Sensor)
+Adafruit_ADS1115 ads;
+
 // HE Sensor pins
 int HESensorReading = 0;
-int HESensorPin = A0;
+int HESensorPin = 0;
 
 //Timing values
 unsigned long start_time;
@@ -20,26 +28,42 @@ unsigned long time_passed = 0;
 
 
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(74800);
 
-  // Print header once
-  Serial.println("Time(ms)\tV(V)\tI(A)\tVPV(V)\tPPV(W)\tCS\tMPPT\tLOAD\tSensor Val");
+  //Start SoftwareSerial UART
+  veSerial.begin(19200);
+  
+  // Use voltage divider before connecting to ADS1115 
+  //ads.setGain(GAIN_TWOTHIRDS);        // 2/3x gain   +/- 6.144V  1 bit = 0.1875mV
+  //ads.setGain(GAIN_TWO);              // 1x gain   +/- 4.096V  1 bit = 0.125mV
+  //Voltage output from 3V esp pin suddenly recorded at 4+V ???
+  if (!ads.begin()) {
+    Serial.println("Failed to initialize ADS.");
+    while (1);
+  }
 
   start_time = millis();
+  Serial.println("Setup Complete Successfully\n");
+
+  // Print header once
+  Serial.println("Time(ms)\tV(V)\tI(A)\tVPV(V)\tPPV(W)\tCS\tMPPT\tERROR\tLOAD\tSensor Val");
+
 }
 
-bool parseMPPT() {
-  if (!Serial1.available()) return false;
+bool parseMPPT() {    // UART pin for esp8266 = Serial.read, not Serial1 
+  if (!veSerial.available()) {
+    return false;
+  }
 
-  String line = Serial1.readStringUntil('\n');
+  String line = veSerial.readStringUntil('\n');
   line.trim();
   if (line.length() == 0) return false;
 
   int tab = line.indexOf('\t');
   if (tab < 0) return false;
 
-  key = line.substring(0, tab);
-  value = line.substring(tab + 1);
+  String key = line.substring(0, tab);
+  String value = line.substring(tab + 1);
 
   if (key == "V") {
     V = value.toInt();
@@ -67,8 +91,12 @@ bool parseMPPT() {
 }
 
 void readCurrentSensor() {
-  HESensorReading = analogRead(HESensorPin);
+  int16_t ADCReading = ads.readADC_SingleEnded(HESensorPin);
+  float volts = ads.computeVolts(ADCReading);
+  // Serial.print("AIN0: "); Serial.print(ADCReading); Serial.print("  "); Serial.print(volts); Serial.println("V");
+  
   // Do calibration here with MPPT data
+  HESensorReading = ADCReading;
 }
 
 void loop() {
@@ -78,8 +106,10 @@ void loop() {
   readCurrentSensor();
 
   if (validMPPT) {
+    Serial.println("Hi");
     printRow();
   }
+  delay(1000);
 }
 
 void printRow() {
