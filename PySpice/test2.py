@@ -30,7 +30,7 @@ PANEL_ARRAY_INTERNAL_RESISTANCE = PANEL_ARRAY_TOTAL_VOLTAGE / PANEL_ARRAY_TOTAL_
 # Battery
 BATTERY_VOLTAGE = 24
 BATTERY_IN_SERIES = 2
-BATTERY_IN_PARALLEL = 1
+BATTERY_IN_PARALLEL = 2
 BATTERY_CAPACITY_AH = 50
 BATTERY_TOTAL_VOLTAGE = BATTERY_IN_SERIES * BATTERY_VOLTAGE
 
@@ -53,6 +53,9 @@ MPPT_OUTPUT_POWER = MPPT_MAX_POWER * MPPT_EFFICIENCY
 MPPT_OUTPUT_CURRENT = MPPT_OUTPUT_POWER / MPPT_OUTPUT_VOLTAGE
 MPPT_INPUT_CURRENT = MPPT_OUTPUT_POWER / PANEL_ARRAY_TOTAL_VOLTAGE
 
+# Power Array
+MPPT_PANEL_ARRAY_COUNT = 2
+
 BARF = "="*50 + "\n"
 BARE = "\n" +"="*50
 
@@ -61,57 +64,61 @@ if __name__ == "__main__" and NGSPICE_AVAILABLE:
     
     components = {"panel": [], "battery": [], "load": [], "wire": []}
     
-    # Solar Array
-    for p in range(PANEL_IN_PARALLEL):
-        panel_row = []
-        for s in range(PANEL_IN_SERIES):
-            panel_name = f"panel_{p}_{s}"
-            panel_row.append(panel_name)
-            
-            if s == 0: # First in series connect to gnd
-                circuit.I(panel_name, circuit.gnd, f"{panel_name}_positive", PANEL_CURRENT)
-                # Current is pushed out of the panel, into the circuit
-                # circuit.I(name, node_from, node_to, I)
-                # node_from is where current comes from
-            else:
-                circuit.I(panel_name, f"panel_{p}_{s-1}_positive", f"{panel_name}_positive", PANEL_CURRENT)
+    for arr_no in range(MPPT_PANEL_ARRAY_COUNT):
+        
+        # Solar Array
+        for p in range(PANEL_IN_PARALLEL):
+            panel_row = []
+            for s in range(PANEL_IN_SERIES):
+                panel_name = f"{arr_no}_panel_{p}_{s}"
+                panel_row.append(panel_name)
+                
+                if s == 0: # First in series connect to gnd
+                    circuit.I(panel_name, circuit.gnd, f"{panel_name}_positive", PANEL_CURRENT)
+                    # Current is pushed out of the panel, into the circuit
+                    # circuit.I(name, node_from, node_to, I)
+                    # node_from is where current comes from
+                else:
+                    prev_panel_name = f"{arr_no}_panel_{p}_{s-1}"
+                    circuit.I(panel_name, f"{prev_panel_name}_positive", f"{panel_name}_positive", PANEL_CURRENT)
 
-        components["panel"].append(panel_row)
-    
-    for index, row in enumerate(components["panel"]):
-        solar_row_end = row[-1]
-        positive_node = f"{solar_row_end}_positive"
-        panel_wire = f"panel_wire_{index}"
-        circuit.R(panel_wire, positive_node, "solar_array_output", 0.01)
-        components["wire"].append(panel_wire)
-        # Small resistance to model wiring losses
-    
-    total_panel_internal_resistance = PANEL_ARRAY_INTERNAL_RESISTANCE
-    circuit.R("panel_internal_resistance", "solar_array_output", circuit.gnd, total_panel_internal_resistance)
-    
-    print(f"""
-{BARF}Solar Array Setup{BARE}
+            components["panel"].append(panel_row)
+        
+        for index, row in enumerate(components["panel"]):
+            solar_row_end = row[-1]
+            positive_node = f"{solar_row_end}_positive"
+            panel_wire = f"{arr_no}_panel_wire_{index}"
+            circuit.R(panel_wire, positive_node, "solar_array_output", 0.01)
+            components["wire"].append(panel_wire)
+            # Small resistance to model wiring losses
+        
+        total_panel_internal_resistance = PANEL_ARRAY_INTERNAL_RESISTANCE
+        circuit.R(f"{arr_no}_panel_internal_resistance", "solar_array_output", circuit.gnd, total_panel_internal_resistance)
+        
+        print(f"""
+{BARF}Solar Array Setup {arr_no + 1}{BARE}
 Configuration: {PANEL_IN_SERIES} in series, {PANEL_IN_PARALLEL} in parallel
 Total Voltage: {PANEL_ARRAY_TOTAL_VOLTAGE} V
 Total Current: {PANEL_ARRAY_TOTAL_CURRENT} A
 Total Power: {PANEL_ARRAY_TOTAL_POWER} W
 Internal Resistance: {PANEL_ARRAY_INTERNAL_RESISTANCE:.2f} Ohm
-          """)
-    
-    #MPPT
-    circuit.I("mppt_output", circuit.gnd, "mppt_output_positive", MPPT_OUTPUT_CURRENT)
+            """)
+        
+        #MPPT
+        circuit.I(f"{arr_no}_mppt_output", circuit.gnd, f"{arr_no}_mppt_output_positive", MPPT_OUTPUT_CURRENT)
 
-    # Tie MPPT output directly to battery bus
-    circuit.R("mppt_bus_link", "mppt_output_positive", f"battery_{BATTERY_IN_PARALLEL-1}_{BATTERY_IN_SERIES-1}_positive", 0.01)
+        # Tie MPPT output directly to battery bus
+        last_battery_in_first_row = f"battery_{BATTERY_IN_PARALLEL-1}_{BATTERY_IN_SERIES-1}"
+        circuit.R(f"{arr_no}_mppt_bus_link", f"{arr_no}_mppt_output_positive", f"{last_battery_in_first_row}_positive", 0.01)
 
-    print(f"""
-{BARF}MPPT Setup{BARE}
+        print(f"""
+{BARF}MPPT Setup {arr_no + 1}{BARE}
 Input Voltage: {MPPT_INPUT_VOLTAGE} V
 Output Voltage: {MPPT_OUTPUT_VOLTAGE} V
 Max Power: {MPPT_MAX_POWER} W
 Output Power: {MPPT_OUTPUT_POWER:.2f} W
 Output Current: {MPPT_OUTPUT_CURRENT:.2f} A
-""")
+    """)
 
     
     # Battery
@@ -157,6 +164,14 @@ Motor Resistance: {MOTOR_RESISTANCE:.2f} Ohm
     
     
     # Simulation
+    print(BARF)
+    print("Components in Circuit:")
+    for comp_type, comp_list in components.items():
+        print(comp_type.capitalize() + ":")
+        for each in comp_list:
+            print(f"\t{each}")
+        
+        
     print(f"""
 {BARF}Starting Simulation{BARE}
 Assuming ideal condition at motor load of {MOTOR_POWER_DEMAND} W ({MOTOR_CONTROLLER*100:.1f}% throttle)
