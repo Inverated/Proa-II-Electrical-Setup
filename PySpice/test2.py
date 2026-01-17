@@ -30,7 +30,7 @@ PANEL_ARRAY_INTERNAL_RESISTANCE = PANEL_ARRAY_TOTAL_VOLTAGE / PANEL_ARRAY_TOTAL_
 # Battery
 BATTERY_VOLTAGE = 24
 BATTERY_IN_SERIES = 2
-BATTERY_IN_PARALLEL = 2
+BATTERY_IN_PARALLEL = 1
 BATTERY_CAPACITY_AH = 50
 BATTERY_TOTAL_VOLTAGE = BATTERY_IN_SERIES * BATTERY_VOLTAGE
 
@@ -39,22 +39,25 @@ MOTOR_TOTAL_POWER = 4000
 MOTOR_VOLTAGE = 48
 MOTOR_CURRENT = MOTOR_TOTAL_POWER / MOTOR_VOLTAGE
 
-MOTOR_CONTROLLER = 0.6
+MOTOR_CONTROLLER = 0.1
 MOTOR_POWER_DEMAND = MOTOR_TOTAL_POWER * MOTOR_CONTROLLER
 MOTOR_CURRENT_DEMAND = MOTOR_POWER_DEMAND / MOTOR_VOLTAGE
 MOTOR_RESISTANCE = MOTOR_VOLTAGE / MOTOR_CURRENT_DEMAND
 
 # MPPT
 MPPT_INPUT_VOLTAGE = PANEL_ARRAY_TOTAL_VOLTAGE
-MPPT_OUTPUT_VOLTAGE = BATTERY_TOTAL_VOLTAGE
+MPPT_OUTPUT_BUFFER_VOLTAGE = 5
+MPPT_OUTPUT_VOLTAGE = BATTERY_TOTAL_VOLTAGE + MPPT_OUTPUT_BUFFER_VOLTAGE
 MPPT_MAX_POWER = PANEL_ARRAY_TOTAL_POWER
 MPPT_EFFICIENCY = 0.95
 MPPT_OUTPUT_POWER = MPPT_MAX_POWER * MPPT_EFFICIENCY
 MPPT_OUTPUT_CURRENT = MPPT_OUTPUT_POWER / MPPT_OUTPUT_VOLTAGE
+MPPT_OUTPUT_LIMIT_RESISTANCE = MPPT_OUTPUT_VOLTAGE / MPPT_OUTPUT_CURRENT
 MPPT_INPUT_CURRENT = MPPT_OUTPUT_POWER / PANEL_ARRAY_TOTAL_VOLTAGE
+MPPT_INPUT_RESISTANCE = MPPT_INPUT_VOLTAGE / MPPT_INPUT_CURRENT
 
 # Power Array
-MPPT_PANEL_ARRAY_COUNT = 2
+MPPT_PANEL_ARRAY_COUNT = 1
 
 BARF = "="*50 + "\n"
 BARE = "\n" +"="*50
@@ -80,7 +83,7 @@ if __name__ == "__main__" and NGSPICE_AVAILABLE:
                     # node_from is where current comes from
                 else:
                     prev_panel_name = f"{arr_no}_panel_{p}_{s-1}"
-                    circuit.I(panel_name, f"{prev_panel_name}_positive", f"{panel_name}_positive", PANEL_CURRENT)
+                    circuit.I(panel_name, f"{prev_panel_name}_negative", f"{panel_name}_positive", PANEL_CURRENT)
 
             components["panel"].append(panel_row)
         
@@ -88,12 +91,9 @@ if __name__ == "__main__" and NGSPICE_AVAILABLE:
             solar_row_end = row[-1]
             positive_node = f"{solar_row_end}_positive"
             panel_wire = f"{arr_no}_panel_wire_{index}"
-            circuit.R(panel_wire, positive_node, "solar_array_output", 0.01)
+            circuit.R(panel_wire, positive_node, f"{arr_no}_solar_array_output", 0.01)
             components["wire"].append(panel_wire)
             # Small resistance to model wiring losses
-        
-        total_panel_internal_resistance = PANEL_ARRAY_INTERNAL_RESISTANCE
-        circuit.R(f"{arr_no}_panel_internal_resistance", "solar_array_output", circuit.gnd, total_panel_internal_resistance)
         
         print(f"""
 {BARF}Solar Array Setup {arr_no + 1}{BARE}
@@ -105,11 +105,21 @@ Internal Resistance: {PANEL_ARRAY_INTERNAL_RESISTANCE:.2f} Ohm
             """)
         
         #MPPT
-        circuit.I(f"{arr_no}_mppt_output", circuit.gnd, f"{arr_no}_mppt_output_positive", MPPT_OUTPUT_CURRENT)
+        circuit.V(f"{arr_no}_current_sense", f"{arr_no}_solar_array_output",f"{arr_no}_solar_measured" , 0)
+        circuit.R(f"{arr_no}_mppt_input_load", 
+                 f"{arr_no}_solar_measured", circuit.gnd, 
+                 MPPT_INPUT_RESISTANCE)
 
-        # Tie MPPT output directly to battery bus
-        last_battery_in_first_row = f"battery_{BATTERY_IN_PARALLEL-1}_{BATTERY_IN_SERIES-1}"
-        circuit.R(f"{arr_no}_mppt_bus_link", f"{arr_no}_mppt_output_positive", f"{last_battery_in_first_row}_positive", 0.01)
+        circuit.R(
+            f"{arr_no}_mppt_ilimit",
+            f"{arr_no}_mppt_vreg_out",
+            f"{arr_no}_mppt_out",
+            MPPT_OUTPUT_LIMIT_RESISTANCE
+        )
+        # Connect MPPT output to DC bus
+        circuit.R(f"{arr_no}_mppt_out_wire", f"{arr_no}_mppt_out", "dc_bus", 0.01)
+        #dc_bus is shared positive node for battery and load
+
 
         print(f"""
 {BARF}MPPT Setup {arr_no + 1}{BARE}
@@ -140,7 +150,7 @@ Output Current: {MPPT_OUTPUT_CURRENT:.2f} A
         battery_row_end = row[-1]
         positive_node = f"{battery_row_end}_positive"
         battery_wire = f"battery_wire_{index}"
-        circuit.R(battery_wire, positive_node, "mppt_output_positive", 0.01)  
+        circuit.R(battery_wire, positive_node, "dc_bus", 0.05)  
         components["wire"].append(battery_wire)
         # Connect battery array to MPPT output with small resistance
 
@@ -152,7 +162,8 @@ Total Voltage: {BATTERY_TOTAL_VOLTAGE} V
     
     
     # Load
-    circuit.R("motor_load", "mppt_output_positive", circuit.gnd, MOTOR_RESISTANCE)
+    circuit.V("motor_load_source", "dc_bus", "motor_load_positive", 0)
+    circuit.R("motor_load", "motor_load_positive", circuit.gnd, MOTOR_RESISTANCE)
     components["load"].append("motor_load")
     
     print(f"""
@@ -162,6 +173,8 @@ Motor Current Demand: {MOTOR_CURRENT_DEMAND:.2f} A
 Motor Resistance: {MOTOR_RESISTANCE:.2f} Ohm
           """)
     
+    # DC bus cap
+    circuit.C("dc_bus_capacitor", "dc_bus", circuit.gnd, 1000)
     
     # Simulation
     print(BARF)
