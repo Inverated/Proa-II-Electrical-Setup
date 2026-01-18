@@ -21,21 +21,20 @@ WIRE_RESISTANCE = 0.01
 BARF = "="*50 + "\n"
 BARE = "\n" +"="*50
 
-# Solar panel
+# Solar panel (Max Power Point)
 PANEL_POWER = 455
 PANEL_VOLTAGE = 40
 PANEL_CURRENT = PANEL_POWER / PANEL_VOLTAGE
 PANEL_INTERNAL_R = PANEL_VOLTAGE / PANEL_CURRENT
 
-PANEL_IN_SERIES = 3
-PANEL_IN_PARALLEL = 2
+PANEL_IN_SERIES = 2
+PANEL_IN_PARALLEL = 3
 PANEL_ARRAY_TOTAL_VOLTAGE = PANEL_IN_SERIES * PANEL_VOLTAGE
 PANEL_ARRAY_TOTAL_CURRENT = PANEL_IN_PARALLEL * PANEL_CURRENT
 PANEL_ARRAY_TOTAL_POWER = PANEL_ARRAY_TOTAL_VOLTAGE * PANEL_ARRAY_TOTAL_CURRENT
-PANEL_ARRAY_INTERNAL_RESISTANCE = PANEL_ARRAY_TOTAL_VOLTAGE / PANEL_ARRAY_TOTAL_CURRENT
 
 # Battery
-BATTERY_VOLTAGE = 25.9
+BATTERY_VOLTAGE = 24
 BATTERY_IN_SERIES = 2
 BATTERY_IN_PARALLEL = 1
 BATTERY_CAPACITY_AH = 50
@@ -55,17 +54,19 @@ MOTOR_RESISTANCE = MOTOR_VOLTAGE / MOTOR_CURRENT_DEMAND
 MPPT_INPUT_VOLTAGE = PANEL_ARRAY_TOTAL_VOLTAGE
 MPPT_OUTPUT_BUFFER_VOLTAGE = 5
 MPPT_OUTPUT_VOLTAGE = BATTERY_TOTAL_VOLTAGE + MPPT_OUTPUT_BUFFER_VOLTAGE
-MPPT_MAX_POWER = PANEL_ARRAY_TOTAL_POWER
+MPPT_MAX_INPUT_POWER = PANEL_ARRAY_TOTAL_POWER
+MPPT_CURRENT_OUTPUT_LIMIT = 45.0
 MPPT_EFFICIENCY = 0.95
-MPPT_OUTPUT_POWER = MPPT_MAX_POWER * MPPT_EFFICIENCY
-MPPT_OUTPUT_CURRENT = MPPT_OUTPUT_POWER / MPPT_OUTPUT_VOLTAGE
+CALCULATED_OUTPUT_POWER = MPPT_MAX_INPUT_POWER * MPPT_EFFICIENCY
+MPPT_OUTPUT_CURRENT = max(MPPT_CURRENT_OUTPUT_LIMIT, CALCULATED_OUTPUT_POWER / MPPT_OUTPUT_VOLTAGE)
 MPPT_OUTPUT_LIMIT_RESISTANCE = MPPT_OUTPUT_VOLTAGE / MPPT_OUTPUT_CURRENT
+MPPT_OUTPUT_POWER = MPPT_OUTPUT_VOLTAGE * MPPT_OUTPUT_CURRENT
 
 MPPT_INPUT_CURRENT = MPPT_OUTPUT_POWER / PANEL_ARRAY_TOTAL_VOLTAGE
 MPPT_INPUT_RESISTANCE = MPPT_INPUT_VOLTAGE / MPPT_INPUT_CURRENT
 
 # Power Array
-MPPT_PANEL_ARRAY_COUNT = 1
+MPPT_PANEL_ARRAY_COUNT = 2
 
 
 if __name__ == "__main__" and NGSPICE_AVAILABLE:
@@ -87,6 +88,8 @@ if __name__ == "__main__" and NGSPICE_AVAILABLE:
                 
                 # Current source: neg -> pos
                 circuit.I(panel_name, panel_neg, panel_pos, PANEL_CURRENT)
+                circuit.R(f"{panel_name}_leak_to_gnd", panel_neg, circuit.gnd, GROUNDING_RESISTANCE)
+
                 if s == 0:
                     # Low resistance connection to ground so that first value starts at 0V
                     # instead of -40V
@@ -112,7 +115,6 @@ Configuration: {PANEL_IN_SERIES} in series, {PANEL_IN_PARALLEL} in parallel
 Total Voltage: {PANEL_ARRAY_TOTAL_VOLTAGE} V
 Total Current: {PANEL_ARRAY_TOTAL_CURRENT} A
 Total Power: {PANEL_ARRAY_TOTAL_POWER} W
-Internal Resistance: {PANEL_ARRAY_INTERNAL_RESISTANCE:.2f} Ohm
             """)
         
         #MPPT
@@ -122,11 +124,12 @@ Internal Resistance: {PANEL_ARRAY_INTERNAL_RESISTANCE:.2f} Ohm
                  f"{arr_no}_solar_array_output_measured", circuit.gnd, 
                  MPPT_INPUT_RESISTANCE)
 
-        circuit.raw_spice += f"B{arr_no}_mppt_vreg {arr_no}_mppt_out 0 I = -{MPPT_OUTPUT_CURRENT}\n"
+        # Regulate output current to calculated amount
+        circuit.raw_spice += f"B{arr_no}_mppt_vreg {arr_no}_mppt_out 0 I = -MAX({MPPT_CURRENT_OUTPUT_LIMIT}, {MPPT_OUTPUT_CURRENT})\n"
         
         circuit.V(f"{arr_no}_mppt_output_current", f"{arr_no}_mppt_out", f"{arr_no}_mppt_output_measured", GROUNDING_RESISTANCE)
         # Connect MPPT output to DC bus
-        circuit.R(f"{arr_no}_mppt_out_wire", f"{arr_no}_mppt_output_measured", "dc_bus", WIRE_RESISTANCE)
+        circuit.R(f"{arr_no}_mppt_out_wire", f"{arr_no}_mppt_output_measured", "power_source", WIRE_RESISTANCE)
         #dc_bus is shared positive node for battery and load
         
 
@@ -134,11 +137,12 @@ Internal Resistance: {PANEL_ARRAY_INTERNAL_RESISTANCE:.2f} Ohm
 {BARF}MPPT Setup {arr_no + 1}{BARE}
 Input Voltage: {MPPT_INPUT_VOLTAGE} V
 Output Voltage: {MPPT_OUTPUT_VOLTAGE} V
-Max Power: {MPPT_MAX_POWER} W
+Max Power: {MPPT_MAX_INPUT_POWER} W
 Output Power: {MPPT_OUTPUT_POWER:.2f} W
 Output Current: {MPPT_OUTPUT_CURRENT:.2f} A
     """)
 
+    circuit.V("total_mppt_output", "power_source", "dc_bus", GROUNDING_RESISTANCE)
     
     # Battery
     for p in range(BATTERY_IN_PARALLEL):
