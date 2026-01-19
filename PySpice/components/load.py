@@ -1,11 +1,11 @@
 from components.battery_array import Battery_Array
-from components.constants import BARE, BARF, GROUNDING_RESISTANCE, RAWSPICE_ITERATIONS
+from configurations.constants import BARE, BARF, GROUNDING_RESISTANCE, RAWSPICE_ITERATIONS
 
 
 class Load:
-    def __init__(self, circuit, components, nominal_voltage):
+    def __init__(self, circuit, components, total_power, nominal_voltage):
         self.MOTOR_VOLTAGE = nominal_voltage
-        self.MOTOR_TOTAL_POWER = 4000
+        self.MOTOR_TOTAL_POWER = total_power
         self.components = components
         self.circuit = circuit
         
@@ -20,13 +20,13 @@ class Load:
         POWER_SOURCE_ID = battery_array.get_terminal_id()
         
         self.circuit.V("motor_load_source", POWER_SOURCE, "motor_load_negative", GROUNDING_RESISTANCE)
-        #self.circuit.R("motor_load", "motor_load_negative", self.circuit.gnd, self.MOTOR_RESISTANCE)
-        self.circuit.raw_spice += f"Bmotor_load motor_load_negative 0 I = I(V{POWER_SOURCE_ID})<{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(V{POWER_SOURCE_ID})+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
+        #self.circuit.R("motor_load", "motor_load_negative", self.circuit.gnd, MOTOR_RESISTANCE)
+        self.circuit.raw_spice += f"Bmotor_load motor_load_negative 0 I = I(V{POWER_SOURCE_ID})<-{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(V{POWER_SOURCE_ID})+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
         
         self.components["load"].append(f"motor_load_{len(self.components['load'])}")
 
         if log:
-            print(self, MOTOR_POWER_DEMAND, MOTOR_CURRENT_DEMAND, MOTOR_RESISTANCE)
+            print(self.__str__(MOTOR_POWER_DEMAND, MOTOR_CURRENT_DEMAND, MOTOR_RESISTANCE))
             
             
     def __str__(self, MOTOR_POWER_DEMAND=None, MOTOR_CURRENT_DEMAND=None, MOTOR_RESISTANCE=None):

@@ -1,16 +1,14 @@
-from constants import *
+from configurations.constants import *
 
 class Solar_Array:
-    def __init__(self, circuit, components, PANEL_IN_PARALLEL, PANEL_IN_SERIES, PANEL_POWER, PANEL_VOLTAGE):
+    def __init__(self, circuit, components, power, voltage, in_series, in_parallel):
         self.circuit = circuit
-        self.PANEL_IN_PARALLEL = PANEL_IN_PARALLEL
-        self.PANEL_IN_SERIES = PANEL_IN_SERIES
-        self.PANEL_POWER = PANEL_POWER
-        self.PANEL_VOLTAGE = PANEL_VOLTAGE
-        self.PANEL_CURRENT = PANEL_POWER / PANEL_VOLTAGE
-        self.PANEL_INTERNAL_R = PANEL_VOLTAGE / self.PANEL_CURRENT
-        self.PANEL_ARRAY_TOTAL_VOLTAGE = PANEL_IN_SERIES * PANEL_VOLTAGE
-        self.PANEL_ARRAY_TOTAL_CURRENT = PANEL_IN_PARALLEL * self.PANEL_CURRENT
+        self.PANEL_IN_PARALLEL = in_parallel
+        self.PANEL_IN_SERIES = in_series
+        self.PANEL_CURRENT = power / voltage
+        self.PANEL_INTERNAL_R = voltage / self.PANEL_CURRENT
+        self.PANEL_ARRAY_TOTAL_VOLTAGE = self.PANEL_IN_SERIES * voltage
+        self.PANEL_ARRAY_TOTAL_CURRENT = self.PANEL_IN_PARALLEL * self.PANEL_CURRENT
         self.PANEL_ARRAY_TOTAL_POWER = self.PANEL_ARRAY_TOTAL_VOLTAGE * self.PANEL_ARRAY_TOTAL_CURRENT
         self.terminal = None
         self.components = components
@@ -55,7 +53,7 @@ class Solar_Array:
         self.terminal = f"{array_number}_solar_array_output_measured"
        
         if log:
-            print(self, array_number)
+            print(self.__str__(array_number))
             
     
     def get_terminal(self):
@@ -69,11 +67,11 @@ class Solar_Array:
     def get_total_current(self):
         return self.PANEL_ARRAY_TOTAL_CURRENT
     
-    def __str__(self, array_number):
-        return print(f"""\
-{BARF}Solar Array Setup {(array_number + 1) if array_number else ""}{BARE}
+    def __str__(self, array_number=None):
+        return f"""\
+{BARF}Solar Array Setup {(array_number + 1) if array_number else 1}{BARE}
 Configuration: {self.PANEL_IN_SERIES} in series, {self.PANEL_IN_PARALLEL} in parallel
 Total Voltage: {self.PANEL_ARRAY_TOTAL_VOLTAGE} V
 Total Current: {self.PANEL_ARRAY_TOTAL_CURRENT} A
 Total Power: {self.PANEL_ARRAY_TOTAL_POWER} W
-            """)
+"""

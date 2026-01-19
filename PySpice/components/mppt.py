@@ -1,6 +1,6 @@
 from components.battery_array import Battery_Array
 from components.solar_panel_array import Solar_Array
-from constants import *
+from configurations.constants import *
 
 class MPPT:
     def __init__(self, circuit, max_output_current, efficiency):
@@ -31,10 +31,10 @@ class MPPT:
         # Connect MPPT output to DC bus
         self.circuit.R(f"{array_number}_mppt_out_wire", f"{array_number}_mppt_output_measured", "power_source", WIRE_RESISTANCE)
         #dc_bus is shared positive node for battery and load
-        
+
 
         if log:
-            print(self, array_number, MPPT_INPUT_VOLTAGE, MPPT_OUTPUT_VOLTAGE, MPPT_MAX_INPUT_POWER, MPPT_OUTPUT_POWER, MPPT_OUTPUT_CURRENT)
+            print(self.__str__(array_number, MPPT_INPUT_VOLTAGE, MPPT_OUTPUT_VOLTAGE, MPPT_MAX_INPUT_POWER, MPPT_OUTPUT_POWER, MPPT_OUTPUT_CURRENT))
             
             
     def __str__(self, array_number, MPPT_INPUT_VOLTAGE, MPPT_OUTPUT_VOLTAGE, MPPT_MAX_INPUT_POWER, MPPT_OUTPUT_POWER, MPPT_OUTPUT_CURRENT):

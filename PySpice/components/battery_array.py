@@ -1,13 +1,13 @@
-from constants import GROUNDING_RESISTANCE, WIRE_RESISTANCE, BARF, BARE
+from configurations.constants import GROUNDING_RESISTANCE, WIRE_RESISTANCE, BARF, BARE
 
 class Battery_Array:
-    def __init__(self, circuit, components, BATTERY_IN_PARALLEL, BATTERY_IN_SERIES, BATTERY_VOLTAGE):
+    def __init__(self, circuit, components, battery_voltage, battery_in_series, battery_in_parallel, max_charge_current, max_discharge_current):
         self.circuit = circuit
-        self.BATTERY_IN_PARALLEL = BATTERY_IN_PARALLEL
-        self.BATTERY_IN_SERIES = BATTERY_IN_SERIES
-        self.BATTERY_VOLTAGE = BATTERY_VOLTAGE
-        self.BATTERY_MAX_CHARGE_CURRENT = 100
-        self.BATTERY_MAX_DISCHARGE_CURRENT = 50
+        self.BATTERY_IN_PARALLEL = battery_in_parallel
+        self.BATTERY_IN_SERIES = battery_in_series
+        self.BATTERY_VOLTAGE = battery_voltage
+        self.BATTERY_MAX_CHARGE_CURRENT = max_charge_current
+        self.BATTERY_MAX_DISCHARGE_CURRENT = max_discharge_current
         self.terminal = None
         self.terminal_id = None
         self.components = components
@@ -36,12 +36,11 @@ class Battery_Array:
             battery_row_end = row[-1]
             positive_node = f"{battery_row_end}_positive"
             battery_wire = f"battery_wire_{index}"
-            self.circuit.R(battery_wire, positive_node, "battery_input", WIRE_RESISTANCE)  
+            self.circuit.R(battery_wire, positive_node, "battery_input_measured", WIRE_RESISTANCE)  
             self.components["wire"].append(battery_wire)
             
         self.circuit.V("battery_input_current_measurement",
-                       "battery_input_measured",
-                       "dc_bus",
+                       "dc_bus", "battery_input_measured",
                        GROUNDING_RESISTANCE)
         
         self.terminal_id = "battery_input_current_measurement"

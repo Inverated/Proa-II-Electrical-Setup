@@ -1,0 +1,58 @@
+{
+    "configuration_name": "electrical_circuit_setup",
+    "display_name": "Electric Proa",
+    "configuration_description": "",
+
+    "mppt_panel_setup": {
+        "description": "Combine all config_x in parallel",
+        "config_1": {
+            "count": 1,
+            "panel_info": {
+                "power": 455,
+                "voltage": 40.0,
+                "in_series": 2,
+                "in_parallel": 3
+            },
+            "mppt_info": {
+                "max_output_current": 45,
+                "efficiency": 0.95
+            }
+        },
+        "config_2": {
+            "count": 1,
+            "panel_info": {
+                "power": 600,
+                "voltage": 45.0,
+                "in_series": 3,
+                "in_parallel": 1
+            },
+            "mppt_info": {
+                "max_output_current": 45,
+                "efficiency": 0.80
+            }
+        }
+
+    },
+    "battery_setup": {
+        "description": "Only can choose one battery type at a time. No mixing",
+        "choice": "LiFePO4",
+        "LiFePO4": {
+            "battery_voltage": 25.9,
+            "battery_in_series": 2,
+            "battery_in_parallel": 1,
+            "max_charge_current": 100,
+            "max_discharge_current": 100
+        },
+        "Lead_Acid": {
+            "battery_voltage": 12.0,
+            "battery_in_series": 4,
+            "battery_in_parallel": 2,
+            "max_charge_current": 50,
+            "max_discharge_current": 50
+        }
+    },
+    "load_setup": {
+        "total_power": 4000,
+        "nominal_voltage": 48
+    }
+}

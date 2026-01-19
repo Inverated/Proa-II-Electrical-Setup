@@ -21,7 +21,7 @@ WIRE_RESISTANCE = 0.01
 BARF = "="*50 + "\n"
 BARE = "\n" +"="*50
 RAWSPICE_ITERATIONS = 1e6
-MPPT_PANEL_ARRAY_COUNT = 1
+MPPT_PANEL_ARRAY_COUNT = 4
 
 # Solar panel
 PANEL_POWER = 455
@@ -40,7 +40,7 @@ BATTERY_VOLTAGE = 25.9
 BATTERY_IN_SERIES = 2
 BATTERY_IN_PARALLEL = 1
 BATTERY_CAPACITY_AH = 50
-BATTERY_MAX_CHARGE_CURRENT = 100
+BATTERY_MAX_CHARGE_CURRENT = 50
 BATTERY_MAX_DISCHARGE_CURRENT = 50
 BATTERY_TOTAL_VOLTAGE = BATTERY_IN_SERIES * BATTERY_VOLTAGE
 
@@ -190,10 +190,7 @@ Total Voltage: {BATTERY_TOTAL_VOLTAGE} V
     #circuit.R("motor_load", "motor_load_negative", circuit.gnd, MOTOR_RESISTANCE)
     circuit.raw_spice += f"Bmotor_load motor_load_negative 0 I = I(Vbattery_input_current)<-{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(Vbattery_input_current)+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
     components["load"].append("motor_load")
-    
-    circuit.V("motor_load_source2", "dc_bus", "motor_load_negative2", GROUNDING_RESISTANCE)
-    circuit.raw_spice += f"Bmotor_load2 motor_load_negative2 0 I = I(Vbattery_input_current)<-{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(Vbattery_input_current)+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
-    
+ 
     print(f"""
 {BARF}Load Setup (Before balancing){BARE}
 Motor Power Demand: {MOTOR_POWER_DEMAND} W
