@@ -20,9 +20,10 @@ GROUNDING_RESISTANCE = 1e-6
 WIRE_RESISTANCE = 0.01
 BARF = "="*50 + "\n"
 BARE = "\n" +"="*50
-MPPT_PANEL_ARRAY_COUNT = 0
+RAWSPICE_ITERATIONS = 1e6
+MPPT_PANEL_ARRAY_COUNT = 1
 
-# Solar panel (Max Power Point)
+# Solar panel
 PANEL_POWER = 455
 PANEL_VOLTAGE = 40
 PANEL_CURRENT = PANEL_POWER / PANEL_VOLTAGE
@@ -35,9 +36,9 @@ PANEL_ARRAY_TOTAL_CURRENT = PANEL_IN_PARALLEL * PANEL_CURRENT
 PANEL_ARRAY_TOTAL_POWER = PANEL_ARRAY_TOTAL_VOLTAGE * PANEL_ARRAY_TOTAL_CURRENT
 
 # Battery
-BATTERY_VOLTAGE = 24
+BATTERY_VOLTAGE = 25.9
 BATTERY_IN_SERIES = 2
-BATTERY_IN_PARALLEL = 2
+BATTERY_IN_PARALLEL = 1
 BATTERY_CAPACITY_AH = 50
 BATTERY_MAX_CHARGE_CURRENT = 100
 BATTERY_MAX_DISCHARGE_CURRENT = 50
@@ -50,38 +51,22 @@ MOTOR_CURRENT = MOTOR_TOTAL_POWER / MOTOR_VOLTAGE
 
 MOTOR_CONTROLLER = 1.0
 MOTOR_POWER_DEMAND = MOTOR_TOTAL_POWER * MOTOR_CONTROLLER if MOTOR_CONTROLLER > 0.0 else GROUNDING_RESISTANCE
-MOTOR_CURRENT_DEMAND = MOTOR_POWER_DEMAND / MOTOR_VOLTAGE
-ESTIMATED_BATTERY_DISCHARGE_POWER = PANEL_ARRAY_TOTAL_POWER * MPPT_PANEL_ARRAY_COUNT - MOTOR_POWER_DEMAND
-
-ESTIMATED_BATTERY_DISCHARGE_CURRENT = ESTIMATED_BATTERY_DISCHARGE_POWER / BATTERY_TOTAL_VOLTAGE
-# Adjust motor current demand if exceeding max discharge current
-if ESTIMATED_BATTERY_DISCHARGE_POWER < 0 and -ESTIMATED_BATTERY_DISCHARGE_CURRENT > (BATTERY_MAX_DISCHARGE_CURRENT * BATTERY_IN_PARALLEL):
-    MOTOR_POWER_DEMAND = PANEL_ARRAY_TOTAL_POWER * MPPT_PANEL_ARRAY_COUNT + (BATTERY_MAX_DISCHARGE_CURRENT * BATTERY_IN_PARALLEL * BATTERY_TOTAL_VOLTAGE)
-    MOTOR_CURRENT_DEMAND = MOTOR_POWER_DEMAND / MOTOR_VOLTAGE
-    print(f"Adjusted Motor Power Demand to {MOTOR_POWER_DEMAND / MOTOR_TOTAL_POWER}")
-
+MOTOR_CURRENT_DEMAND = MOTOR_POWER_DEMAND / BATTERY_TOTAL_VOLTAGE
 MOTOR_RESISTANCE = MOTOR_VOLTAGE / MOTOR_CURRENT_DEMAND
 
 # MPPT
+MPPT_MAX_OUTPUT_CURRENT = 45
 MPPT_INPUT_VOLTAGE = PANEL_ARRAY_TOTAL_VOLTAGE
+MPPT_MAX_INPUT_POWER = PANEL_ARRAY_TOTAL_POWER
 MPPT_OUTPUT_BUFFER_VOLTAGE = 5
 MPPT_OUTPUT_VOLTAGE = BATTERY_TOTAL_VOLTAGE + MPPT_OUTPUT_BUFFER_VOLTAGE
-MPPT_MAX_INPUT_POWER = PANEL_ARRAY_TOTAL_POWER
-MPPT_CURRENT_OUTPUT_LIMIT = 45.0
 MPPT_EFFICIENCY = 0.95
-CALCULATED_OUTPUT_POWER = MPPT_MAX_INPUT_POWER * MPPT_EFFICIENCY
-MPPT_OUTPUT_CURRENT = min(MPPT_CURRENT_OUTPUT_LIMIT, CALCULATED_OUTPUT_POWER / MPPT_OUTPUT_VOLTAGE)
+MPPT_OUTPUT_POWER = MPPT_MAX_INPUT_POWER * MPPT_EFFICIENCY
+MPPT_OUTPUT_CURRENT = MPPT_OUTPUT_POWER / MPPT_OUTPUT_VOLTAGE
 
-ESTIMATED_BATTERY_CHARGE_CURRENT = (CALCULATED_OUTPUT_POWER * MPPT_PANEL_ARRAY_COUNT - MOTOR_POWER_DEMAND) / BATTERY_TOTAL_VOLTAGE
-# Adjust battery charge current if exceeding max charge current
-if ESTIMATED_BATTERY_CHARGE_CURRENT > 0 and ESTIMATED_BATTERY_CHARGE_CURRENT > BATTERY_MAX_CHARGE_CURRENT * BATTERY_IN_PARALLEL:
-    MPPT_OUTPUT_CURRENT = ((BATTERY_MAX_CHARGE_CURRENT * BATTERY_IN_PARALLEL) + MOTOR_CURRENT_DEMAND) / MPPT_PANEL_ARRAY_COUNT
-
-MPPT_OUTPUT_LIMIT_RESISTANCE = MPPT_OUTPUT_VOLTAGE / MPPT_OUTPUT_CURRENT
-MPPT_OUTPUT_POWER = MPPT_OUTPUT_VOLTAGE * MPPT_OUTPUT_CURRENT
+# 2 Limitation: MPPT output current & battery charge current
 MPPT_INPUT_CURRENT = MPPT_OUTPUT_POWER / PANEL_ARRAY_TOTAL_VOLTAGE
 MPPT_INPUT_RESISTANCE = MPPT_INPUT_VOLTAGE / MPPT_INPUT_CURRENT
-
 
 
 
@@ -104,13 +89,11 @@ if __name__ == "__main__" and NGSPICE_AVAILABLE:
                 
                 # Current source: neg -> pos
                 circuit.I(panel_name, panel_neg, panel_pos, PANEL_CURRENT)
-                circuit.R(f"{panel_name}_leak_to_gnd", panel_neg, circuit.gnd, GROUNDING_RESISTANCE)
                 
-                if s == 0:
-                    # Low resistance connection to ground so that first value starts at 0V
-                    # instead of -40V
-                    circuit.R(f"{panel_name}_grounding", panel_neg, circuit.gnd, GROUNDING_RESISTANCE)
-                else:
+                # Ground all panel, else panel can only deliver voltage by a factor of 40 for some reason
+                circuit.R(f"{panel_name}_leak_to_gnd", panel_neg, circuit.gnd, GROUNDING_RESISTANCE)
+
+                if s != 0:
                     prev_panel_name = f"{arr_no}_panel_{p}_{s-1}"
                     # Internal resistance
                     circuit.R(f"{panel_name}_internal", panel_neg, f"{prev_panel_name}_positive", PANEL_INTERNAL_R)
@@ -141,8 +124,9 @@ Total Power: {PANEL_ARRAY_TOTAL_POWER} W
                  MPPT_INPUT_RESISTANCE)
 
         # Regulate output current to calculated amount
-        circuit.raw_spice += f"B{arr_no}_mppt_vreg {arr_no}_mppt_out 0 I = -MIN({MPPT_CURRENT_OUTPUT_LIMIT}, {MPPT_OUTPUT_CURRENT})\n"
+        circuit.raw_spice += f"""B{arr_no}_mppt_i_reg 0 {arr_no}_mppt_out I = min({MPPT_MAX_OUTPUT_CURRENT}, {MPPT_OUTPUT_CURRENT})\n"""
         
+
         circuit.V(f"{arr_no}_mppt_output_current", f"{arr_no}_mppt_out", f"{arr_no}_mppt_output_measured", GROUNDING_RESISTANCE)
         # Connect MPPT output to DC bus
         circuit.R(f"{arr_no}_mppt_out_wire", f"{arr_no}_mppt_output_measured", "power_source", WIRE_RESISTANCE)
@@ -177,7 +161,7 @@ Output Current: {MPPT_OUTPUT_CURRENT:.2f} A
                 prev_battery_name = f"battery_{p}_{s-1}"
                 circuit.R(f"{battery_name}_internal", battery_neg, f"{prev_battery_name}_positive", WIRE_RESISTANCE)
             components["battery"].append(battery_row)
-    
+            
     circuit.V("battery_input_current", "dc_bus", "battery_input_measured", GROUNDING_RESISTANCE)
     
     for index, row in enumerate(components["battery"]):
@@ -186,8 +170,8 @@ Output Current: {MPPT_OUTPUT_CURRENT:.2f} A
         battery_wire = f"battery_wire_{index}"
         circuit.R(battery_wire, positive_node, "battery_input_measured", WIRE_RESISTANCE)  
         components["wire"].append(battery_wire)
-        # Connect battery array to MPPT output with small resistance
 
+        
     print(f"""
 {BARF}Battery Setup{BARE}
 Configuration: {BATTERY_IN_SERIES} in series, {BATTERY_IN_PARALLEL} in parallel
@@ -195,24 +179,26 @@ Total Voltage: {BATTERY_TOTAL_VOLTAGE} V
           """)    
     
     #'''
-    # Load
-    circuit.V("load_input_current", "dc_bus", "load_input_measured", GROUNDING_RESISTANCE)
+    # Load    
+    # Balancing load to limit battery charge current
+    # Note: No idea how did this worked. PySpice might have allowed cyclical calculation such that:
+    # I(Vbattery_input_current)-{BATTERY_MAX_CHARGE_CURRENT} repeats until it tends to the max charge current 
+    circuit.V("balancing_load_current", "dc_bus", "balancing_load_in", GROUNDING_RESISTANCE) 
+    circuit.raw_spice += f"Bbalancing_load balancing_load_in 0 I = I(Vbattery_input_current)>{BATTERY_MAX_CHARGE_CURRENT} ? (I(Vbattery_input_current)-{BATTERY_MAX_CHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : 0\n"
     
-    # Separate measurement for current input into load circuit and current input into motor in case of additional loads later
-    circuit.V("motor_load_source", "load_input_measured", "motor_load_negative", GROUNDING_RESISTANCE)
-    circuit.R("motor_load", "motor_load_negative", circuit.gnd, MOTOR_RESISTANCE)
+    circuit.V("motor_load_source", "dc_bus", "motor_load_negative", GROUNDING_RESISTANCE)
+    #circuit.R("motor_load", "motor_load_negative", circuit.gnd, MOTOR_RESISTANCE)
+    circuit.raw_spice += f"Bmotor_load motor_load_negative 0 I = I(Vbattery_input_current)<-{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(Vbattery_input_current)+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
     components["load"].append("motor_load")
     
     print(f"""
-{BARF}Load Setup{BARE}
+{BARF}Load Setup (Before balancing){BARE}
 Motor Power Demand: {MOTOR_POWER_DEMAND} W
 Motor Current Demand: {MOTOR_CURRENT_DEMAND:.2f} A
 Motor Resistance: {MOTOR_RESISTANCE:.2f} Ohm
           """)
     #'''
     
-    # DC bus cap
-    circuit.C("dc_bus_capacitor", "dc_bus", circuit.gnd, 1000)
     
     # Simulation
     print(BARF)
