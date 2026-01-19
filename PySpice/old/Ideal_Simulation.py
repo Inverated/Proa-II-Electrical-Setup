@@ -49,7 +49,7 @@ MOTOR_TOTAL_POWER = 4000
 MOTOR_VOLTAGE = 48
 MOTOR_CURRENT = MOTOR_TOTAL_POWER / MOTOR_VOLTAGE
 
-MOTOR_CONTROLLER = 1.0
+MOTOR_CONTROLLER = 0.9
 MOTOR_POWER_DEMAND = MOTOR_TOTAL_POWER * MOTOR_CONTROLLER if MOTOR_CONTROLLER > 0.0 else GROUNDING_RESISTANCE
 MOTOR_CURRENT_DEMAND = MOTOR_POWER_DEMAND / BATTERY_TOTAL_VOLTAGE
 MOTOR_RESISTANCE = MOTOR_VOLTAGE / MOTOR_CURRENT_DEMAND
@@ -190,6 +190,9 @@ Total Voltage: {BATTERY_TOTAL_VOLTAGE} V
     #circuit.R("motor_load", "motor_load_negative", circuit.gnd, MOTOR_RESISTANCE)
     circuit.raw_spice += f"Bmotor_load motor_load_negative 0 I = I(Vbattery_input_current)<-{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(Vbattery_input_current)+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
     components["load"].append("motor_load")
+    
+    circuit.V("motor_load_source2", "dc_bus", "motor_load_negative2", GROUNDING_RESISTANCE)
+    circuit.raw_spice += f"Bmotor_load2 motor_load_negative2 0 I = I(Vbattery_input_current)<-{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(Vbattery_input_current)+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
     
     print(f"""
 {BARF}Load Setup (Before balancing){BARE}
