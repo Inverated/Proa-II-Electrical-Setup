@@ -1,11 +1,14 @@
 from components.battery_array import Battery_Array
 from components.solar_panel_array import Solar_Array
-from configurations.constants import GROUNDING_RESISTANCE, WIRE_RESISTANCE, BARF, BARE
+from configurations.constants import GROUNDING_RESISTANCE, MPPT_BATTERY_VOLTAGE_BUFFER, VOLTAGE_MISMATCH_TOLERANCE, WIRE_RESISTANCE, BARF, BARE
 
 class MPPT:
-    def __init__(self, circuit, components, max_output_current, efficiency):
+    def __init__(self, circuit, components, max_input_voltage, max_input_current, max_output_voltage, max_output_current, efficiency):
+        self.MPPT_MAX_INPUT_VOLTAGE = max_input_voltage
+        self.MPPT_MAX_INPUT_CURRENT = max_input_current
+        self.MPPT_MAX_OUTPUT_VOLTAGE = max_output_voltage
         self.MPPT_MAX_OUTPUT_CURRENT = max_output_current
-        self.MPPT_OUTPUT_BUFFER_VOLTAGE = 5
+        self.MPPT_OUTPUT_BUFFER_VOLTAGE = MPPT_BATTERY_VOLTAGE_BUFFER
         self.MPPT_EFFICIENCY = efficiency
         self.circuit = circuit
         self.components = components
@@ -20,8 +23,9 @@ class MPPT:
         MPPT_OUTPUT_POWER = MPPT_MAX_INPUT_POWER * self.MPPT_EFFICIENCY
         MPPT_OUTPUT_CURRENT = MPPT_OUTPUT_POWER / MPPT_OUTPUT_VOLTAGE
 
+        SOLAR_POWER_RAIL = solar_array.get_terminal()
         self.circuit.R(f"{array_number}_mppt_input_load", 
-                 f"{array_number}_solar_array_output_measured", self.circuit.gnd, 
+                 f"{SOLAR_POWER_RAIL}", self.circuit.gnd, 
                  MPPT_INPUT_RESISTANCE)
 
         # Regulate output current to calculated amount
@@ -38,7 +42,15 @@ class MPPT:
         if log:
             print(self.__str__(array_number, MPPT_INPUT_VOLTAGE, MPPT_OUTPUT_VOLTAGE, MPPT_MAX_INPUT_POWER, MPPT_OUTPUT_POWER, MPPT_OUTPUT_CURRENT))
             
-            
+        if abs(battery_array.get_total_voltage() - self.MPPT_MAX_OUTPUT_VOLTAGE) > VOLTAGE_MISMATCH_TOLERANCE:
+            return f"Mismatch between battery voltage ({battery_array.get_total_voltage()} V) and MPPT max output voltage ({self.MPPT_MAX_OUTPUT_VOLTAGE} V) exceeds tolerance of {VOLTAGE_MISMATCH_TOLERANCE} V"
+        if MPPT_INPUT_VOLTAGE > self.MPPT_MAX_INPUT_VOLTAGE:
+            return f"(Array {array_number}) Panel input voltage ({MPPT_INPUT_VOLTAGE} V) exceeds max MPPT input voltage ({self.MPPT_MAX_INPUT_VOLTAGE} V)"
+        if MPPT_INPUT_CURRENT > self.MPPT_MAX_INPUT_CURRENT:
+            return f"(Array {array_number}) Panel input current ({MPPT_INPUT_CURRENT} A) exceeds max MPPT input current ({self.MPPT_MAX_INPUT_CURRENT} A)"
+        else:
+            return None
+        
     def __str__(self, array_number, MPPT_INPUT_VOLTAGE, MPPT_OUTPUT_VOLTAGE, MPPT_MAX_INPUT_POWER, MPPT_OUTPUT_POWER, MPPT_OUTPUT_CURRENT):
         return f"""
 {BARF}MPPT Setup {array_number + 1}{BARE}

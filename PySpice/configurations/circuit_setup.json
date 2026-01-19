@@ -7,14 +7,21 @@
         "description": "Combine all config_x in parallel",
         "config_1": {
             "count": 2,
+            "description": {
+                "panel": "NA",
+                "mppt": "https://www.victronenergy.com/media/pg/Manual_BlueSolar_150-35__150-45/en/technical-specifications.html"
+            },
             "panel_info": {
                 "power": 455,
                 "voltage": 40.0,
-                "in_series": 2,
-                "in_parallel": 3
+                "in_series": 4,
+                "in_parallel": 2
             },
             "mppt_info": {
-                "max_output_current": 45,
+                "max_input_voltage": 150.0,
+                "max_input_current": 45.0,
+                "max_output_voltage": 48.0,
+                "max_output_current": 45.0,
                 "efficiency": 0.95
             }
         },
@@ -28,15 +35,18 @@
                 "in_parallel": 1
             },
             "mppt_info": {
-                "max_output_current": 45,
+                "max_input_voltage": 150.0,
+                "max_input_current": 45.0,
+                "max_output_voltage": 48.0,
+                "max_output_current": 45.0,
                 "efficiency": 0.80
             }
         }
 
     },
     "battery_setup": {
-        "description": "Only can choose one battery type at a time. No mixing",
-        "choice": "LiFePO4",
+        "description": "Choose one battery type at a time. No mixing",
+        "choice": "Lead_Acid",
         "LiFePO4": {
             "battery_voltage": 25.9,
             "battery_in_series": 2,
@@ -45,8 +55,8 @@
             "max_discharge_current": 100
         },
         "Lead_Acid": {
-            "battery_voltage": 12.0,
-            "battery_in_series": 4,
+            "battery_voltage": 24.9,
+            "battery_in_series": 2,
             "battery_in_parallel": 2,
             "max_charge_current": 50,
             "max_discharge_current": 50
@@ -54,6 +64,6 @@
     },
     "load_setup": {
         "total_power": 4000,
-        "nominal_voltage": 48
+        "nominal_voltage": 48.0
     }
 }

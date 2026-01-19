@@ -1,5 +1,5 @@
 from components.battery_array import Battery_Array
-from configurations.constants import BARE, BARF, GROUNDING_RESISTANCE, RAWSPICE_ITERATIONS
+from configurations.constants import BARE, BARF, GROUNDING_RESISTANCE, RAWSPICE_ITERATIONS, VOLTAGE_MISMATCH_TOLERANCE
 
 
 class Load:
@@ -27,6 +27,10 @@ class Load:
 
         if log:
             print(self.__str__(MOTOR_POWER_DEMAND, MOTOR_CURRENT_DEMAND, MOTOR_RESISTANCE))
+        
+        if abs(battery_array.get_total_voltage() - self.MOTOR_VOLTAGE) > VOLTAGE_MISMATCH_TOLERANCE:
+            return f"Mismatch between battery voltage ({battery_array.get_total_voltage()} V) and motor nominal voltage ({self.MOTOR_VOLTAGE} V) exceeds tolerance of {VOLTAGE_MISMATCH_TOLERANCE} V"
+        return None
             
             
     def __str__(self, MOTOR_POWER_DEMAND=None, MOTOR_CURRENT_DEMAND=None, MOTOR_RESISTANCE=None):

@@ -45,7 +45,7 @@ class Solar_Array:
             self.components["wire"].append(panel_wire)
             # Small resistance to model wiring losses
         
-        self.circuit.V(f"{array_number}_solar_array_output_current_measurement", 
+        self.circuit.V(f"{array_number}_solar_array_output_current", 
                        f"{array_number}_solar_array_output",
                        f"{array_number}_solar_array_output_measured", 
                        GROUNDING_RESISTANCE)
@@ -55,6 +55,7 @@ class Solar_Array:
         if log:
             print(self.__str__(array_number))
             
+        return None
     
     def get_terminal(self):
         if self.terminal is None:
