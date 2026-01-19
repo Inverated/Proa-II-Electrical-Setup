@@ -1,4 +1,4 @@
-from configurations.constants import *
+from configurations.constants import BARF, BARE, GROUNDING_RESISTANCE, WIRE_RESISTANCE
 
 class Solar_Array:
     def __init__(self, circuit, components, power, voltage, in_series, in_parallel):

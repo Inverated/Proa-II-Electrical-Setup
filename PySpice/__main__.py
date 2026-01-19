@@ -1,16 +1,18 @@
 import json
 
 from PySpice.Spice.Netlist import Circuit
-from PySpice.Unit import *
+#from PySpice.Unit import *
 from PySpice.Spice.NgSpice.Shared import NgSpiceShared
-from configurations.constants import GROUNDING_RESISTANCE
+from configurations.constants import BARF, BARE, GROUNDING_RESISTANCE
 from components.load_balancer import Load_Balancer
 from components.load import Load
 from components.battery_array import Battery_Array
 from components.mppt import MPPT
 from components.solar_panel_array import Solar_Array
 
+PATH = 'pyspice/configurations/circuit_setup.json'
 NGSPICE_AVAILABLE = True
+ENABLE_LOGGING = False
 
 try:
     NgSpiceShared.new_instance()
@@ -23,7 +25,8 @@ components = {
     "panel": [],
     "battery": [],
     "load": [],
-    "wire": []
+    "wire": [],
+    "mppt": []
 }
 
 def build_circuit_from_json(file_path: str):
@@ -35,7 +38,7 @@ def build_circuit_from_json(file_path: str):
     battery_choice = battery_array['choice']
     battery_config = battery_array[battery_choice]
     battery_array = Battery_Array(circuit, components, **battery_config)
-    battery_array.create_battery_array(log=True)
+    battery_array.create_battery_array(log=ENABLE_LOGGING)
     
     # MPPT Array
     mppt_array = data['mppt_panel_setup']
@@ -46,10 +49,10 @@ def build_circuit_from_json(file_path: str):
         config = mppt_array[key]
         for _ in range(config['count']):
             solar_array = Solar_Array(circuit, components, **config['panel_info'])
-            mppt = MPPT(circuit, **config['mppt_info'])
+            mppt = MPPT(circuit, components, **config['mppt_info'])
             
-            solar_array.create_panels(mppt_index, log=True)
-            mppt.setup_mppt(mppt_index, solar_array, battery_array, log=True)
+            solar_array.create_panels(mppt_index, log=ENABLE_LOGGING)
+            mppt.setup_mppt(mppt_index, solar_array, battery_array, log=ENABLE_LOGGING)
             mppt_index += 1
     
     POWER_TO = battery_array.get_terminal()
@@ -57,7 +60,7 @@ def build_circuit_from_json(file_path: str):
         
     # Load/Motor
     motor = Load(circuit, components, **data['load_setup']) 
-    motor.setup_load(battery_array, throttle=1, log=True)
+    motor.setup_load(battery_array, throttle=1, log=ENABLE_LOGGING)
     
     # Load Balancer
     load_balancer = Load_Balancer(circuit, components)
@@ -87,7 +90,7 @@ def begin_simulation():
         simulator = circuit.simulator(temperature=25, nominal_temperature=25)
         analysis = simulator.operating_point()
 
-        print("Simulation Results:")
+        print(f"{BARF}Simulation Results:{BARE}")
 
         # Node voltages
         for node_name, node in analysis.nodes.items():
@@ -103,4 +106,4 @@ def begin_simulation():
         print("An error occurred during simulation:")
         print(e)
             
-build_circuit_from_json('pyspice/configurations/circuit_setup.json')
+build_circuit_from_json(PATH)

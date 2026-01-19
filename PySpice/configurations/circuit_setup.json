@@ -6,7 +6,7 @@
     "mppt_panel_setup": {
         "description": "Combine all config_x in parallel",
         "config_1": {
-            "count": 1,
+            "count": 2,
             "panel_info": {
                 "power": 455,
                 "voltage": 40.0,
@@ -19,7 +19,8 @@
             }
         },
         "config_2": {
-            "count": 1,
+            "count": 0,
+            "description": "Test",
             "panel_info": {
                 "power": 600,
                 "voltage": 45.0,
