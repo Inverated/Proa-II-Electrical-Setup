@@ -12,6 +12,7 @@ class MPPT:
         self.MPPT_EFFICIENCY = efficiency
         self.circuit = circuit
         self.components = components
+        self.terminal = None
     
     def setup_mppt(self, array_number, solar_array: Solar_Array, battery_array: Battery_Array, log=False):
         MPPT_INPUT_VOLTAGE = solar_array.get_total_voltage()
@@ -32,8 +33,10 @@ class MPPT:
         self.circuit.raw_spice += f"""B{array_number}_mppt_i_reg 0 {array_number}_mppt_out I = min({self.MPPT_MAX_OUTPUT_CURRENT}, {MPPT_OUTPUT_CURRENT})\n"""
         
         self.circuit.V(f"{array_number}_mppt_output_current", f"{array_number}_mppt_out", f"{array_number}_mppt_output_measured", GROUNDING_RESISTANCE)
+        
+        self.terminal = "total_mppt_output_voltage"
         # Connect MPPT output to DC bus
-        self.circuit.R(f"{array_number}_mppt_out_wire", f"{array_number}_mppt_output_measured", "power_source", WIRE_RESISTANCE)
+        self.circuit.R(f"{array_number}_mppt_out_wire", f"{array_number}_mppt_output_measured", self.terminal, WIRE_RESISTANCE)
         #dc_bus is shared positive node for battery and load
 
         self.components["mppt"].append(f"{array_number}_mppt_i_reg")
@@ -50,7 +53,12 @@ class MPPT:
             return f"(Array {array_number}) Panel input current ({MPPT_INPUT_CURRENT} A) exceeds max MPPT input current ({self.MPPT_MAX_INPUT_CURRENT} A)"
         else:
             return None
-        
+    
+    def get_terminal(self):
+        if self.terminal is None:
+            return "MPPT terminal has not been set up yet."
+        return self.terminal
+    
     def __str__(self, array_number, MPPT_INPUT_VOLTAGE, MPPT_OUTPUT_VOLTAGE, MPPT_MAX_INPUT_POWER, MPPT_OUTPUT_POWER, MPPT_OUTPUT_CURRENT):
         return f"""
 {BARF}MPPT Setup {array_number + 1}{BARE}

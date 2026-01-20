@@ -39,12 +39,14 @@ class Battery_Array:
             self.circuit.R(battery_wire, positive_node, "battery_input_measured", WIRE_RESISTANCE)  
             self.components["wire"].append(battery_wire)
             
-        self.circuit.V("battery_input_current",
-                       "dc_bus", "battery_input_measured",
+        self.terminal_id = "total_battery_input_current"
+        self.terminal = "total_dc_bus_voltage"   
+        
+        self.circuit.V(self.terminal_id,
+                       self.terminal, "battery_input_measured",
                        GROUNDING_RESISTANCE)
         
-        self.terminal_id = "battery_input_current"
-        self.terminal = "dc_bus"
+        
         
         if log:
             print(self)        
