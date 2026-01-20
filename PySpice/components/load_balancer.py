@@ -15,7 +15,7 @@ class Load_Balancer:
         POWER_SOURCE = battery_array.get_terminal()
         BATTERY_MAX_CHARGE_CURRENT = battery_array.get_charge_limit()
         
-        self.circuit.V("balancing_load_current", POWER_SOURCE, "balancing_load_in", GROUNDING_RESISTANCE) 
-        self.circuit.raw_spice += f"Bbalancing_load balancing_load_in 0 I = I(V{POWER_SOURCE_ID})>{BATTERY_MAX_CHARGE_CURRENT} ? (I(V{POWER_SOURCE_ID})-{BATTERY_MAX_CHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : 0\n"
+        self.circuit.V("balancing_load", POWER_SOURCE, "balancing_load", GROUNDING_RESISTANCE) 
+        self.circuit.raw_spice += f"Bbalancing_load balancing_load 0 I = I(V{POWER_SOURCE_ID})>{BATTERY_MAX_CHARGE_CURRENT} ? (I(V{POWER_SOURCE_ID})-{BATTERY_MAX_CHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : 0\n"
         
         return None

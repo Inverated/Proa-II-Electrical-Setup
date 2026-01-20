@@ -17,7 +17,7 @@ class Battery_Array:
         for p in range(self.BATTERY_IN_PARALLEL):
             battery_row = []
             for s in range(self.BATTERY_IN_SERIES):
-                battery_name = f"battery_{p}_{s}"
+                battery_name = f"{p}|{s}|battery"
                 battery_row.append(battery_name)
                 
                 battery_pos = f"{battery_name}_positive"
@@ -27,7 +27,7 @@ class Battery_Array:
                 if s == 0:
                     self.circuit.R(f"{battery_name}_grounding", battery_neg, self.circuit.gnd, GROUNDING_RESISTANCE)
                 else:
-                    prev_battery_name = f"battery_{p}_{s-1}"
+                    prev_battery_name = f"{p}|{s-1}|battery"
                     self.circuit.R(f"{battery_name}_internal", battery_neg, f"{prev_battery_name}_positive", WIRE_RESISTANCE)
                 
             self.components["battery"].append(battery_row)
@@ -35,7 +35,7 @@ class Battery_Array:
         for index, row in enumerate(self.components["battery"]):
             battery_row_end = row[-1]
             positive_node = f"{battery_row_end}_positive"
-            battery_wire = f"battery_wire_{index}"
+            battery_wire = f"battery_wire|{index}"
             self.circuit.R(battery_wire, positive_node, "battery_input_measured", WIRE_RESISTANCE)  
             self.components["wire"].append(battery_wire)
             

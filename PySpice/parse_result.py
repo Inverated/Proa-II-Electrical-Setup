@@ -1,6 +1,12 @@
-from configurations.constants import BARF, BARE
+from configurations.constants import BARE, BARF
 
-def parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING=False):
+def parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING=False, SHOW_PANELS=False):
+    if analysis is None:
+        return
+    
+    if SIMULATION_LOGGING:
+        print(f"{BARF}Simulation Results:{BARE}")
+    
     # Node voltages
     for node_name, node in analysis.nodes.items():
         if "measured" in node_name:
@@ -9,21 +15,22 @@ def parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING=False):
         for dic in result.values():
             if matched:
                 break
-            if dic["keyword"] in node_name:
+            if dic.get("keyword", 'None') in node_name:
                 matched = True
-                
-                prefix = node_name[0:node_name.index("_")]
-                if prefix.isdigit():
-                    prefix = int(prefix)
-                    if prefix > len(dic["data"]):
+                if ":" in node_name and node_name[0:node_name.index(":")].isdigit():
+                    prefix = int(node_name[0:node_name.index(":")])
+                    if prefix + 1 > len(dic["data"]):
                         dic["data"].extend(eval(struc) for _ in range(prefix - len(dic["data"]) + 1))
                         dic["array_count"] = len(dic["data"])
-                    dic["data"][prefix]["voltage"][node_name.lstrip(f"{prefix}_")] = float(node.as_ndarray()[0])
+
+                    dic["data"][prefix]["voltage"][node_name.replace(f"{prefix}:", "")] = float(node.as_ndarray()[0])
+                    dic["data"][prefix]["array_index"] = prefix
                 else:
                     if len(dic["data"]) == 0:
                         dic["data"].append(eval(struc))
                         dic["array_count"] += 1
                     dic["data"][0]["voltage"][node_name] = float(node.as_ndarray()[0])
+
         if not matched:
             print(f"Node {node_name}: {float(node.as_ndarray()[0]):.2f} V")
 
@@ -38,30 +45,34 @@ def parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING=False):
         for dic in result.values():
             if matched:
                 break
-            if dic["keyword"] in branch_name:
+            if dic.get("keyword", 'None') in branch_name:
                 matched = True
                 
-                prefix = branch_name[0:branch_name.index("_")]
-                if prefix.isdigit():
-                    prefix = int(prefix)
-                    # Add to data list at index i of i_name
-                    if prefix > len(dic["data"]):
+                if ":" in branch_name and branch_name[0:branch_name.index(":")].isdigit():
+                    prefix = int(branch_name[0:branch_name.index(":")])
+                    # Add to data list at index i of i:name
+                    if prefix + 1 > len(dic["data"]):
                         dic["data"].extend(eval(struc) for _ in range(prefix - len(dic["data"]) + 1))
                         dic["array_count"] = len(dic["data"])
-                    dic["data"][prefix]["current"][branch_name.lstrip(f"{prefix}_")] = float(branch.as_ndarray()[0])
+                        
+                    dic["data"][prefix]["current"][branch_name.replace(f"{prefix}:", "")] = float(branch.as_ndarray()[0])
+                    dic["data"][prefix]["array_index"] = prefix
                 else:
                     if len(dic["data"]) == 0:
                         dic["data"].append(eval(struc))
                         dic["array_count"] += 1
+                        
                     dic["data"][0]["current"][branch_name] = float(branch.as_ndarray()[0])
         if not matched:
             print(f"Branch {branch_name}: {float(branch.as_ndarray()[0]):.2f} A")
 
     if SIMULATION_LOGGING:
         for key in result.keys():
-            if key in ["panel_result", "error", "warning"]:
-                continue  # Skip panels
-            
+            if key == "panel_result" and not SHOW_PANELS:
+                continue
+            if key in ["error", "warning", "info"]:
+                continue
+
             count = result[key]['array_count']
             print(f"\n{result[key]['keyword'].capitalize()} Results (Count: {count}):")
             for index, data in enumerate(result[key]['data']):
