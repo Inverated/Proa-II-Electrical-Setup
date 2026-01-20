@@ -10,12 +10,14 @@ from components.battery_array import Battery_Array
 from components.mppt import MPPT
 from components.solar_panel_array import Solar_Array
 
-PATH = 'pyspice/configurations/circuit_setup.json'
-ENABLE_LOGGING = 0
+CONFIG_PATH = 'pyspice/configurations/circuit_setup.json'
+SAVE_FILE = 'pyspice/result/simulation_results.json'
+COMPONENT_LOGGING = 0
 SHOW_COMPONENTS = 0
 SHOW_NETLIST = 0
 IGNORE_ERROR = 1
 START_SIMULATION = 1
+SIMULATION_LOGGING = 0
 
 
 NGSPICE_AVAILABLE = True
@@ -46,7 +48,7 @@ def build_circuit_from_json(file_path: str):
     battery_choice = battery_array['choice']
     battery_config = battery_array[battery_choice]
     battery_array = Battery_Array(circuit, components, **battery_config)
-    res = battery_array.create_battery_array(log=ENABLE_LOGGING)
+    res = battery_array.create_battery_array(log=COMPONENT_LOGGING)
     errors.append(res) if res else None
 
     # MPPT Array
@@ -61,9 +63,9 @@ def build_circuit_from_json(file_path: str):
                 circuit, components, **config['panel_info'])
             mppt = MPPT(circuit, components, **config['mppt_info'])
 
-            solar_array.create_panels(mppt_index, log=ENABLE_LOGGING)
+            solar_array.create_panels(mppt_index, log=COMPONENT_LOGGING)
             res = mppt.setup_mppt(mppt_index, solar_array,
-                                  battery_array, log=ENABLE_LOGGING)
+                                  battery_array, log=COMPONENT_LOGGING)
             errors.append(res) if res else None
             mppt_index += 1
 
@@ -74,7 +76,7 @@ def build_circuit_from_json(file_path: str):
 
     # Load/Motor
     motor = Load(circuit, components, **data['load_setup'])
-    res = motor.setup_load(battery_array, throttle=1, log=ENABLE_LOGGING)
+    res = motor.setup_load(battery_array, throttle=1, log=COMPONENT_LOGGING)
     errors.append(res) if res else None
 
     # Load Balancer
@@ -91,7 +93,7 @@ def build_circuit_from_json(file_path: str):
 
     if not has_error or IGNORE_ERROR:
         if START_SIMULATION:
-            begin_simulation()
+            begin_simulation(errors)
     else:
         print(f"{BARF}Simulation Aborted Due to Errors in Circuit Setup.{BARE}")
     
@@ -115,7 +117,7 @@ def display_netlist(circuit):
     print(circuit)
 
 
-def begin_simulation():
+def begin_simulation(errors=[]):
     if not NGSPICE_AVAILABLE:
         print("NgSpice is not available. Simulation cannot proceed.")
         return
@@ -158,14 +160,21 @@ def begin_simulation():
         "data": [],
     }
     
-    others = {
+    summary = {
         "keyword": "total",
         "array_count": 0,
         "data": [],
     }
     
+    error = {
+        "keyword": "error",
+        "array_count": len(errors),
+        "data": errors,
+    }
+    
     result = {
-        "others": others,
+        "error": error,
+        "summary": summary,
         "mppt_result": mppt_result,
         "battery_result": battery_result,
         "solar_result": solar_result,
@@ -229,23 +238,29 @@ def begin_simulation():
         if not matched:
             print(f"Branch {branch_name}: {float(branch.as_ndarray()[0]):.2f} A")
 
-    for key in result.keys():
-        if key == "panel_result":
-            continue  # Skip panels
-        
-        count = result[key]['array_count']
-        print(f"\n{result[key]['keyword'].capitalize()} Results (Count: {count}):")
-        for index, data in enumerate(result[key]['data']):
-            print(f"{result[key]['keyword'].capitalize()} {index}:") if count > 1 else None
+    if SIMULATION_LOGGING:
+        for key in result.keys():
+            if key in ["panel_result", "error"]:
+                continue  # Skip panels
             
-            print("\t"*min(1, count) + "Voltages:")
-            for node, voltage in data['voltage'].items():
-                print("\t"*min(1, count) + f"\t{node}: {voltage:.2f} V")
-            print("\t"*min(1, count) + "Currents:")
-            for branch, current in data['current'].items():
-                print("\t"*min(1, count) + f"\t{branch}: {current:.2f} A")
-        print(BARE)
+            count = result[key]['array_count']
+            print(f"\n{result[key]['keyword'].capitalize()} Results (Count: {count}):")
+            for index, data in enumerate(result[key]['data']):
+                print(f"{result[key]['keyword'].capitalize()} {index}:") if count > 1 else None
+                
+                print("\t"*min(1, count) + "Voltages:")
+                for node, voltage in data['voltage'].items():
+                    print("\t"*min(1, count) + f"\t{node}: {voltage:.2f} V")
+                print("\t"*min(1, count) + "Currents:")
+                for branch, current in data['current'].items():
+                    print("\t"*min(1, count) + f"\t{branch}: {current:.2f} A")
+            print(BARE)
 
+
+    json_result = json.dumps(result, indent=4)
+    with open(SAVE_FILE, 'w') as f:
+        f.write(json_result)
+        print(f"Simulation results saved to {SAVE_FILE}")
 
 if __name__ == "__main__":
-    build_circuit_from_json(PATH)
+    build_circuit_from_json(CONFIG_PATH)
