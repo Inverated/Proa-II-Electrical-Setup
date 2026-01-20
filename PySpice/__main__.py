@@ -1,8 +1,9 @@
 import json
 
-from PySpice.Spice.Netlist import Circuit
 # from PySpice.Unit import *
+from PySpice.Spice.Netlist import Circuit
 from PySpice.Spice.NgSpice.Shared import NgSpiceShared
+from parse_result import parse_simulation_result
 from configurations.constants import BARF, BARE, GROUNDING_RESISTANCE
 from components.load_balancer import Load_Balancer
 from components.load import Load
@@ -17,7 +18,7 @@ SHOW_COMPONENTS = 0
 SHOW_NETLIST = 0
 IGNORE_ERROR = 1
 START_SIMULATION = 1
-SIMULATION_LOGGING = 0
+SIMULATION_LOGGING = 1
 
 
 NGSPICE_AVAILABLE = True
@@ -75,9 +76,13 @@ def build_circuit_from_json(file_path: str):
     circuit.V("total_mppt_output_current", POWER_FROM, POWER_TO, GROUNDING_RESISTANCE)
 
     # Load/Motor
-    motor = Load(circuit, components, **data['load_setup'])
-    res = motor.setup_load(battery_array, throttle=1, log=COMPONENT_LOGGING)
-    errors.append(res) if res else None
+    for index, key in enumerate(data["load_setup"].keys()):
+        if key == "description":
+            continue
+        load_name = key + f"_load_{index}"
+        motor = Load(circuit, components, load_name=load_name, **data['load_setup'][key])
+        res = motor.setup_load(battery_array, log=COMPONENT_LOGGING)
+        errors.append(res) if res else None
 
     # Load Balancer
     load_balancer = Load_Balancer(circuit, components)
@@ -118,18 +123,6 @@ def display_netlist(circuit):
 
 
 def begin_simulation(errors=[]):
-    if not NGSPICE_AVAILABLE:
-        print("NgSpice is not available. Simulation cannot proceed.")
-        return
-    
-    try:
-        simulator = circuit.simulator(temperature=25, nominal_temperature=25)
-        analysis = simulator.operating_point()
-    except Exception as e:
-        print("An error occurred during simulation:")
-        print(e)
-        return
-
     print(f"{BARF}Simulation Results:{BARE}")
 
     struc = '{"voltage": {}, "current": {}}'
@@ -172,8 +165,15 @@ def begin_simulation(errors=[]):
         "data": errors,
     }
     
+    warning = {
+        "keyword": "warning",
+        "array_count": 0,
+        "data": [],
+    }
+    
     result = {
         "error": error,
+        "warning": warning,
         "summary": summary,
         "mppt_result": mppt_result,
         "battery_result": battery_result,
@@ -181,86 +181,36 @@ def begin_simulation(errors=[]):
         "panel_result": panel_result,
         "load_result": load_result,
     }
+    
+    if not NGSPICE_AVAILABLE:
+        err = "NgSpice is not available. Simulation cannot proceed."
+        print(err)
+        result["error"]["data"].append(err)
+        save_to_file(result)
+        return
+    
+    try:
+        simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+        analysis = simulator.operating_point()
+    except Exception as _:
+        print("An error occurred during simulation:")
+        result["error"]["data"].append("Error has occured during simulation. Check console for details.")
+        save_to_file(result)
+        return
 
-    # Node voltages
-    for node_name, node in analysis.nodes.items():
-        if "measured" in node_name:
-            continue
-        matched = False
-        for dic in result.values():
-            if matched:
-                break
-            if dic["keyword"] in node_name:
-                matched = True
-                
-                prefix = node_name[0:node_name.index("_")]
-                if prefix.isdigit():
-                    prefix = int(prefix)
-                    if prefix > len(dic["data"]):
-                        dic["data"].extend(eval(struc) for _ in range(prefix - len(dic["data"]) + 1))
-                        dic["array_count"] = len(dic["data"])
-                    dic["data"][prefix]["voltage"][node_name.lstrip(f"{prefix}_")] = float(node.as_ndarray()[0])
-                else:
-                    if len(dic["data"]) == 0:
-                        dic["data"].append(eval(struc))
-                        dic["array_count"] += 1
-                    dic["data"][0]["voltage"][node_name] = float(node.as_ndarray()[0])
-        if not matched:
-            print(f"Node {node_name}: {float(node.as_ndarray()[0]):.2f} V")
-
-    # Branch currents
-    for branch_name, branch in analysis.branches.items():
-        if branch_name.startswith("v"):
-            branch_name = branch_name[1:]  # Remove 'v' prefix
-        
-        if "measured" in branch_name:
-                continue
-        matched = False
-        for dic in result.values():
-            if matched:
-                break
-            if dic["keyword"] in branch_name:
-                matched = True
-                
-                prefix = branch_name[0:branch_name.index("_")]
-                if prefix.isdigit():
-                    prefix = int(prefix)
-                    # Add to data list at index i of i_name
-                    if prefix > len(dic["data"]):
-                        dic["data"].extend(eval(struc) for _ in range(prefix - len(dic["data"]) + 1))
-                        dic["array_count"] = len(dic["data"])
-                    dic["data"][prefix]["current"][branch_name.lstrip(f"{prefix}_")] = float(branch.as_ndarray()[0])
-                else:
-                    if len(dic["data"]) == 0:
-                        dic["data"].append(eval(struc))
-                        dic["array_count"] += 1
-                    dic["data"][0]["current"][branch_name] = float(branch.as_ndarray()[0])
-        if not matched:
-            print(f"Branch {branch_name}: {float(branch.as_ndarray()[0]):.2f} A")
-
-    if SIMULATION_LOGGING:
-        for key in result.keys():
-            if key in ["panel_result", "error"]:
-                continue  # Skip panels
-            
-            count = result[key]['array_count']
-            print(f"\n{result[key]['keyword'].capitalize()} Results (Count: {count}):")
-            for index, data in enumerate(result[key]['data']):
-                print(f"{result[key]['keyword'].capitalize()} {index}:") if count > 1 else None
-                
-                print("\t"*min(1, count) + "Voltages:")
-                for node, voltage in data['voltage'].items():
-                    print("\t"*min(1, count) + f"\t{node}: {voltage:.2f} V")
-                print("\t"*min(1, count) + "Currents:")
-                for branch, current in data['current'].items():
-                    print("\t"*min(1, count) + f"\t{branch}: {current:.2f} A")
-            print(BARE)
+    parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING)
+    
+    save_to_file(result)
+    
+    return None
 
 
+def save_to_file(result):
     json_result = json.dumps(result, indent=4)
+    
     with open(SAVE_FILE, 'w') as f:
         f.write(json_result)
-        print(f"Simulation results saved to {SAVE_FILE}")
+        print(f"\n{BARF}Simulation results saved to {SAVE_FILE}{BARE}")
 
 if __name__ == "__main__":
     build_circuit_from_json(CONFIG_PATH)

@@ -63,7 +63,15 @@
         }
     },
     "load_setup": {
-        "total_power": 4000,
-        "nominal_voltage": 48.0
+        "description": "Load will be powered in parallel. Throttle can leave empty",
+        "Torqeedo_Cruise_4.0": {
+            "total_power": 4000,
+            "nominal_voltage": 48.0,
+            "throttle": 0.0
+        },
+        "Torqeedo_Cruise_2.0": {
+            "total_power": 1000,
+            "nominal_voltage": 48.0
+        }
     }
 }
