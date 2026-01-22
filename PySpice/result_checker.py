@@ -48,7 +48,6 @@ def cross_check_result(component_object, result):
 
         if (throttle_setting - actual_throttle) * 100 > POWER_MISMATCH_TOLERANCE_PERCENTAGE:
             actual_throttle = actual_power / power_rating if power_rating > 0 else 0.0
-            print(actual_throttle, throttle_setting)
             result["warning"]["data"].append(f"Battery array is being over-discharged. Motor {index} has been restricted to {actual_throttle*100:.2f}% instead of {throttle_setting*100:.2f}% throttle level.")
         
         

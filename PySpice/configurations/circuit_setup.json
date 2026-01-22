@@ -6,7 +6,7 @@
     "mppt_panel_setup": {
         "description": "Combine all config_x in parallel",
         "config_1": {
-            "count": 0,
+            "count": 1,
             "description": {
                 "panel": "NA",
                 "mppt": "https://www.victronenergy.com/media/pg/Manual_BlueSolar_150-35__150-45/en/technical-specifications.html"
@@ -65,7 +65,7 @@
     "load_setup": {
         "description": "Load will be powered in parallel. Throttle can leave empty",
         "Torqeedo_Cruise_4.0": {
-            "total_power": 4000,
+            "total_power": 8000,
             "nominal_voltage": 48.0,
             "throttle": 0.0
         }

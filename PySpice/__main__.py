@@ -17,7 +17,7 @@ from components.solar_panel_array import Solar_Array
 path = os.getcwd()
 CONFIG_PATH         = os.path.join(path, 'pyspice/configurations/circuit_setup.json')
 SAVE_FILE           = os.path.join(path, 'pyspice/result/simulation_results.json')
-SAVE_OUTPUT         = 1
+SAVE_OUTPUT         = 0
 
 COMPONENT_LOGGING   = 0
 SHOW_COMPONENTS     = 0
@@ -26,11 +26,11 @@ SHOW_NETLIST        = 0
 
 IGNORE_ERROR        = 1
 START_SIMULATION    = 1
-SIMULATION_LOGGING  = 1
+SIMULATION_LOGGING  = 0
 SIMULATION_TYPE     = 'sweep'  # operating_point / sweep
 
-SHOW_ERRORS         = 1
-SHOW_WARNINGS       = 1
+SHOW_ERRORS         = 0
+SHOW_WARNINGS       = 0
 
 "================== NgSpice Initialization ================"
 NGSPICE_AVAILABLE = True
@@ -255,7 +255,8 @@ def begin_simulation(meta_data, circuit, errors=[]):
         result["error"]["data"].append("Error has occured during simulation. Check console for details.")
         return None, result, struc
     
-    print(f"\n{BARF}Simulation Completed Successfully.{BARE}")
+    if SIMULATION_LOGGING:
+        print(f"\n{BARF}Simulation Completed Successfully.{BARE}")
     
     return analysis, result, struc
 
@@ -272,10 +273,11 @@ if __name__ == "__main__":
         result = build_circuit_from_json(CONFIG_PATH)
 
     elif SIMULATION_TYPE == 'sweep':
-        throttle_range = [i/100 for i in range(0, 101, 10)]
+        throttle_range = [i/100 for i in range(0, 101, 1)]
         results = []
         for throttle in throttle_range:
-            print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")
+            if SIMULATION_LOGGING:
+                print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")
             result = build_circuit_from_json(CONFIG_PATH, throttle)
             results.append(result)
             

@@ -35,10 +35,13 @@ def generate_graph(results: list, x_axis: list,
         print("No display choices selected")
         return
     
-    # Create figure with subplots
-    fig, axes = plt.subplots(num_plots, 1, figsize=(12, 5 * num_plots))
+    # Create figure with subplots with more vertical spacing
+    fig, axes = plt.subplots(num_plots, 1, figsize=(12, 6 * num_plots))
     if num_plots == 1:
         axes = [axes]
+    
+    # Adjust spacing between subplots
+    plt.subplots_adjust(hspace=0.4, bottom=0.15)
     
     # Collect warnings for annotation
     warning_points = []
@@ -63,7 +66,7 @@ def generate_graph(results: list, x_axis: list,
             voltages = extract_traces(results, category, 'voltage')
             
             for label, values in voltages.items():
-                ax.plot(x_axis, values, marker='o', markersize=3, 
+                ax.plot(x_axis, values, marker='o', markersize=2, 
                        label=f"{category} - {label}", 
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -93,7 +96,7 @@ def generate_graph(results: list, x_axis: list,
             currents = extract_traces(results, category, 'current')
             
             for label, values in currents.items():
-                ax.plot(x_axis, values, marker='o', markersize=3,
+                ax.plot(x_axis, values, marker='o', markersize=2,
                        label=f"{category} - {label}",
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -120,7 +123,7 @@ def generate_graph(results: list, x_axis: list,
             power_traces = extract_power_traces(results, category)
             
             for label, values in power_traces.items():
-                ax.plot(x_axis, values, marker='o', markersize=3,
+                ax.plot(x_axis, values, marker='o', markersize=2,
                        label=f"{category} - {label}",
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -136,18 +139,18 @@ def generate_graph(results: list, x_axis: list,
             for wp in warning_points:
                 ax.axvline(x=wp['x'], color='red', linestyle='--', alpha=0.3)
     
-    # Add warning text box
+    # Add warning text box positioned below all graphs
     if warning_points:
         warning_text = "Warnings:\n"
         for wp in warning_points:
             warning_text += f"x={wp['x']}: {', '.join(wp['warnings'])}\n"
         
-        fig.text(0.02, 0.02, warning_text, 
+        fig.text(0.1, 0.02, warning_text, 
                 fontsize=8, color='red', 
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5),
                 verticalalignment='bottom')
     
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0.05, 1, 1])  # Leave space at bottom for warnings
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
