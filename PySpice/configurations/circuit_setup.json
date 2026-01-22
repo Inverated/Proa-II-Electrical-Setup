@@ -6,7 +6,7 @@
     "mppt_panel_setup": {
         "description": "Combine all config_x in parallel",
         "config_1": {
-            "count": 2,
+            "count": 0,
             "description": {
                 "panel": "NA",
                 "mppt": "https://www.victronenergy.com/media/pg/Manual_BlueSolar_150-35__150-45/en/technical-specifications.html"
@@ -52,7 +52,7 @@
             "battery_in_series": 2,
             "battery_in_parallel": 1,
             "max_charge_current": 50,
-            "max_discharge_current": 100
+            "max_discharge_current": 50
         },
         "LiFePO4": {
             "battery_voltage": 24.9,

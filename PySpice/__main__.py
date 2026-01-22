@@ -91,7 +91,7 @@ def build_circuit_from_json(file_path: str, throttle_setting = None):
             component_object["solar_array"] = component_object.get("solar_array", []) + [solar_array]
             mppt_index += 1
 
-    POWER_FROM = mppt.get_terminal()
+    POWER_FROM = mppt.get_terminal() if mppt_index > 0 else None
     POWER_TO = battery_array.get_terminal()
     
     circuit.V("total_mppt_output_current", POWER_FROM, POWER_TO, GROUNDING_RESISTANCE)
@@ -272,7 +272,7 @@ if __name__ == "__main__":
         result = build_circuit_from_json(CONFIG_PATH)
 
     elif SIMULATION_TYPE == 'sweep':
-        throttle_range = [i/100 for i in range(0, 301, 10)]
+        throttle_range = [i/100 for i in range(0, 101, 10)]
         results = []
         for throttle in throttle_range:
             print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")

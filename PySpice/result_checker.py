@@ -12,6 +12,8 @@ def cross_check_result(component_object, result):
     solar_data = solar["data"]
     mppt_data = mppt["data"]
     for i in range(set_count):
+        if component_object.get("mppt") is None:
+            continue
         output_curr_limit = component_object["mppt"][i].get_output_limit()
         actual_curr_output = mppt_data[i]["current"]["mppt_output"]
         actual_voltage_output = mppt_data[i]["voltage"]["mppt_output"]
@@ -33,10 +35,11 @@ def cross_check_result(component_object, result):
         current = float(list(load["current"].values())[0])
         actual_power = voltage * current
 
+        mppt_count = len(component_object.get("mppt", []))
         temp_eff_calculation = 0.0
-        for i in range(len(component_object["mppt"])):
+        for i in range(mppt_count):
             temp_eff_calculation += component_object["mppt"][i].get_efficiency()
-        average_efficiency = temp_eff_calculation / len(component_object["mppt"])
+        average_efficiency = temp_eff_calculation / mppt_count if mppt_count > 0 else 1.0
             
         index = load["array_index"]
         power_rating = component_object["load"][index].power_rating() * average_efficiency
