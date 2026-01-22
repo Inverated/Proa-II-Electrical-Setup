@@ -4,6 +4,7 @@ import os
 
 from PySpice.Spice.Netlist import Circuit
 from PySpice.Spice.NgSpice.Shared import NgSpiceShared
+from sweep_graph_generation import generate_graph
 from result_checker import cross_check_result
 from parse_result import parse_simulation_result
 from configurations.constants import BARF, BARE, GROUNDING_RESISTANCE
@@ -16,7 +17,7 @@ from components.solar_panel_array import Solar_Array
 path = os.getcwd()
 CONFIG_PATH         = os.path.join(path, 'pyspice/configurations/circuit_setup.json')
 SAVE_FILE           = os.path.join(path, 'pyspice/result/simulation_results.json')
-SAVE_OUTPUT         = 0
+SAVE_OUTPUT         = 1
 
 COMPONENT_LOGGING   = 0
 SHOW_COMPONENTS     = 0
@@ -26,6 +27,7 @@ SHOW_NETLIST        = 0
 IGNORE_ERROR        = 1
 START_SIMULATION    = 1
 SIMULATION_LOGGING  = 1
+SIMULATION_TYPE     = 'sweep'  # operating_point / sweep
 
 SHOW_ERRORS         = 1
 SHOW_WARNINGS       = 1
@@ -42,7 +44,7 @@ except Exception as e:
 
 "================== Construct circuit ================="
 
-def build_circuit_from_json(file_path: str):
+def build_circuit_from_json(file_path: str, throttle_setting = None):
     circuit = Circuit("Solar_Panel-Mppt-Battery-Motor Circuit Thingy")
     components = {
         "panel": [],
@@ -100,6 +102,13 @@ def build_circuit_from_json(file_path: str):
         if key == "description":
             continue
         load_name = f"{index}:{key}_load"
+        
+        if throttle_setting is not None:
+            if type(throttle_setting) == list:
+                input_data['load_setup'][key]['throttle'] = throttle_setting[index]
+            else:
+                input_data['load_setup'][key]['throttle'] = throttle_setting
+                
         load = Load(circuit, components, load_name=load_name, **input_data['load_setup'][key])
         err = load.setup_load(battery_array, log=COMPONENT_LOGGING)
         
@@ -133,9 +142,6 @@ def build_circuit_from_json(file_path: str):
             analysis, result, struc = begin_simulation(meta_data, circuit, errors)
             parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING, SHOW_PANELS)
             cross_check_result(component_object, result)
-            
-            if SAVE_OUTPUT:
-                save_to_file(result)
     else:
         if SHOW_ERRORS and START_SIMULATION:
             print(f"{BARF}Simulation Aborted Due to Errors in Circuit Setup.{BARE}")
@@ -152,6 +158,8 @@ def build_circuit_from_json(file_path: str):
         for warning in result["warning"]["data"]:
             print(f"\t{warning}")
         print()
+        
+    return result
     
 
 
@@ -260,4 +268,23 @@ def save_to_file(result):
         print(f"\n{BARF}Simulation results saved to {SAVE_FILE}{BARE}")
 
 if __name__ == "__main__":
-    build_circuit_from_json(CONFIG_PATH)
+    if SIMULATION_TYPE == 'operating_point':
+        result = build_circuit_from_json(CONFIG_PATH)
+
+    elif SIMULATION_TYPE == 'sweep':
+        throttle_range = [i/100 for i in range(0, 301, 10)]
+        results = []
+        for throttle in throttle_range:
+            print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")
+            result = build_circuit_from_json(CONFIG_PATH, throttle)
+            results.append(result)
+            
+        generate_graph(results, throttle_range, 
+                       voltage_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
+                       current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
+                       power_display_choice=['load_result'],
+                       save_path=None)
+            
+            
+    if START_SIMULATION and SAVE_OUTPUT:
+        save_to_file(result)

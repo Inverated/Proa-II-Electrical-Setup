@@ -14,7 +14,7 @@
             "panel_info": {
                 "power": 455,
                 "voltage": 40.0,
-                "in_series": 4,
+                "in_series": 2,
                 "in_parallel": 2
             },
             "mppt_info": {
@@ -47,14 +47,14 @@
     "battery_setup": {
         "description": "Choose one battery type at a time. No mixing",
         "choice": "Lead_Acid",
-        "LiFePO4": {
+        "Lead_Acid": {
             "battery_voltage": 25.9,
             "battery_in_series": 2,
             "battery_in_parallel": 1,
-            "max_charge_current": 100,
+            "max_charge_current": 50,
             "max_discharge_current": 100
         },
-        "Lead_Acid": {
+        "LiFePO4": {
             "battery_voltage": 24.9,
             "battery_in_series": 2,
             "battery_in_parallel": 1,
@@ -67,11 +67,7 @@
         "Torqeedo_Cruise_4.0": {
             "total_power": 4000,
             "nominal_voltage": 48.0,
-            "throttle": 1.0
-        },
-        "Torqeedo_Cruise_2.0": {
-            "total_power": 1000,
-            "nominal_voltage": 48.0
+            "throttle": 0.0
         }
     }
 }

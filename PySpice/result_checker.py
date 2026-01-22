@@ -33,12 +33,17 @@ def cross_check_result(component_object, result):
         current = float(list(load["current"].values())[0])
         actual_power = voltage * current
 
+        temp_eff_calculation = 0.0
+        for i in range(len(component_object["mppt"])):
+            temp_eff_calculation += component_object["mppt"][i].get_efficiency()
+        average_efficiency = temp_eff_calculation / len(component_object["mppt"])
+            
         index = load["array_index"]
-        power_rating = component_object["load"][index].power_rating()
+        power_rating = component_object["load"][index].power_rating() * average_efficiency
         throttle_setting = component_object["load"][index].throttle_setting()
         actual_throttle = actual_power / power_rating if power_rating > 0 else 0.0
 
-        if abs(actual_throttle - throttle_setting) * 100 > POWER_MISMATCH_TOLERANCE_PERCENTAGE:
+        if (throttle_setting - actual_throttle) * 100 > POWER_MISMATCH_TOLERANCE_PERCENTAGE:
             actual_throttle = actual_power / power_rating if power_rating > 0 else 0.0
             print(actual_throttle, throttle_setting)
             result["warning"]["data"].append(f"Battery array is being over-discharged. Motor {index} has been restricted to {actual_throttle*100:.2f}% instead of {throttle_setting*100:.2f}% throttle level.")
