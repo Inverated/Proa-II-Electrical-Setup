@@ -3,12 +3,14 @@
 #include <Adafruit_ADS1X15.h>
 #include <SoftwareSerial.h>
 
+#define LedSignalPin 2
+
 //UART (Software) declaration
 SoftwareSerial veSerial(D7, D8); // D4: RX, D5: TX will not be used 
 //**Note: RX pin unable to receive signal across different boards**
 
 bool ENABLE_SERIAL_LOGGING = true;
-bool ENABLE_ESP_STATUS_LOGGING = true;
+bool ENABLE_ESP_STATUS_LOGGING = false;
 bool ENABLE_ANALOG_CURRENT_SIM = true;
 
 // VE.Direct values
@@ -26,13 +28,14 @@ String LOAD = "OFF";
 Adafruit_ADS1115 ads;
 
 // HE Sensor pins
+const int HESensorPin = 0;
+const int HESensorMaxI = 100000; //mA
 int HESensorReading = 0;
-int HESensorPin = 0;
 
 // Pin for simulating current draw from MPPT
+const int ISimOutPin = 1;
 int ISimOutReading = 0;
-int ISimOutPin = 1;
-float MPPTMaxIOut = 45;
+float MPPTMaxIOut = 45000;  //mA
 float CircuitVoltageReading = 26560;
 
 //Timing values
@@ -40,11 +43,11 @@ unsigned long start_time;
 unsigned long time_passed = 0;
 
 // Setup ESP Now
-uint8_t broadcastAddress[] = {0x40, 0xF5, 0x20, 0x33, 0x10, 0xEB};
+uint8_t broadcastAddress[] = {0xF8, 0xB3, 0xB7, 0x86, 0x7B, 0x21};
 bool messageSent;
 
 typedef struct {
-  int time_passed;
+  unsigned long time_since_module_start;
   float mppt_current;
   float voltage;
   float HESensorOutput;
@@ -54,6 +57,7 @@ MPPT_Sensor_Data data;
 
 void setup() {
   Serial.begin(9600);
+  pinMode(LedSignalPin, OUTPUT);
 
   // Use voltage divider before connecting to ADS1115 
   ads.setGain(GAIN_TWOTHIRDS);        // 2/3x gain   +/- 6.144V  1 bit = 0.1875mV
@@ -87,7 +91,7 @@ void setup() {
   if (ENABLE_SERIAL_LOGGING) {
     Serial.println("Setup Complete Successfully\n");
     // Print header once
-    Serial.println("Time(ms)\tV(V)\tI(A)\tVPV(V)\tPPV(W)\tCS\tMPPT\tERROR\tLOAD\tSensor Val");
+    Serial.println("Time(ms)\tV(mV)\tI(mA)\tVPV(V)\tPPV(W)\tCS\tMPPT\tERROR\tLOAD\tSensor (A)");
   }
 
   start_time = millis();
@@ -112,8 +116,8 @@ void loop() {
 }
 
 void compileMessage() {
-  data.time_passed = time_passed;
-  data.HESensorOutput = HESensorReading;
+  data.time_since_module_start = time_passed;
+  data.HESensorOutput = max(0, HESensorReading);
   data.mppt_current = I;
   data.voltage = V;
 }
@@ -123,6 +127,7 @@ void onSend(uint8_t *mac_addr, uint8_t sendStatus) {
     Serial.print("Send status: ");
     Serial.println(sendStatus == 0 ? "Success" : "Fail");
   }
+  digitalWrite(LedSignalPin, sendStatus);
 }
 
 void printRow() {
@@ -145,7 +150,7 @@ void readCurrentSensor() {
   // Do calibration here with MPPT data
   // Untested: Please update after doing actual test
   float ratio = volts / 3.3;
-  HESensorReading = ratio * 100; //Rated 100A he sensor
+  HESensorReading = ratio * HESensorMaxI; //Rated 100A he sensor
 }
 
 bool parseSimMPPT() {
