@@ -4,7 +4,7 @@
     "configuration_description": "",
 
     "mppt_panel_setup": {
-        "description": "Combine all config_x in parallel",
+        "description": "Combine all config_x in parallel. Set count to 0 to disable that config",
         "config_1": {
             "count": 1,
             "description": {
@@ -45,9 +45,9 @@
 
     },
     "battery_setup": {
-        "description": "Choose one battery type at a time. No mixing",
-        "choice": "Lead_Acid",
-        "Lead_Acid": {
+        "description": "Choose one battery type at a time. No mixing of battery types.",
+        "choice": "LiNMC",
+        "LiNMC": {
             "battery_voltage": 25.9,
             "battery_in_series": 2,
             "battery_in_parallel": 1,
@@ -63,7 +63,7 @@
         }
     },
     "load_setup": {
-        "description": "Load will be powered in parallel. Throttle can leave empty",
+        "description": "Load will be powered in parallel. Throttle can leave empty for max power.",
         "Torqeedo_Cruise_4.0": {
             "total_power": 8000,
             "nominal_voltage": 48.0,
