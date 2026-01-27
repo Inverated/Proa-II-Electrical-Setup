@@ -1,0 +1,7 @@
+PySpice==1.5
+
+schemdraw
+
+## OPtional dependencies for extra features
+# schemdraw[matplotlib]
+# schemdraw[svgmath]

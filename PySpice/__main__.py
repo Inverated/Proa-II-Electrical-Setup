@@ -19,6 +19,7 @@ path = os.getcwd()
 CONFIG_FILE         = os.path.join(path, 'pyspice\\configurations\\circuit_setup.json')
 SIM_SAVE_PATH       = os.path.join(path, 'pyspice\\result')
 SWEEP_SAVE_PATH     = os.path.join(path, 'pyspice\\result')
+SWEEP_INTERVAL_COUNT= 100   # Number of intervals in sweep simulation
 SAVE_OUTPUT         = 1
 
 COMPONENT_LOGGING   = 0
@@ -29,8 +30,8 @@ SHOW_NETLIST        = 0
 IGNORE_ERROR        = 1
 START_SIMULATION    = 1
 SIMULATION_LOGGING  = 0
-SIMULATION_TYPE     = 2  # 0: operating_point / 1:sweep throttle / 2: sweep panel power
-SHOW_SWEEP_PLOT     = 1
+SIMULATION_TYPE     = 2     # 0: operating_point / 1:sweep throttle / 2: sweep panel power
+SHOW_SWEEP_PLOT     = 0
 
 SHOW_ERRORS         = 0
 SHOW_WARNINGS       = 0
@@ -277,7 +278,7 @@ if __name__ == "__main__":
 
     else:
         if SIMULATION_TYPE == 1:
-            throttle_range = [i/100 for i in range(0, 101, 1)]
+            throttle_range = [i/SWEEP_INTERVAL_COUNT for i in range(0, SWEEP_INTERVAL_COUNT+1, 1)]
             results = []
             for throttle in throttle_range:
                 if SIMULATION_LOGGING:
@@ -291,7 +292,7 @@ if __name__ == "__main__":
                     display_graph=SHOW_SWEEP_PLOT,
                     save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
         elif SIMULATION_TYPE == 2:
-            panel_power_range = [i/100 for i in range(101, 0, -1)]
+            panel_power_range = [i/SWEEP_INTERVAL_COUNT for i in range(SWEEP_INTERVAL_COUNT, 0, -1)]
             results = []
             for panel_power in panel_power_range:
                 if SIMULATION_LOGGING:
