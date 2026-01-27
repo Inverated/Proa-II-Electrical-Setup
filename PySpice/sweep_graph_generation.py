@@ -10,7 +10,7 @@ MARKER_SIZE = 0
 IMG_FILE_NAME = "sweep_simulation_results.png"
 WARNING_FILE_NAME = "sweep_simulation_warnings.json"
 
-def generate_graph(results: list, x_axis: list, 
+def generate_graph(results: list, x_axis: list, x_label: str = "",
                    voltage_display_choice: list = [], 
                    current_display_choice: list = [], 
                    power_display_choice: list = [], 
@@ -25,12 +25,12 @@ def generate_graph(results: list, x_axis: list,
         print("No display choices selected")
         return
     
-    fig, axes = plt.subplots(num_plots, 1, figsize=(12, 6 * num_plots))
+    _, axes = plt.subplots(num_plots, 1, figsize=(10, 6 * num_plots))
     if num_plots == 1:
         axes = [axes]
     
     # Adjust spacing between subplots
-    plt.subplots_adjust(hspace=8, bottom=0.1)
+    plt.subplots_adjust(hspace=15, bottom=0.1)
     
 
     warning_points = []
@@ -43,7 +43,6 @@ def generate_graph(results: list, x_axis: list,
             })
         for array in result['battery_result']['data']:
             current_list = list(array['current'].values())
-            print(abs(sum(current_list) / len(current_list) - 0))
             if abs(sum(current_list) / len(current_list) - 0) < 0.9:
                 equilibrium_points.append(x_axis[i])
     
@@ -66,9 +65,9 @@ def generate_graph(results: list, x_axis: list,
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
         
-        ax.set_xlabel('Throttle Input')
+        ax.set_xlabel(x_label)
         ax.set_ylabel('Voltage (V)')
-        ax.set_title('Voltage vs Throttle Input')
+        ax.set_title(f'Voltage vs {x_label}')
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.grid(True, alpha=0.3)
         
@@ -82,8 +81,7 @@ def generate_graph(results: list, x_axis: list,
                 
         # Add equilibrium markers
         if equilibrium_points:
-            for ep in equilibrium_points:
-                ax.axvline(x=ep, color='green', linestyle='--', alpha=0.3)
+            ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle='--', alpha=0.3)
         
         plot_idx += 1
     
@@ -101,9 +99,9 @@ def generate_graph(results: list, x_axis: list,
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
         
-        ax.set_xlabel('Throttle Input')
+        ax.set_xlabel(x_label)
         ax.set_ylabel('Current (A)')
-        ax.set_title('Current vs Throttle Input')
+        ax.set_title(f'Current vs {x_label}')
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.grid(True, alpha=0.3)
         
@@ -114,9 +112,7 @@ def generate_graph(results: list, x_axis: list,
         
         # Add equilibrium markers
         if equilibrium_points:
-            for ep in equilibrium_points:
-                ax.axvline(x=ep, color='green', linestyle='--', alpha=0.3)
-        
+            ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle='--', alpha=0.3)       
         
         plot_idx += 1
     
@@ -134,9 +130,9 @@ def generate_graph(results: list, x_axis: list,
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
         
-        ax.set_xlabel('Throttle Input')
+        ax.set_xlabel(x_label)
         ax.set_ylabel('Power (W)')
-        ax.set_title('Power vs Throttle Input')
+        ax.set_title(f'Power vs {x_label}')
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.grid(True, alpha=0.3)
         
@@ -147,8 +143,7 @@ def generate_graph(results: list, x_axis: list,
 
         # Add equilibrium markers
         if equilibrium_points:
-            for ep in equilibrium_points:
-                ax.axvline(x=ep, color='green', linestyle='--', alpha=0.3)
+            ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle='--', alpha=0.3)
         
         
     """ # Add warning text box positioned below all graphs
@@ -164,11 +159,13 @@ def generate_graph(results: list, x_axis: list,
     
     plt.tight_layout(rect=[0, 0.05, 1, 1])  # Leave space at bottom for warnings
     
-    with open(os.path.join(save_path, WARNING_FILE_NAME), 'w') as f:
-        json.dump(warning_points, f, indent=4)
-        print(f"Warning points saved to {os.path.join(save_path, WARNING_FILE_NAME)}")
+    
     
     if save_path:
+        with open(os.path.join(save_path, WARNING_FILE_NAME), 'w') as f:
+            json.dump(warning_points, f, indent=4)
+            print(f"Warning points saved to {os.path.join(save_path, WARNING_FILE_NAME)}")
+            
         save_file = os.path.join(save_path, IMG_FILE_NAME)
         plt.savefig(save_file, dpi=300, bbox_inches='tight')
         print(f"Graph saved to {save_file}")

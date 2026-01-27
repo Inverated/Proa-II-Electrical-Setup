@@ -1,7 +1,9 @@
 from configurations.constants import EPISON, POWER_MISMATCH_TOLERANCE_PERCENTAGE
 
 
-def cross_check_result(component_object, result):
+def cross_check_result(analysis, component_object, result):
+    if analysis is None:
+        return
     mppt = result["mppt_result"]
     solar = result["solar_result"]
     load = result["load_result"]
@@ -55,4 +57,5 @@ has been restricted to {actual_throttle*100:.2f}% instead of {throttle_setting*1
         
     
     result["warning"]["array_count"] = len(result["warning"]["data"])
+    return None
         

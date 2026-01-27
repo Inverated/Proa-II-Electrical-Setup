@@ -29,7 +29,7 @@ SHOW_NETLIST        = 0
 IGNORE_ERROR        = 1
 START_SIMULATION    = 1
 SIMULATION_LOGGING  = 0
-SIMULATION_TYPE     = 1  # 0: operating_point / 1:sweep
+SIMULATION_TYPE     = 2  # 0: operating_point / 1:sweep throttle / 2: sweep panel power
 SHOW_SWEEP_PLOT     = 1
 
 SHOW_ERRORS         = 0
@@ -46,7 +46,7 @@ except Exception as e:
 
 
 "================== Construct circuit ================="
-def build_circuit_from_json(file_path: str, throttle_setting = None):
+def build_circuit_from_json(file_path: str, throttle_setting = None, panel_power_setting = None):
     circuit = Circuit("Solar_Panel-Mppt-Battery-Motor Circuit Thingy")
     components = {
         "panel": [],
@@ -80,6 +80,8 @@ def build_circuit_from_json(file_path: str, throttle_setting = None):
             continue
         config = mppt_array[key]
         for _ in range(config['count']):
+            if panel_power_setting is not None:
+                config['panel_info']['power'] *= panel_power_setting
             solar_array = Solar_Array(
                 circuit, components, **config['panel_info'])
             mppt = MPPT(circuit, components, **config['mppt_info'])
@@ -143,7 +145,7 @@ def build_circuit_from_json(file_path: str, throttle_setting = None):
             
             analysis, result, struc = begin_simulation(meta_data, circuit, errors)
             parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING, SHOW_PANELS)
-            cross_check_result(component_object, result)
+            cross_check_result(analysis, component_object, result)
     else:
         if SHOW_ERRORS and START_SIMULATION:
             print(f"{BARF}Simulation Aborted Due to Errors in Circuit Setup.{BARE}")
@@ -160,8 +162,7 @@ def build_circuit_from_json(file_path: str, throttle_setting = None):
         for warning in result["warning"]["data"]:
             print(f"\t{warning}")
         print()
-        
-    return result
+    return analysis, result
     
 
 
@@ -272,23 +273,43 @@ def save_to_file(result):
 
 if __name__ == "__main__":
     if SIMULATION_TYPE == 0:
-        result = build_circuit_from_json(CONFIG_FILE)
+        analysis, result = build_circuit_from_json(CONFIG_FILE)
 
-    elif SIMULATION_TYPE == 1:
-        throttle_range = [i/100 for i in range(0, 101, 1)]
-        results = []
-        for throttle in throttle_range:
-            if SIMULATION_LOGGING:
-                print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")
-            result = build_circuit_from_json(CONFIG_FILE, throttle)
-            results.append(result)
-            
-        generate_graph(results, throttle_range, 
-                       voltage_display_choice=['mppt_result', 'solar_result', 'load_result'],
-                       current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
-                       power_display_choice=['load_result', 'battery_result'],
-                       display_graph=SHOW_SWEEP_PLOT,
-                       save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
+    else:
+        if SIMULATION_TYPE == 1:
+            throttle_range = [i/100 for i in range(0, 101, 1)]
+            results = []
+            for throttle in throttle_range:
+                if SIMULATION_LOGGING:
+                    print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")
+                analysis, result = build_circuit_from_json(CONFIG_FILE, throttle)
+                results.append(result)
+            generate_graph(results, throttle_range, x_label="Throttle Input (%)",
+                    voltage_display_choice=['mppt_result', 'solar_result', 'load_result'],
+                    current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
+                    power_display_choice=['load_result', 'battery_result'],
+                    display_graph=SHOW_SWEEP_PLOT,
+                    save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
+        elif SIMULATION_TYPE == 2:
+            panel_power_range = [i/100 for i in range(101, 0, -1)]
+            results = []
+            for panel_power in panel_power_range:
+                if SIMULATION_LOGGING:
+                    print(f"\n{BARF}Starting Simulation with Panel Power Setting: {panel_power*100:.2f}%{BARE}")
+                analysis, result = build_circuit_from_json(CONFIG_FILE, panel_power_setting=panel_power)
+                if analysis:
+                    results.append(result)
+                else:
+                    panel_power_range = panel_power_range[:panel_power_range.index(panel_power)]
+                    break
+            generate_graph(results, panel_power_range, x_label="Panel Power (%)",
+                    voltage_display_choice=['mppt_result', 'solar_result', 'load_result'],
+                    current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
+                    power_display_choice=['load_result', 'battery_result', 'solar_result'],
+                    display_graph=SHOW_SWEEP_PLOT,
+                    save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
+                
+        
             
             
     if START_SIMULATION and SAVE_OUTPUT:
