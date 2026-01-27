@@ -1,8 +1,8 @@
 {
     "info": {
         "name": "Solar_Panel-Mppt-Battery-Motor Circuit Thingy",
-        "configuration_file": "C:\\Users\\Kor\\Documents\\GitHub\\Proa-II-Electrical-Setup\\pyspice/configurations/circuit_setup.json",
-        "date": "2026-01-22T16:47:15.685174"
+        "configuration_file": "C:\\Users\\Kor\\Documents\\GitHub\\Proa-II-Electrical-Setup\\pyspice\\configurations\\circuit_setup.json",
+        "date": "2026-01-27T11:08:41.010525"
     },
     "error": {
         "keyword": "error",
@@ -13,7 +13,7 @@
         "keyword": "warning",
         "array_count": 1,
         "data": [
-            "Battery array is being over-discharged. Motor 0 has been restricted to 54.90% instead of 100.00% throttle level."
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 100.00% throttle level."
         ]
     },
     "summary": {
@@ -23,24 +23,33 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "total_mppt_output": 50.799950553877004,
-                    "total_dc_bus_voltage": 50.799949553877006
+                    "total_mppt_output": 50.79995119665942,
+                    "total_dc_bus_voltage": 50.799950196659424
                 },
                 "current": {
-                    "total_mppt_output_current": 32.137546457350254,
-                    "total_battery_input_current": -50.00007230253568
+                    "total_mppt_output_current": 64.27509293705225,
+                    "total_battery_input_current": -50.00004016502134
                 }
             }
         ]
     },
     "mppt_result": {
         "keyword": "mppt",
-        "array_count": 1,
+        "array_count": 2,
         "data": [
             {
                 "array_index": 0,
                 "voltage": {
-                    "mppt_output": 51.121327018557004
+                    "mppt_output": 51.12132766133942
+                },
+                "current": {
+                    "mppt_output": 32.137546468000004
+                }
+            },
+            {
+                "array_index": 1,
+                "voltage": {
+                    "mppt_output": 51.12132766133942
                 },
                 "current": {
                     "mppt_output": 32.137546468000004
@@ -55,46 +64,69 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "0|1|battery_negative": 25.39994927690235,
-                    "0|1|battery_positive": 51.29994927690235,
-                    "0|0|battery_negative": -5.000007230253459e-05,
-                    "0|0|battery_positive": 25.8999499999277
+                    "0|1|battery_negative": 25.39994959830963,
+                    "0|1|battery_positive": 51.29994959830963,
+                    "0|0|battery_negative": -5.000004016502089e-05,
+                    "0|0|battery_positive": 25.899949999959837
                 },
                 "current": {
-                    "0|0|battery": -50.00007230253459,
-                    "0|1|battery": -50.000072302535045
+                    "0|0|battery": -50.00004016502089,
+                    "0|1|battery": -50.000040165021346
                 }
             }
         ]
     },
     "solar_result": {
         "keyword": "solar_array",
-        "array_count": 1,
+        "array_count": 2,
         "data": [
             {
                 "array_index": 0,
                 "voltage": {
-                    "solar_array_output": 80.00000100000001
+                    "solar_array_output": 79.94320675431516
                 },
                 "current": {
-                    "solar_array_output": 22.75
+                    "solar_array_output": 22.73384913638337
+                }
+            },
+            {
+                "array_index": 1,
+                "voltage": {
+                    "solar_array_output": 80.056795245679
+                },
+                "current": {
+                    "solar_array_output": 22.766150863614964
                 }
             }
         ]
     },
     "panel_result": {
         "keyword": "panel",
-        "array_count": 1,
+        "array_count": 2,
         "data": [
             {
                 "array_index": 0,
                 "voltage": {
-                    "1|1|panel_positive": 80.11375100000001,
+                    "1|1|panel_positive": 80.05687599999708,
                     "1|1|panel_negative": -1.6940658945086007e-21,
                     "1|0|panel_positive": 40.0,
                     "1|0|panel_negative": -1.1374999999999999e-05,
-                    "0|1|panel_positive": 80.11375100000001,
-                    "0|1|panel_negative": 0.0,
+                    "0|1|panel_positive": 80.05687599999708,
+                    "0|1|panel_negative": -1.6940658945086007e-21,
+                    "0|0|panel_positive": 40.0,
+                    "0|0|panel_negative": -1.1374999999999999e-05
+                },
+                "current": {}
+            },
+            {
+                "array_index": 1,
+                "voltage": {
+                    "1|1|panel_positive": 80.170545245679,
+                    "1|1|panel_negative": -1.6940658945086007e-21,
+                    "1|0|panel_positive": 40.0,
+                    "1|0|panel_negative": -1.1374999999999999e-05,
+                    "0|1|panel_positive": 80.170545245679,
+                    "0|1|panel_negative": -1.6940658945086007e-21,
                     "0|0|panel_positive": 40.0,
                     "0|0|panel_negative": -1.1374999999999999e-05
                 },
@@ -109,7 +141,7 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "balancing_load": 50.79994855387701
+                    "balancing_load": 50.799949196659426
                 },
                 "current": {
                     "balancing_load": 0.0
@@ -124,10 +156,10 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "torqeedo_cruise_4.0_load": 50.79994855387701
+                    "torqeedo_cruise_4.0_load": 50.799949196659426
                 },
                 "current": {
-                    "torqeedo_cruise_4.0_load": 82.13761876523495
+                    "torqeedo_cruise_4.0_load": 114.27513310313225
                 }
             }
         ]

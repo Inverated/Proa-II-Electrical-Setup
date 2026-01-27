@@ -22,7 +22,8 @@ def cross_check_result(component_object, result):
         solar_output_current = solar_data[i]["current"]["solar_array_output"]
         input_power = solar_output_voltage * solar_output_current * component_object["mppt"][i].get_efficiency()
         if output_curr_limit - actual_curr_output < EPISON:
-            result["warning"]["data"].append(f"(Array {i}) Excess power input into MPPT due to {output_curr_limit} A output limit. Input Power: {input_power:.2f} W, Output Power: {actual_voltage_output*actual_curr_output:.2f} W")
+            result["warning"]["data"].append(f"(Array {i}) Excess power input into MPPT due to {output_curr_limit} A output limit. \
+Total Input Power: {input_power:.2f} W, restricted to: {actual_voltage_output*actual_curr_output:.2f} W")
     
     # Check battery charge
     excess_current = load_balancer['data'][0]["current"]["balancing_load"]
@@ -48,7 +49,8 @@ def cross_check_result(component_object, result):
 
         if (throttle_setting - actual_throttle) * 100 > POWER_MISMATCH_TOLERANCE_PERCENTAGE:
             actual_throttle = actual_power / power_rating if power_rating > 0 else 0.0
-            result["warning"]["data"].append(f"Battery array is being over-discharged. Motor {index} has been restricted to {actual_throttle*100:.2f}% instead of {throttle_setting*100:.2f}% throttle level.")
+            result["warning"]["data"].append(f"Battery array is being over-discharged. Motor {index} \
+has been restricted to {actual_throttle*100:.2f}% instead of {throttle_setting*100:.2f}% throttle level.")
         
         
     

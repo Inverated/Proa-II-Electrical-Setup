@@ -1,32 +1,22 @@
+import json
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import List, Dict, Optional
+import os
+from typing import List, Dict
+from configurations.constants import EPISON
+
+
+MARKER_SIZE = 0
+IMG_FILE_NAME = "sweep_simulation_results.png"
+WARNING_FILE_NAME = "sweep_simulation_warnings.json"
 
 def generate_graph(results: list, x_axis: list, 
                    voltage_display_choice: list = [], 
                    current_display_choice: list = [], 
                    power_display_choice: list = [], 
+                   display_graph: bool = False,
                    save_path: str = None):
-    """
-    Plot current, voltage, and power curves from circuit simulation results.
     
-    Parameters:
-    -----------
-    results : list
-        List of result dictionaries from circuit simulations
-    x_axis : list
-        X-axis values (e.g., throttle_range)
-    voltage_display_choice : list
-        Categories to plot voltages for (e.g., ['mppt_result', 'solar_result'])
-    current_display_choice : list
-        Categories to plot currents for
-    power_display_choice : list
-        Categories to plot power for
-    save_path : str, optional
-        Path to save the figure. If None, displays instead.
-    """
-    
-    # Count how many subplots we need
     num_plots = sum([len(voltage_display_choice) > 0, 
                      len(current_display_choice) > 0, 
                      len(power_display_choice) > 0])
@@ -35,22 +25,27 @@ def generate_graph(results: list, x_axis: list,
         print("No display choices selected")
         return
     
-    # Create figure with subplots with more vertical spacing
     fig, axes = plt.subplots(num_plots, 1, figsize=(12, 6 * num_plots))
     if num_plots == 1:
         axes = [axes]
     
     # Adjust spacing between subplots
-    plt.subplots_adjust(hspace=0.4, bottom=0.15)
+    plt.subplots_adjust(hspace=8, bottom=0.1)
     
-    # Collect warnings for annotation
+
     warning_points = []
+    equilibrium_points = []
     for i, result in enumerate(results):
         if 'warning' in result and result['warning']['array_count'] > 0:
             warning_points.append({
                 'x': x_axis[i],
                 'warnings': result['warning']['data']
             })
+        for array in result['battery_result']['data']:
+            current_list = list(array['current'].values())
+            print(abs(sum(current_list) / len(current_list) - 0))
+            if abs(sum(current_list) / len(current_list) - 0) < 0.9:
+                equilibrium_points.append(x_axis[i])
     
     # Color cycles for different traces
     colors = plt.cm.tab10(np.linspace(0, 1, 10))
@@ -66,7 +61,7 @@ def generate_graph(results: list, x_axis: list,
             voltages = extract_traces(results, category, 'voltage')
             
             for label, values in voltages.items():
-                ax.plot(x_axis, values, marker='o', markersize=2, 
+                ax.plot(x_axis, values, marker='o', markersize=MARKER_SIZE, 
                        label=f"{category} - {label}", 
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -84,6 +79,11 @@ def generate_graph(results: list, x_axis: list,
                       linestyle='--', alpha=0, label='_nolegend_')
             for wp in warning_points:
                 ax.axvline(x=wp['x'], color='red', linestyle='--', alpha=0.3)
+                
+        # Add equilibrium markers
+        if equilibrium_points:
+            for ep in equilibrium_points:
+                ax.axvline(x=ep, color='green', linestyle='--', alpha=0.3)
         
         plot_idx += 1
     
@@ -96,7 +96,7 @@ def generate_graph(results: list, x_axis: list,
             currents = extract_traces(results, category, 'current')
             
             for label, values in currents.items():
-                ax.plot(x_axis, values, marker='o', markersize=2,
+                ax.plot(x_axis, values, marker='o', markersize=MARKER_SIZE,
                        label=f"{category} - {label}",
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -112,6 +112,12 @@ def generate_graph(results: list, x_axis: list,
             for wp in warning_points:
                 ax.axvline(x=wp['x'], color='red', linestyle='--', alpha=0.3)
         
+        # Add equilibrium markers
+        if equilibrium_points:
+            for ep in equilibrium_points:
+                ax.axvline(x=ep, color='green', linestyle='--', alpha=0.3)
+        
+        
         plot_idx += 1
     
     # Plot Power
@@ -123,7 +129,7 @@ def generate_graph(results: list, x_axis: list,
             power_traces = extract_power_traces(results, category)
             
             for label, values in power_traces.items():
-                ax.plot(x_axis, values, marker='o', markersize=2,
+                ax.plot(x_axis, values, marker='o', markersize=MARKER_SIZE,
                        label=f"{category} - {label}",
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -138,8 +144,14 @@ def generate_graph(results: list, x_axis: list,
         if warning_points:
             for wp in warning_points:
                 ax.axvline(x=wp['x'], color='red', linestyle='--', alpha=0.3)
-    
-    # Add warning text box positioned below all graphs
+
+        # Add equilibrium markers
+        if equilibrium_points:
+            for ep in equilibrium_points:
+                ax.axvline(x=ep, color='green', linestyle='--', alpha=0.3)
+        
+        
+    """ # Add warning text box positioned below all graphs
     if warning_points:
         warning_text = "Warnings:\n"
         for wp in warning_points:
@@ -148,15 +160,20 @@ def generate_graph(results: list, x_axis: list,
         fig.text(0.1, 0.02, warning_text, 
                 fontsize=8, color='red', 
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5),
-                verticalalignment='bottom')
+                verticalalignment='bottom') """
     
     plt.tight_layout(rect=[0, 0.05, 1, 1])  # Leave space at bottom for warnings
     
+    with open(os.path.join(save_path, WARNING_FILE_NAME), 'w') as f:
+        json.dump(warning_points, f, indent=4)
+        print(f"Warning points saved to {os.path.join(save_path, WARNING_FILE_NAME)}")
+    
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"Graph saved to {save_path}")
-    else:
-        plt.show()
+        save_file = os.path.join(save_path, IMG_FILE_NAME)
+        plt.savefig(save_file, dpi=300, bbox_inches='tight')
+        print(f"Graph saved to {save_file}")
+    if display_graph:
+        plt.show()     
 
 
 def extract_traces(results: list, category: str, data_type: str) -> Dict[str, List[float]]:
@@ -219,7 +236,7 @@ def extract_power_traces(results: list, category: str) -> Dict[str, List[float]]
                 # Match voltage and current keys to compute power
                 for v_key, v_value in voltages.items():
                     # Try to find matching current key
-                    c_key = v_key
+                    c_key = v_key.rstrip('_positive').rstrip('_negative')
                     if c_key in currents:
                         trace_name = v_key
                         if 'array_index' in array_item:
@@ -232,11 +249,3 @@ def extract_power_traces(results: list, category: str) -> Dict[str, List[float]]
                         power_traces[trace_name].append(power)
     
     return power_traces
-
-
-# Example usage:
-# generate_graph(results, throttle_range, 
-#                voltage_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
-#                current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
-#                power_display_choice=['load_result'],
-#                save_path=None)

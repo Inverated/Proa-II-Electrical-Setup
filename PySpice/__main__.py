@@ -15,9 +15,11 @@ from components.mppt import MPPT
 from components.solar_panel_array import Solar_Array
 
 path = os.getcwd()
-CONFIG_PATH         = os.path.join(path, 'pyspice/configurations/circuit_setup.json')
-SAVE_FILE           = os.path.join(path, 'pyspice/result/simulation_results.json')
-SAVE_OUTPUT         = 0
+
+CONFIG_FILE         = os.path.join(path, 'pyspice\\configurations\\circuit_setup.json')
+SIM_SAVE_PATH       = os.path.join(path, 'pyspice\\result')
+SWEEP_SAVE_PATH     = os.path.join(path, 'pyspice\\result')
+SAVE_OUTPUT         = 1
 
 COMPONENT_LOGGING   = 0
 SHOW_COMPONENTS     = 0
@@ -27,7 +29,8 @@ SHOW_NETLIST        = 0
 IGNORE_ERROR        = 1
 START_SIMULATION    = 1
 SIMULATION_LOGGING  = 0
-SIMULATION_TYPE     = 'sweep'  # operating_point / sweep
+SIMULATION_TYPE     = 1  # 0: operating_point / 1:sweep
+SHOW_SWEEP_PLOT     = 1
 
 SHOW_ERRORS         = 0
 SHOW_WARNINGS       = 0
@@ -43,7 +46,6 @@ except Exception as e:
 
 
 "================== Construct circuit ================="
-
 def build_circuit_from_json(file_path: str, throttle_setting = None):
     circuit = Circuit("Solar_Panel-Mppt-Battery-Motor Circuit Thingy")
     components = {
@@ -137,7 +139,7 @@ def build_circuit_from_json(file_path: str, throttle_setting = None):
     if not has_error or IGNORE_ERROR:
         if START_SIMULATION:
             simulation_started = True
-            meta_data = {"name": circuit.title, "configuration_file": CONFIG_PATH, "date": datetime.datetime.now().isoformat()}
+            meta_data = {"name": circuit.title, "configuration_file": CONFIG_FILE, "date": datetime.datetime.now().isoformat()}
             
             analysis, result, struc = begin_simulation(meta_data, circuit, errors)
             parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING, SHOW_PANELS)
@@ -263,29 +265,30 @@ def begin_simulation(meta_data, circuit, errors=[]):
 
 def save_to_file(result):
     json_result = json.dumps(result, indent=4)
-    
-    with open(SAVE_FILE, 'w') as f:
+    save_path = os.path.join(SIM_SAVE_PATH, 'simulation_results.json')
+    with open(save_path, 'w') as f:
         f.write(json_result)
-        print(f"\n{BARF}Simulation results saved to {SAVE_FILE}{BARE}")
+        print(f"\n{BARF}Simulation results saved to {save_path}{BARE}")
 
 if __name__ == "__main__":
-    if SIMULATION_TYPE == 'operating_point':
-        result = build_circuit_from_json(CONFIG_PATH)
+    if SIMULATION_TYPE == 0:
+        result = build_circuit_from_json(CONFIG_FILE)
 
-    elif SIMULATION_TYPE == 'sweep':
+    elif SIMULATION_TYPE == 1:
         throttle_range = [i/100 for i in range(0, 101, 1)]
         results = []
         for throttle in throttle_range:
             if SIMULATION_LOGGING:
                 print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")
-            result = build_circuit_from_json(CONFIG_PATH, throttle)
+            result = build_circuit_from_json(CONFIG_FILE, throttle)
             results.append(result)
             
         generate_graph(results, throttle_range, 
-                       voltage_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
+                       voltage_display_choice=['mppt_result', 'solar_result', 'load_result'],
                        current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
-                       power_display_choice=['load_result'],
-                       save_path=None)
+                       power_display_choice=['load_result', 'battery_result'],
+                       display_graph=SHOW_SWEEP_PLOT,
+                       save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
             
             
     if START_SIMULATION and SAVE_OUTPUT:

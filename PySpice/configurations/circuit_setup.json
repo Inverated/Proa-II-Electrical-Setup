@@ -6,7 +6,7 @@
     "mppt_panel_setup": {
         "description": "Combine all config_x in parallel. Set count to 0 to disable that config",
         "config_1": {
-            "count": 1,
+            "count": 2,
             "description": {
                 "panel": "NA",
                 "mppt": "https://www.victronenergy.com/media/pg/Manual_BlueSolar_150-35__150-45/en/technical-specifications.html"

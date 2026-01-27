@@ -1,0 +1,200 @@
+[
+    {
+        "x": 0.0,
+        "warnings": [
+            "Battery is overcharged by 14.275078639388084 A"
+        ]
+    },
+    {
+        "x": 0.01,
+        "warnings": [
+            "Battery is overcharged by 12.730678670108318 A"
+        ]
+    },
+    {
+        "x": 0.02,
+        "warnings": [
+            "Battery is overcharged by 11.18627866357565 A"
+        ]
+    },
+    {
+        "x": 0.03,
+        "warnings": [
+            "Battery is overcharged by 9.641878671944141 A"
+        ]
+    },
+    {
+        "x": 0.04,
+        "warnings": [
+            "Battery is overcharged by 8.097478665411472 A"
+        ]
+    },
+    {
+        "x": 0.05,
+        "warnings": [
+            "Battery is overcharged by 6.553078666329384 A"
+        ]
+    },
+    {
+        "x": 0.06,
+        "warnings": [
+            "Battery is overcharged by 5.008678667247295 A"
+        ]
+    },
+    {
+        "x": 0.07,
+        "warnings": [
+            "Battery is overcharged by 3.4642786607146263 A"
+        ]
+    },
+    {
+        "x": 0.08,
+        "warnings": [
+            "Battery is overcharged by 1.9198786690831184 A"
+        ]
+    },
+    {
+        "x": 0.09,
+        "warnings": [
+            "Battery is overcharged by 0.37547866255044937 A"
+        ]
+    },
+    {
+        "x": 0.78,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 78.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.79,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 79.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.8,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 80.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.81,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 81.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.82,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 82.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.83,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 83.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.84,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 84.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.85,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 85.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.86,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 86.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.87,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 87.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.88,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 88.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.89,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 89.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.9,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 90.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.91,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 91.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.92,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 92.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.93,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 93.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.94,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 94.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.95,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 95.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.96,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 96.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.97,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 97.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.98,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 98.00% throttle level."
+        ]
+    },
+    {
+        "x": 0.99,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 99.00% throttle level."
+        ]
+    },
+    {
+        "x": 1.0,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 76.38% instead of 100.00% throttle level."
+        ]
+    }
+]
