@@ -30,8 +30,8 @@ SHOW_NETLIST        = 0
 IGNORE_ERROR        = 1
 START_SIMULATION    = 1
 SIMULATION_LOGGING  = 0
-SIMULATION_TYPE     = 2     # 0: operating_point / 1:sweep throttle / 2: sweep panel power
-SHOW_SWEEP_PLOT     = 0
+SIMULATION_TYPE     = 1     # 0: operating_point / 1:sweep throttle / 2: sweep panel power
+SHOW_SWEEP_PLOT     = 1
 
 SHOW_ERRORS         = 0
 SHOW_WARNINGS       = 0
@@ -286,7 +286,7 @@ if __name__ == "__main__":
                 analysis, result = build_circuit_from_json(CONFIG_FILE, throttle)
                 results.append(result)
             generate_graph(results, throttle_range, x_label="Throttle Input (%)",
-                    voltage_display_choice=['mppt_result', 'solar_result', 'load_result'],
+                    voltage_display_choice=['mppt_result', 'load_result'],
                     current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
                     power_display_choice=['load_result', 'battery_result'],
                     display_graph=SHOW_SWEEP_PLOT,
@@ -304,7 +304,7 @@ if __name__ == "__main__":
                     panel_power_range = panel_power_range[:panel_power_range.index(panel_power)]
                     break
             generate_graph(results, panel_power_range, x_label="Panel Power (%)",
-                    voltage_display_choice=['mppt_result', 'solar_result', 'load_result'],
+                    voltage_display_choice=['mppt_result', 'load_result'],
                     current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
                     power_display_choice=['load_result', 'battery_result', 'solar_result'],
                     display_graph=SHOW_SWEEP_PLOT,

@@ -1,4 +1,4 @@
-from configurations.constants import EPISON, POWER_MISMATCH_TOLERANCE_PERCENTAGE
+from configurations.constants import EPSILON, POWER_MISMATCH_TOLERANCE_PERCENTAGE
 
 
 def cross_check_result(analysis, component_object, result):
@@ -23,13 +23,13 @@ def cross_check_result(analysis, component_object, result):
         solar_output_voltage = solar_data[i]["voltage"]["solar_array_output"]
         solar_output_current = solar_data[i]["current"]["solar_array_output"]
         input_power = solar_output_voltage * solar_output_current * component_object["mppt"][i].get_efficiency()
-        if output_curr_limit - actual_curr_output < EPISON:
+        if output_curr_limit - actual_curr_output < EPSILON:
             result["warning"]["data"].append(f"(Array {i}) Excess power input into MPPT due to {output_curr_limit} A output limit. \
 Total Input Power: {input_power:.2f} W, restricted to: {actual_voltage_output*actual_curr_output:.2f} W")
     
     # Check battery charge
     excess_current = load_balancer['data'][0]["current"]["balancing_load"]
-    if excess_current > EPISON:
+    if excess_current > EPSILON:
         result["warning"]["data"].append(f"Battery is overcharged by {excess_current} A")
         
     # Check battery discharge
