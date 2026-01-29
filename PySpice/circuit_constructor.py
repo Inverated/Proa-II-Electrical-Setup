@@ -11,7 +11,7 @@ from components.mppt import MPPT
 from components.solar_panel_array import Solar_Array
 
 
-def build_circuit_from_json(file_path: str, throttle_setting = None, panel_power_setting = None):
+def build_circuit_from_json(file_path: str, modifications: dict = {}):
     circuit = Circuit("Solar_Panel-Mppt-Battery-Motor Circuit Thingy")
     components = {
         "panel": [],
@@ -45,8 +45,8 @@ def build_circuit_from_json(file_path: str, throttle_setting = None, panel_power
             continue
         config = mppt_array[key]
         for _ in range(config['count']):
-            if panel_power_setting is not None:
-                config['panel_info']['power'] *= panel_power_setting
+            if modifications.get('panel_power_setting') is not None:
+                config['panel_info']['power'] *= modifications['panel_power_setting']
             solar_array = Solar_Array(
                 circuit, components, **config['panel_info'])
             mppt = MPPT(circuit, components, **config['mppt_info'])
@@ -72,11 +72,11 @@ def build_circuit_from_json(file_path: str, throttle_setting = None, panel_power
             continue
         load_name = f"{index}:{key}_load"
         
-        if throttle_setting is not None:
-            if type(throttle_setting) == list:
-                input_data['load_setup'][key]['throttle'] = throttle_setting[index]
+        if modifications.get('throttle_setting') is not None:
+            if type(modifications['throttle_setting']) == list:
+                input_data['load_setup'][key]['throttle'] = modifications['throttle_setting'][index]
             else:
-                input_data['load_setup'][key]['throttle'] = throttle_setting
+                input_data['load_setup'][key]['throttle'] = modifications['throttle_setting']
                 
         load = Load(circuit, components, load_name=load_name, **input_data['load_setup'][key])
         err = load.setup_load(battery_array, log=COMPONENT_LOGGING)

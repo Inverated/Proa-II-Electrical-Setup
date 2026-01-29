@@ -1,15 +1,23 @@
+from simulation_over_time import real_time_digital_simulation, start_voyage
+from simulation_sweeper import sweep_panel_power, sweep_throttle
 from circuit_constructor import build_circuit_from_json
 from pyspice_simulator import begin_simulation
 from result_saver import save_to_file
 from configurations.constants import *
 from configurations.simulation_config import *
 from PySpice.Spice.NgSpice.Shared import NgSpiceShared
-from sweep_graph_generation import generate_graph
+import os
 
 
 # 0: operating_point / 1:sweep throttle / 2: sweep panel power / 3: Voyage mode / 4: RTDS mode
-SIMULATION_TYPE     = 1
+SIMULATION_TYPE         = 2
 
+path = os.getcwd()
+CIRCUIT_CONFIG_FILE     = os.path.join(path, 'pyspice\\configurations\\circuit_setup.json')
+SIM_SAVE_PATH           = os.path.join(path, 'pyspice\\result')
+SWEEP_SAVE_PATH         = os.path.join(path, 'pyspice\\result')
+VOYAGE_CONFIG_FILE      = os.path.join(path, 'pyspice\\configurations\\voyage_setup.json')
+    
 ngspice_available = True
 
 try:
@@ -21,60 +29,22 @@ except Exception as e:
 
 if __name__ == "__main__":
     if SIMULATION_TYPE == 0:
-        circuit, component_object, errors = build_circuit_from_json(CONFIG_FILE)
-        analysis, result = begin_simulation(circuit, component_object, errors)
+        circuit, component_object, errors = build_circuit_from_json(CIRCUIT_CONFIG_FILE)
+        analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
         
         if START_SIMULATION and SAVE_OUTPUT:
-            save_to_file(result)
+            save_to_file(result, save_path=SIM_SAVE_PATH)
 
     elif SIMULATION_TYPE == 1:
-        # Range from 0 to 100% throttle
-        throttle_range = [i / SWEEP_INTERVAL_COUNT for i in range(0, SWEEP_INTERVAL_COUNT + 1, 1)]
-        results = []
-        for throttle in throttle_range:
-            if SIMULATION_LOGGING:
-                print(f"\n{BARF}Starting Simulation with Throttle Setting: {throttle*100:.2f}%{BARE}")
-                
-            circuit, component_object, errors = build_circuit_from_json(CONFIG_FILE, throttle)
-            analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
-            results.append(result)
-        
-        generate_graph(results, throttle_range, x_label="Throttle Input (%)",
-                voltage_display_choice=['mppt_result', 'load_result'],
-                current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
-                power_display_choice=['load_result', 'battery_result'],
-                display_graph=SHOW_SWEEP_PLOT,
-                save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
+        sweep_throttle(circuit_config_loc=CIRCUIT_CONFIG_FILE, save_path=SWEEP_SAVE_PATH, ngspice_available=ngspice_available)
         
     elif SIMULATION_TYPE == 2:
-        # Range from 100% to 0% panel power
-        panel_power_range = [i / SWEEP_INTERVAL_COUNT for i in range(SWEEP_INTERVAL_COUNT, 0, -1)]
-        results = []
-        for panel_power in panel_power_range:
-            if SIMULATION_LOGGING:
-                print(f"\n{BARF}Starting Simulation with Panel Power Setting: {panel_power*100:.2f}%{BARE}")
-                
-            circuit, component_object, errors = build_circuit_from_json(CONFIG_FILE, panel_power_setting=panel_power)
-            analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
-            
-            # If the simulation fails at a certain panel power, stop the sweep
-            if analysis:
-                results.append(result)
-            else:
-                panel_power_range = panel_power_range[:panel_power_range.index(panel_power)]
-                break
-            
-        generate_graph(results, panel_power_range, x_label="Panel Power (%)",
-                voltage_display_choice=['mppt_result', 'load_result'],
-                current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
-                power_display_choice=['load_result', 'battery_result', 'solar_result'],
-                display_graph=SHOW_SWEEP_PLOT,
-                save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
+       sweep_panel_power(circuit_config_loc=CIRCUIT_CONFIG_FILE, save_path=SWEEP_SAVE_PATH, ngspice_available=ngspice_available)
 
     elif SIMULATION_TYPE == 3:
-        None
+        start_voyage(circuit_config_loc=CIRCUIT_CONFIG_FILE,voyage_config_loc=VOYAGE_CONFIG_FILE, ngspice_available=ngspice_available)
     elif SIMULATION_TYPE == 4:
-        None
+        real_time_digital_simulation(circuit_config_loc=CIRCUIT_CONFIG_FILE, ngspice_available=ngspice_available)
     else: 
         print("Invalid SIMULATION_TYPE selected.")
         exit(1)

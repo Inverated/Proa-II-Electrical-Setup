@@ -13,7 +13,7 @@ def begin_simulation(circuit, component_object, errors, pyspice_availablility=Fa
     if not has_error or IGNORE_ERROR:
         if START_SIMULATION:
             simulation_started = True
-            meta_data = {"name": circuit.title, "configuration_file": CONFIG_FILE, "date": datetime.datetime.now().isoformat()}
+            meta_data = {"name": circuit.title, "date": datetime.datetime.now().isoformat()}
             
             analysis, result, struc = __simulate__(circuit, meta_data, errors, pyspice_availablility)
             parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING, SHOW_PANELS)
