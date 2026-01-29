@@ -43,7 +43,7 @@ unsigned long start_time;
 unsigned long time_passed = 0;
 
 // Setup ESP Now
-uint8_t broadcastAddress[] = {0xF8, 0xB3, 0xB7, 0x86, 0x7B, 0x21};
+uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0x4A, 0xCD, 0x08};
 bool messageSent;
 
 typedef struct {
@@ -91,7 +91,7 @@ void setup() {
   if (ENABLE_SERIAL_LOGGING) {
     Serial.println("Setup Complete Successfully\n");
     // Print header once
-    Serial.println("Time(ms)\tV(mV)\tI(mA)\tVPV(V)\tPPV(W)\tCS\tMPPT\tERROR\tLOAD\tSensor (A)");
+    Serial.println("Time(ms)\tV(mV)\tI(mA)\tVPV(V)\tPPV(W)\tCS\tMPPT\tERROR\tLOAD\tSensor (mA)");
   }
 
   start_time = millis();

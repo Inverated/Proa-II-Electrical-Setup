@@ -29,12 +29,12 @@ SHOW_NETLIST        = 0
 
 IGNORE_ERROR        = 1
 START_SIMULATION    = 1
-SIMULATION_LOGGING  = 0
-SIMULATION_TYPE     = 2     # 0: operating_point / 1:sweep throttle / 2: sweep panel power
-SHOW_SWEEP_PLOT     = 0
+SIMULATION_LOGGING  = 1
+SIMULATION_TYPE     = 1     # 0: operating_point / 1:sweep throttle / 2: sweep panel power
+SHOW_SWEEP_PLOT     = 1
 
-SHOW_ERRORS         = 0
-SHOW_WARNINGS       = 0
+SHOW_ERRORS         = 1
+SHOW_WARNINGS       = 1
 
 "================== NgSpice Initialization ================"
 NGSPICE_AVAILABLE = True

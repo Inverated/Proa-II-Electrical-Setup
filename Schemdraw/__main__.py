@@ -10,9 +10,10 @@ drawing = schemdraw.Drawing()
 drawing.config(unit=2)  # default .length( units )
 
 drawing, (top, bottom) = draw_array(drawing=drawing, element=elm.Solar, \
-    terminateDist=TERMINATING_DISTANCE, series=2, parallel=2, isRight=True)
+    terminateDist=TERMINATING_DISTANCE, series=20, parallel=2, isRight=True)
 
-solar_mppt_point = Point((bottom.end.x, bottom.end.y - TERMINATING_DISTANCE/2))
+
+solar_mppt_point = Point((bottom.end.x, bottom.end.y - TERMINATING_DISTANCE / 2))
 mppt = MPPT(pin_gap=TERMINATING_DISTANCE).at(solar_mppt_point).label('MPPT1')
 drawing.add(mppt)
 drawing.draw()
