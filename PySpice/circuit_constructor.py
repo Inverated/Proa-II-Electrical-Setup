@@ -11,7 +11,7 @@ from components.mppt import MPPT
 from components.solar_panel_array import Solar_Array
 
 
-def build_circuit_from_json(file_path: str, modifications: dict = {}):
+def build_circuit_from_json(circuit_config_loc: str, modifications: dict = {}):
     circuit = Circuit("Solar_Panel-Mppt-Battery-Motor Circuit Thingy")
     components = {
         "panel": [],
@@ -21,7 +21,7 @@ def build_circuit_from_json(file_path: str, modifications: dict = {}):
         "mppt": []
     }
     
-    with open(file_path, 'r') as f:
+    with open(circuit_config_loc, 'r') as f:
         input_data = json.load(f)
 
     component_object = {}
@@ -31,6 +31,12 @@ def build_circuit_from_json(file_path: str, modifications: dict = {}):
     battery_array = input_data['battery_setup']
     battery_choice = battery_array['choice']
     battery_config = battery_array[battery_choice]
+    if modifications.get('max_discharge_current') is not None:
+        battery_config['max_discharge_current'] = modifications['max_discharge_current']
+    
+    if modifications.get('battery_voltage') is not None:
+        battery_config['battery_voltage'] = modifications['battery_voltage']
+        
     battery_array = Battery_Array(circuit, components, **battery_config)
     err = battery_array.create_battery_array(log=COMPONENT_LOGGING)
     

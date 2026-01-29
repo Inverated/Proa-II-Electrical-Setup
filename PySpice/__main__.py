@@ -10,14 +10,17 @@ import os
 
 
 # 0: operating_point / 1:sweep throttle / 2: sweep panel power / 3: Voyage mode / 4: RTDS mode
-SIMULATION_TYPE         = 2
+SIMULATION_TYPE         = 0
+
 
 path = os.getcwd()
 CIRCUIT_CONFIG_FILE     = os.path.join(path, 'pyspice\\configurations\\circuit_setup.json')
-SIM_SAVE_PATH           = os.path.join(path, 'pyspice\\result')
-SWEEP_SAVE_PATH         = os.path.join(path, 'pyspice\\result')
 VOYAGE_CONFIG_FILE      = os.path.join(path, 'pyspice\\configurations\\voyage_setup.json')
-    
+
+SIM_SAVE_PATH           = os.path.join(path, 'pyspice\\result\\operating_point_result')
+SWEEP_SAVE_PATH         = os.path.join(path, 'pyspice\\result\\sweep_result')
+VOYAGE_RESULT_SAVE_PATH = os.path.join(path, 'pyspice\\result\\voyage_result')
+
 ngspice_available = True
 
 try:
@@ -42,7 +45,7 @@ if __name__ == "__main__":
        sweep_panel_power(circuit_config_loc=CIRCUIT_CONFIG_FILE, save_path=SWEEP_SAVE_PATH, ngspice_available=ngspice_available)
 
     elif SIMULATION_TYPE == 3:
-        start_voyage(circuit_config_loc=CIRCUIT_CONFIG_FILE,voyage_config_loc=VOYAGE_CONFIG_FILE, ngspice_available=ngspice_available)
+        start_voyage(circuit_config_loc=CIRCUIT_CONFIG_FILE, voyage_config_loc=VOYAGE_CONFIG_FILE, save_path=VOYAGE_RESULT_SAVE_PATH, ngspice_available=ngspice_available)
     elif SIMULATION_TYPE == 4:
         real_time_digital_simulation(circuit_config_loc=CIRCUIT_CONFIG_FILE, ngspice_available=ngspice_available)
     else: 

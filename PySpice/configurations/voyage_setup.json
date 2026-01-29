@@ -1,38 +1,38 @@
 {
   "voyage_info": {
     "name": "Day Trip Simulation",
-    "duration_hours": 8,
+    "duration_minutes": 8,
     "time_step_minutes": 15
   },
   "initial_battery_soc": 0.80,
   "segments": [
     {
       "name": "Morning Cruise",
-      "duration_hours": 2,
+      "duration_minutes": 2,
       "throttle": 0.6,
       "solar_power": 0.4
     },
     {
       "name": "Midday Full Speed",
-      "duration_hours": 2,
+      "duration_minutes": 2,
       "throttle": 0.8,
       "solar_power": 1.0
     },
     {
       "name": "Lunch Stop",
-      "duration_hours": 1,
+      "duration_minutes": 1,
       "throttle": 0.0,
       "solar_power": 1.0
     },
     {
       "name": "Afternoon Return",
-      "duration_hours": 2,
+      "duration_minutes": 2,
       "throttle": 0.7,
       "solar_power": 0.8
     },
     {
       "name": "Evening Approach",
-      "duration_hours": 1,
+      "duration_minutes": 1,
       "throttle": 0.3,
       "solar_power": 0.3
     }

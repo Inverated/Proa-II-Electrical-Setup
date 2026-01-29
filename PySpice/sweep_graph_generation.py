@@ -15,7 +15,8 @@ WARNING_FILE_NAME = "sweep_simulation_warnings.json"
 def generate_graph(results: list, x_axis: list, x_label: str = "",
                    voltage_display_choice: list = [], 
                    current_display_choice: list = [], 
-                   power_display_choice: list = [], 
+                   power_display_choice: list = [],
+                   battery_capacity: list = [],
                    display_graph: bool = False,
                    save_path: str = None):
     
@@ -126,6 +127,12 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         draw_warning_points(warning_points, ax)
         draw_equilibrium_points(equilibrium_points, ax)
 
+    if battery_capacity:
+        ax = axes[plot_idx]
+        ax.plot(x_axis, battery_capacity, marker=MARKER_STYLE, markersize=MARKER_SIZE,
+               label="Battery Capacity (Ah)", color='orange')
+        ax.set_xlabel(x_label)
+        
     
     plt.tight_layout(rect=[0, 0.05, 1, 1])  # Leave space at bottom for warnings
 
