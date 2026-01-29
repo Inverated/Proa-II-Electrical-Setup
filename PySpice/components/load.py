@@ -3,11 +3,11 @@ from configurations.constants import BARE, BARF, GROUNDING_RESISTANCE, VOLTAGE_M
 from configurations.simulation_config import RAWSPICE_ITERATIONS
 
 class Load:
-    def __init__(self, circuit, components, load_name, total_power, nominal_voltage, throttle: float = 1.0):
-        self.load_name = load_name
-        self.throttle = throttle
-        self.MOTOR_VOLTAGE = nominal_voltage
-        self.MOTOR_TOTAL_POWER = total_power
+    def __init__(self, circuit, components, **kwargs):
+        self.load_name = kwargs.get("load_name")
+        self.throttle = kwargs.get("throttle", 1.0)
+        self.MOTOR_VOLTAGE = kwargs.get("nominal_voltage")
+        self.MOTOR_TOTAL_POWER = kwargs.get("total_power")
         self.components = components
         self.circuit = circuit
         self.MOTOR_POWER_DEMAND = self.MOTOR_TOTAL_POWER * self.throttle if self.throttle > 0.0 else GROUNDING_RESISTANCE

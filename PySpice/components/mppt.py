@@ -3,13 +3,13 @@ from components.solar_panel_array import Solar_Array
 from configurations.constants import GROUNDING_RESISTANCE, MPPT_BATTERY_VOLTAGE_BUFFER, VOLTAGE_MISMATCH_TOLERANCE, WIRE_RESISTANCE, BARF, BARE
 
 class MPPT:
-    def __init__(self, circuit, components, max_input_voltage, max_input_current, max_output_voltage, max_output_current, efficiency):
-        self.MPPT_MAX_INPUT_VOLTAGE = max_input_voltage
-        self.MPPT_MAX_INPUT_CURRENT = max_input_current
-        self.MPPT_MAX_OUTPUT_VOLTAGE = max_output_voltage
-        self.MPPT_MAX_OUTPUT_CURRENT = max_output_current
+    def __init__(self, circuit, components, **kwargs):
+        self.MPPT_MAX_INPUT_VOLTAGE = kwargs.get("max_input_voltage")
+        self.MPPT_MAX_INPUT_CURRENT = kwargs.get("max_input_current")
+        self.MPPT_MAX_OUTPUT_VOLTAGE = kwargs.get("max_output_voltage")
+        self.MPPT_MAX_OUTPUT_CURRENT = kwargs.get("max_output_current")
         self.MPPT_OUTPUT_BUFFER_VOLTAGE = MPPT_BATTERY_VOLTAGE_BUFFER
-        self.MPPT_EFFICIENCY = efficiency
+        self.MPPT_EFFICIENCY = kwargs.get("efficiency")
         self.circuit = circuit
         self.components = components
         self.terminal = None
