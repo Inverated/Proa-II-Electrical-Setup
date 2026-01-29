@@ -1,7 +1,8 @@
+from circuit_constructor import build_circuit_from_json
 from pyspice_simulator import begin_simulation
 from result_saver import save_to_file
 from configurations.constants import *
-from circuit_constructor import build_circuit_from_json
+from configurations.simulation_config import *
 from PySpice.Spice.NgSpice.Shared import NgSpiceShared
 from sweep_graph_generation import generate_graph
 
@@ -40,6 +41,7 @@ if __name__ == "__main__":
                     power_display_choice=['load_result', 'battery_result'],
                     display_graph=SHOW_SWEEP_PLOT,
                     save_path=SWEEP_SAVE_PATH if SAVE_OUTPUT else None)
+            
         elif SIMULATION_TYPE == 2:
             panel_power_range = [i/SWEEP_INTERVAL_COUNT for i in range(SWEEP_INTERVAL_COUNT, 0, -1)]
             results = []

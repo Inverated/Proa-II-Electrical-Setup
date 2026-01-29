@@ -1,6 +1,6 @@
 from components.battery_array import Battery_Array
-from configurations.constants import BARE, BARF, GROUNDING_RESISTANCE, RAWSPICE_ITERATIONS, VOLTAGE_MISMATCH_TOLERANCE
-
+from configurations.constants import BARE, BARF, GROUNDING_RESISTANCE, VOLTAGE_MISMATCH_TOLERANCE
+from configurations.simulation_config import RAWSPICE_ITERATIONS
 
 class Load:
     def __init__(self, circuit, components, load_name, total_power, nominal_voltage, throttle: float = 1.0):

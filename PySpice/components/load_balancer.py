@@ -1,5 +1,6 @@
 from components.battery_array import Battery_Array
-from configurations.constants import GROUNDING_RESISTANCE, RAWSPICE_ITERATIONS
+from configurations.constants import GROUNDING_RESISTANCE
+from configurations.simulation_config import RAWSPICE_ITERATIONS
 
 class Load_Balancer:
     def __init__(self, circuit, components):

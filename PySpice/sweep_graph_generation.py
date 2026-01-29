@@ -174,7 +174,7 @@ def draw_warning_points(warning_points: list, ax):
             
 def draw_equilibrium_points(equilibrium_points: list, ax):
     if equilibrium_points:
-        ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle=DOTTED_STYLE, alpha=0.3, zorder=5)
+        ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='lime', linestyle=DOTTED_STYLE, alpha=1, zorder=5)
         ax.relim()
         ax.autoscale_view()
         

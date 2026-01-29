@@ -1,13 +1,13 @@
 from configurations.constants import GROUNDING_RESISTANCE, WIRE_RESISTANCE, BARF, BARE
 
 class Battery_Array:
-    def __init__(self, circuit, components, battery_voltage, battery_in_series, battery_in_parallel, max_charge_current, max_discharge_current):
+    def __init__(self, circuit, components, **kwargs):
         self.circuit = circuit
-        self.BATTERY_IN_PARALLEL = battery_in_parallel
-        self.BATTERY_IN_SERIES = battery_in_series
-        self.BATTERY_VOLTAGE = battery_voltage
-        self.BATTERY_MAX_CHARGE_CURRENT = max_charge_current
-        self.BATTERY_MAX_DISCHARGE_CURRENT = max_discharge_current
+        self.BATTERY_IN_PARALLEL = kwargs.get("battery_in_parallel")
+        self.BATTERY_IN_SERIES = kwargs.get("battery_in_series")
+        self.BATTERY_VOLTAGE = kwargs.get("battery_voltage")
+        self.BATTERY_MAX_CHARGE_CURRENT = kwargs.get("max_charge_current")
+        self.BATTERY_MAX_DISCHARGE_CURRENT = kwargs.get("max_discharge_current")
         self.terminal = None
         self.terminal_id = None
         self.components = components
@@ -45,8 +45,6 @@ class Battery_Array:
         self.circuit.V(self.terminal_id,
                        self.terminal, "battery_input_measured",
                        GROUNDING_RESISTANCE)
-        
-        
         
         if log:
             print(self)        

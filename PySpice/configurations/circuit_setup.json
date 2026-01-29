@@ -45,17 +45,22 @@
 
     },
     "battery_setup": {
-        "description": "Choose one battery type at a time. No mixing of battery types.",
+        "description": "Choose one battery type at a time. No mixing of battery types. Simplfied voltage-capacity to linear model",
         "choice": "LiNMC",
         "LiNMC": {
             "battery_voltage": 25.9,
+            "min_voltage": 21.0,
+            "max_voltage": 29.4,
+
             "battery_in_series": 2,
             "battery_in_parallel": 1,
-            "max_charge_current": 50,
+            "max_charge_current": 100,
             "max_discharge_current": 50
         },
         "LiFePO4": {
             "battery_voltage": 24.9,
+            "min_voltage": 21.0,
+            "max_voltage": 25.0,
             "battery_in_series": 2,
             "battery_in_parallel": 1,
             "max_charge_current": 50,
