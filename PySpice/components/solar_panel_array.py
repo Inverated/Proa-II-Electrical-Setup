@@ -1,11 +1,11 @@
-from configurations.constants import BARF, BARE, GROUNDING_RESISTANCE, WIRE_RESISTANCE, EPISON
+from configurations.constants import BARF, BARE, GROUNDING_RESISTANCE, WIRE_RESISTANCE, EPSILON
 
 class Solar_Array:
     def __init__(self, circuit, components, power, voltage, in_series, in_parallel):
         self.circuit = circuit
         self.PANEL_IN_PARALLEL = in_parallel
         self.PANEL_IN_SERIES = in_series
-        self.PANEL_CURRENT = max(EPISON, power / voltage)
+        self.PANEL_CURRENT = max(EPSILON, power / voltage)
         self.PANEL_INTERNAL_R = voltage / self.PANEL_CURRENT
         self.PANEL_ARRAY_TOTAL_VOLTAGE = self.PANEL_IN_SERIES * voltage
         self.PANEL_ARRAY_TOTAL_CURRENT = self.PANEL_IN_PARALLEL * self.PANEL_CURRENT

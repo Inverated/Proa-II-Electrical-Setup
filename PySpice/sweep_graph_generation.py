@@ -3,10 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from typing import List, Dict
-from configurations.constants import EPISON
 
 
 MARKER_SIZE = 0
+MARKER_STYLE = 'o'  #'o', 's', '^', 'D', '*', 'P', 'X', etc.
+DOTTED_STYLE = ":"     #'-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
+
 IMG_FILE_NAME = "sweep_simulation_results.png"
 WARNING_FILE_NAME = "sweep_simulation_warnings.json"
 
@@ -60,7 +62,7 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
             voltages = extract_traces(results, category, 'voltage')
             
             for label, values in voltages.items():
-                ax.plot(x_axis, values, marker='o', markersize=MARKER_SIZE, 
+                ax.plot(x_axis, values, marker=MARKER_STYLE, markersize=MARKER_SIZE, 
                        label=f"{category} - {label}", 
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -71,17 +73,8 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.grid(True, alpha=0.3)
         
-        # Add warning markers
-        if warning_points:
-            warning_x = [wp['x'] for wp in warning_points]
-            ax.axvline(x=warning_x[0] if warning_x else 0, color='red', 
-                      linestyle='--', alpha=0, label='_nolegend_')
-            for wp in warning_points:
-                ax.axvline(x=wp['x'], color='red', linestyle='--', alpha=0.3)
-                
-        # Add equilibrium markers
-        if equilibrium_points:
-            ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle='--', alpha=0.3)
+        draw_warning_points(warning_points, ax)
+        draw_equilibrium_points(equilibrium_points, ax)
         
         plot_idx += 1
     
@@ -94,7 +87,7 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
             currents = extract_traces(results, category, 'current')
             
             for label, values in currents.items():
-                ax.plot(x_axis, values, marker='o', markersize=MARKER_SIZE,
+                ax.plot(x_axis, values, marker=MARKER_STYLE, markersize=MARKER_SIZE,
                        label=f"{category} - {label}",
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -105,14 +98,8 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.grid(True, alpha=0.3)
         
-        # Add warning markers
-        if warning_points:
-            for wp in warning_points:
-                ax.axvline(x=wp['x'], color='red', linestyle='--', alpha=0.3)
-        
-        # Add equilibrium markers
-        if equilibrium_points:
-            ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle='--', alpha=0.3)       
+        draw_warning_points(warning_points, ax)
+        draw_equilibrium_points(equilibrium_points, ax) 
         
         plot_idx += 1
     
@@ -125,7 +112,7 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
             power_traces = extract_power_traces(results, category)
             
             for label, values in power_traces.items():
-                ax.plot(x_axis, values, marker='o', markersize=MARKER_SIZE,
+                ax.plot(x_axis, values, marker=MARKER_STYLE, markersize=MARKER_SIZE,
                        label=f"{category} - {label}",
                        color=colors[color_idx % len(colors)])
                 color_idx += 1
@@ -136,30 +123,36 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.grid(True, alpha=0.3)
         
-        # Add warning markers
-        if warning_points:
-            for wp in warning_points:
-                ax.axvline(x=wp['x'], color='red', linestyle='--', alpha=0.3)
+        draw_warning_points(warning_points, ax)
+        draw_equilibrium_points(equilibrium_points, ax)
 
-        # Add equilibrium markers
-        if equilibrium_points:
-            ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle='--', alpha=0.3)
-        
-        
-    """ # Add warning text box positioned below all graphs
-    if warning_points:
-        warning_text = "Warnings:\n"
-        for wp in warning_points:
-            warning_text += f"x={wp['x']}: {', '.join(wp['warnings'])}\n"
-        
-        fig.text(0.1, 0.02, warning_text, 
-                fontsize=8, color='red', 
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5),
-                verticalalignment='bottom') """
     
     plt.tight_layout(rect=[0, 0.05, 1, 1])  # Leave space at bottom for warnings
-    
-    
+
+    for i, ax in enumerate(axes):
+        fig_single, ax_single = plt.subplots()
+
+        for line in ax.get_lines():
+            x = line.get_xdata()
+            y = line.get_ydata()
+
+            if len(x) <= 2 or len(y) <= 2:
+                continue
+            
+            ax_single.plot(x, y, label=line.get_label())
+            
+        draw_warning_points(warning_points, ax_single)
+        draw_equilibrium_points(equilibrium_points, ax_single)
+        
+        color_idx += 1
+
+        ax_single.set_title(ax.get_title())
+        ax_single.set_xlabel(ax.get_xlabel())
+        ax_single.set_ylabel(ax.get_ylabel())
+
+        save_file = os.path.join(save_path, f"{ax.get_title()}.png")
+        fig_single.savefig(save_file, bbox_inches="tight")
+        plt.close(fig_single)
     
     if save_path:
         with open(os.path.join(save_path, WARNING_FILE_NAME), 'w') as f:
@@ -172,7 +165,19 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
     if display_graph:
         plt.show()     
 
-
+def draw_warning_points(warning_points: list, ax):
+    if warning_points:
+        for wp in warning_points:
+            ax.axvline(x=wp['x'], color='red', linestyle=DOTTED_STYLE, alpha=0.3, zorder=5)
+            ax.relim()
+            ax.autoscale_view()
+            
+def draw_equilibrium_points(equilibrium_points: list, ax):
+    if equilibrium_points:
+        ax.axvline(x=equilibrium_points[len(equilibrium_points)//2], color='green', linestyle=DOTTED_STYLE, alpha=0.3, zorder=5)
+        ax.relim()
+        ax.autoscale_view()
+        
 def extract_traces(results: list, category: str, data_type: str) -> Dict[str, List[float]]:
     """
     Extract voltage or current traces from results.
