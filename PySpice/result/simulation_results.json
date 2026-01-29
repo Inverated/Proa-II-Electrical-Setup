@@ -1,8 +1,8 @@
 {
     "info": {
         "name": "Solar_Panel-Mppt-Battery-Motor Circuit Thingy",
-        "configuration_file": "F:\\Github\\Proa-II-Electrical-Setup\\pyspice\\configurations\\circuit_setup.json",
-        "date": "2026-01-29T00:33:18.437290"
+        "configuration_file": "C:\\Users\\Kor\\Documents\\GitHub\\Proa-II-Electrical-Setup\\pyspice\\configurations\\circuit_setup.json",
+        "date": "2026-01-29T11:21:32.511943"
     },
     "error": {
         "keyword": "error",
