@@ -1,8 +1,14 @@
 [
     {
-        "x": 8,
+        "x": 170.21730877529325,
         "warnings": [
-            "Battery array is being over-discharged. Motor 0 has been restricted to 92.75% instead of 100.00% throttle level."
+            "Battery array is being over-discharged. Motor 0 has been restricted to 66.88% instead of 100.00% throttle level."
+        ]
+    },
+    {
+        "x": 300.0,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 0.00% instead of 100.00% throttle level."
         ]
     }
 ]

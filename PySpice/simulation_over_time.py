@@ -34,19 +34,20 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
     analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
     results.append(result)
     
-    for segment_idx in range(len(segments)):
+    segment_length = len(segments)
+    for segment_idx in range(segment_length):
+        print("time lis",time_range_min)
+        """ print("len", segment_length)
         
-        print(time_range_min)
         print(battery_capacity_list)
         for each in segments:
             print(json.dumps(each, indent=4))
-        print("\n\n\n")
+        print("\n\n\n") """
         segment = segments[segment_idx]
         
         duration_minutes = segment['duration_minutes']
         throttle_setting = segment['throttle']
         panel_power_setting = segment['solar_power']
-        
         modifications = {}
 
         modifications['battery_voltage'] = estimate_battery_voltage(current_soc, battery_min_voltage, battery_max_voltage)
@@ -61,24 +62,29 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
 
         #if result[battery discharge] * voyage time > current capacity, 
         # calculate how huch time to reach 0, remainding time of the segment modify to 0 discharge
-        discharge_current_Ah = -result["summary"]["data"][0]["current"]["total_battery_input_current"]
+        discharge_current_A = -result["summary"]["data"][0]["current"]["total_battery_input_current"]
         
-        print(current_capacity_Amin, discharge_current_Ah, duration_minutes)
-        print()
+        """ print(current_capacity_Amin, discharge_current_A, duration_minutes)
+        print() """
         # use summary res
         
-        if current_capacity_Amin - (discharge_current_Ah * 60 * duration_minutes) <= 0: 
-            minues_to_empty = (current_capacity_Amin / (discharge_current_Ah * 60))
-            segments[segment_idx]["duration_minutes"] -= minues_to_empty
+        print(current_capacity_Amin, discharge_current_A, duration_minutes)
+        if current_capacity_Amin > 0 and (current_capacity_Amin - discharge_current_A * duration_minutes <= 0): 
+            minues_to_empty = current_capacity_Amin / discharge_current_A
             
+            print("to change",duration_minutes, minues_to_empty)
+            copy = deepcopy(segments[segment_idx])
+            copy["duration_minutes"] = duration_minutes - minues_to_empty
+            segments.insert(segment_idx + 1, copy)
+            segment_length += 1      
+                  
             current_capacity_Amin = 0
             current_soc = 0
             
             results.append(result)
             time_range_min.append(time_range_min[-1] + minues_to_empty)
-            segment_idx -= 1
         else:
-            current_capacity_Amin -= discharge_current_Ah * 60 * duration_minutes
+            current_capacity_Amin -= discharge_current_A * duration_minutes
             current_soc = (current_capacity_Amin / battery_capacity_Amin)
             print('current soc:', current_soc)
             

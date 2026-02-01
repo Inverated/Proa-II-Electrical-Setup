@@ -8,32 +8,32 @@
   "segments": [
     {
       "name": "Morning Cruise",
-      "duration_minutes": 2,
+      "duration_minutes": 100,
       "throttle": 0.6,
       "solar_power": 0.4
     },
     {
       "name": "Midday Full Speed",
-      "duration_minutes": 2,
-      "throttle": 0.8,
-      "solar_power": 1.0
+      "duration_minutes": 200,
+      "throttle": 1.0,
+      "solar_power": 0.0
     },
     {
       "name": "Lunch Stop",
-      "duration_minutes": 1,
+      "duration_minutes": 100,
       "throttle": 0.0,
       "solar_power": 1.0
     },
     {
       "name": "Afternoon Return",
-      "duration_minutes": 2,
+      "duration_minutes": 50,
       "throttle": 1.0,
       "solar_power": 1.0
     },
     {
       "name": "Evening Approach",
-      "duration_minutes": 1,
-      "throttle": 1.0,
+      "duration_minutes": 100,
+      "throttle": 0.3,
       "solar_power": 0.3
     }
   ]
