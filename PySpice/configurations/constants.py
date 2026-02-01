@@ -2,7 +2,7 @@ GROUNDING_RESISTANCE    = 1e-6
 WIRE_RESISTANCE         = 0.01
 BARF                    = "=" * 50 + "\n"
 BARE                    = "\n" + "=" * 50
-EPSILON = 1e-12
+EPSILON = 1e-10
 
 MPPT_BATTERY_VOLTAGE_BUFFER     = 2.0
 VOLTAGE_MISMATCH_TOLERANCE      = 5.0

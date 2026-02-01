@@ -27,13 +27,13 @@
     {
       "name": "Afternoon Return",
       "duration_minutes": 2,
-      "throttle": 0.0,
+      "throttle": 1.0,
       "solar_power": 1.0
     },
     {
       "name": "Evening Approach",
       "duration_minutes": 1,
-      "throttle": 0.3,
+      "throttle": 1.0,
       "solar_power": 0.3
     }
   ]

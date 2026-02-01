@@ -4,6 +4,8 @@ import numpy as np
 import os
 from typing import List, Dict
 
+from configurations.simulation_config import SHOW_SWEEP_PLOT
+
 
 MARKER_SIZE = 0
 MARKER_STYLE = 'o'  #'o', 's', '^', 'D', '*', 'P', 'X', etc.
@@ -17,8 +19,9 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
                    current_display_choice: list = [], 
                    power_display_choice: list = [],
                    battery_capacity: list = [],
-                   display_graph: bool = False,
                    save_path: str = None):
+    
+    display_graph = SHOW_SWEEP_PLOT
     
     num_plots = sum([len(voltage_display_choice) > 0, 
                      len(current_display_choice) > 0, 
@@ -29,16 +32,17 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         print("No display choices selected")
         return
     
-    _, axes = plt.subplots(num_plots, 1, figsize=(10, 6 * num_plots))
+    _, axes = plt.subplots(num_plots, 1, figsize=(10, 5 * num_plots))
     if num_plots == 1:
         axes = [axes]
     
     # Adjust spacing between subplots
-    plt.subplots_adjust(hspace=15, bottom=0.1)
+    plt.subplots_adjust(hspace=20, bottom=0.1)
     
 
     warning_points = []
     equilibrium_points = []
+    
     for i, result in enumerate(results):
         if 'warning' in result and result['warning']['array_count'] > 0:
             warning_points.append({
@@ -47,7 +51,7 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
             })
         for array in result['battery_result']['data']:
             current_list = list(array['current'].values())
-            if abs(sum(current_list) / len(current_list) - 0) < 0.9:
+            if abs(sum(current_list) / len(current_list) - 0) < 1:
                 equilibrium_points.append(x_axis[i])
     
     # Color cycles for different traces
@@ -177,6 +181,7 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         save_file = os.path.join(save_path, IMG_FILE_NAME)
         plt.savefig(save_file, dpi=300, bbox_inches='tight')
         print(f"Graph saved to {save_file}")
+    
     if display_graph:
         plt.show()     
 

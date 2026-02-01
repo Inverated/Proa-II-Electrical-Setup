@@ -1,1 +1,8 @@
-[]
+[
+    {
+        "x": 8,
+        "warnings": [
+            "Battery array is being over-discharged. Motor 0 has been restricted to 92.75% instead of 100.00% throttle level."
+        ]
+    }
+]

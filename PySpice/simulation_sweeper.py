@@ -22,7 +22,6 @@ def sweep_throttle(circuit_config_loc, save_path, ngspice_available):
             voltage_display_choice=['mppt_result', 'load_result'],
             current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
             power_display_choice=['load_result', 'battery_result'],
-            display_graph=SHOW_SWEEP_PLOT,
             save_path=save_path if SAVE_OUTPUT else None)
     
 def sweep_panel_power(circuit_config_loc, save_path, ngspice_available):
@@ -48,5 +47,4 @@ def sweep_panel_power(circuit_config_loc, save_path, ngspice_available):
             voltage_display_choice=['mppt_result', 'load_result'],
             current_display_choice=['mppt_result', 'solar_result', 'load_result', 'battery_result'],
             power_display_choice=['load_result', 'battery_result', 'solar_result'],
-            display_graph=SHOW_SWEEP_PLOT,
             save_path=save_path if SAVE_OUTPUT else None)

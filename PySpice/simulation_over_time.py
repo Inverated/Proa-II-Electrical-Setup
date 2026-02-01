@@ -20,16 +20,27 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
 
     battery_choice = circuit_data['battery_setup']['choice']
     battery_setup_info = circuit_data['battery_setup'][battery_choice]
-    battery_capacity = battery_setup_info['capacity_ah'] * battery_setup_info['battery_in_parallel']
+    battery_capacity_Amin = battery_setup_info['capacity_ah'] * battery_setup_info['battery_in_parallel'] * 60
     battery_min_voltage = battery_setup_info['min_voltage']
     battery_max_voltage = battery_setup_info['max_voltage']
     
-    current_capacity_Amin = (current_soc / 100) * battery_capacity * 60
+    current_capacity_Amin = current_soc * battery_capacity_Amin
     time_range_min = [0]
     results = []
     battery_capacity_list = [current_capacity_Amin]
     
+    #initial run at t=0
+    circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications={})
+    analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
+    results.append(result)
+    
     for segment_idx in range(len(segments)):
+        
+        print(time_range_min)
+        print(battery_capacity_list)
+        for each in segments:
+            print(json.dumps(each, indent=4))
+        print("\n\n\n")
         segment = segments[segment_idx]
         
         duration_minutes = segment['duration_minutes']
@@ -51,6 +62,9 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
         #if result[battery discharge] * voyage time > current capacity, 
         # calculate how huch time to reach 0, remainding time of the segment modify to 0 discharge
         discharge_current_Ah = -result["summary"]["data"][0]["current"]["total_battery_input_current"]
+        
+        print(current_capacity_Amin, discharge_current_Ah, duration_minutes)
+        print()
         # use summary res
         
         if current_capacity_Amin - (discharge_current_Ah * 60 * duration_minutes) <= 0: 
@@ -65,22 +79,21 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             segment_idx -= 1
         else:
             current_capacity_Amin -= discharge_current_Ah * 60 * duration_minutes
-            current_soc = (current_capacity_Amin / (battery_capacity * 60)) / 100
+            current_soc = (current_capacity_Amin / battery_capacity_Amin)
+            print('current soc:', current_soc)
             
             results.append(result)
             time_range_min.append(time_range_min[-1] + duration_minutes)
-
-        battery_capacity_list.append(min(battery_capacity, current_capacity_Amin))
+            
+        print(current_capacity_Amin)
+        battery_capacity_list.append(min(battery_capacity_Amin, current_capacity_Amin))
+        print(battery_capacity_list)
     
-    print(len(results))     #missing one. Add a blank result at start?
-    print(len(time_range_min))
-    print(len(battery_capacity_list))
-    generate_graph(results=results, x_axis=time_range_min[:-1], x_label="Time (minutes)",
+    generate_graph(results=results, x_axis=time_range_min, x_label="Time (minutes)",
                    voltage_display_choice=['battery_result', 'load_result'],
                    current_display_choice=['battery_result', 'load_result'],
                    power_display_choice=['panel_result', 'load_result'],
-                   battery_capacity=battery_capacity_list[:-1],
-                   display_graph=False,
+                   battery_capacity=battery_capacity_list,
                    save_path=save_path)
 
     
