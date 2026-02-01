@@ -22,7 +22,7 @@
       "name": "Lunch Stop",
       "duration_minutes": 100,
       "throttle": 0.0,
-      "solar_power": 1.0
+      "solar_power": 0.0
     },
     {
       "name": "Afternoon Return",
