@@ -22,7 +22,8 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
     
     num_plots = sum([len(voltage_display_choice) > 0, 
                      len(current_display_choice) > 0, 
-                     len(power_display_choice) > 0])
+                     len(power_display_choice) > 0,
+                     len(battery_capacity) > 0])
     
     if num_plots == 0:
         print("No display choices selected")
@@ -126,13 +127,20 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         
         draw_warning_points(warning_points, ax)
         draw_equilibrium_points(equilibrium_points, ax)
+        plot_idx += 1
 
     if battery_capacity:
         ax = axes[plot_idx]
         ax.plot(x_axis, battery_capacity, marker=MARKER_STYLE, markersize=MARKER_SIZE,
                label="Battery Capacity (Ah)", color='orange')
         ax.set_xlabel(x_label)
+        ax.set_ylabel('Battery Capacity (Ah)')
+        ax.set_title(f'Battery Capacity vs {x_label}')
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.grid(True, alpha=0.3)
         
+        draw_equilibrium_points(equilibrium_points, ax)
+        draw_warning_points(warning_points, ax)
     
     plt.tight_layout(rect=[0, 0.05, 1, 1])  # Leave space at bottom for warnings
 

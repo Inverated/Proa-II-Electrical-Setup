@@ -10,7 +10,7 @@ import os
 
 
 # 0: operating_point / 1:sweep throttle / 2: sweep panel power / 3: Voyage mode / 4: RTDS mode
-SIMULATION_TYPE         = 0
+SIMULATION_TYPE         = 3
 
 
 path = os.getcwd()

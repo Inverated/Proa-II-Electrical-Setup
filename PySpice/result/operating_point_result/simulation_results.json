@@ -1,7 +1,7 @@
 {
     "info": {
         "name": "Solar_Panel-Mppt-Battery-Motor Circuit Thingy",
-        "date": "2026-01-29T16:21:46.342640"
+        "date": "2026-01-30T12:28:53.741665"
     },
     "error": {
         "keyword": "error",
@@ -10,10 +10,8 @@
     },
     "warning": {
         "keyword": "warning",
-        "array_count": 1,
-        "data": [
-            "Battery array is being over-discharged. Motor 0 has been restricted to 67.03% instead of 100.00% throttle level."
-        ]
+        "array_count": 0,
+        "data": []
     },
     "summary": {
         "keyword": "total",
@@ -22,12 +20,12 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "total_mppt_output": 50.79995145839721,
-                    "total_dc_bus_voltage": 50.79995045839721
+                    "total_mppt_output": 51.67054568466787,
+                    "total_dc_bus_voltage": 51.670544684667874
                 },
                 "current": {
-                    "total_mppt_output_current": 0.1412639319896698,
-                    "total_battery_input_current": -50.000027078786204
+                    "total_mppt_output_current": 64.27509293599871,
+                    "total_battery_input_current": -12.944984284001293
                 }
             }
         ]
@@ -39,19 +37,19 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "mppt_output": 50.80065877809981
+                    "mppt_output": 51.99192214934787
                 },
                 "current": {
-                    "mppt_output": 0.07063197026
+                    "mppt_output": 32.137546468000004
                 }
             },
             {
                 "array_index": 1,
                 "voltage": {
-                    "mppt_output": 50.80065877809981
+                    "mppt_output": 51.99192214934787
                 },
                 "current": {
-                    "mppt_output": 0.07063197026
+                    "mppt_output": 32.137546468000004
                 }
             }
         ]
@@ -63,14 +61,20 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "0|1|battery_negative": 25.39994972918506,
-                    "0|1|battery_positive": 51.29994972918507,
-                    "0|0|battery_negative": -5.0000027078786386e-05,
-                    "0|0|battery_positive": 25.899949999972925
+                    "1|1|battery_negative": 25.835268606087862,
+                    "1|1|battery_positive": 51.73526860608787,
+                    "1|0|battery_negative": -6.4724921419997365e-06,
+                    "1|0|battery_positive": 25.89999352750786,
+                    "0|1|battery_negative": 25.835268606087862,
+                    "0|1|battery_positive": 51.735268606087864,
+                    "0|0|battery_negative": -6.4724921419997365e-06,
+                    "0|0|battery_positive": 25.89999352750786
                 },
                 "current": {
-                    "0|0|battery": -50.00002707878639,
-                    "0|1|battery": -50.00002707878684
+                    "0|0|battery": -6.472492141999737,
+                    "0|1|battery": -6.472492141999737,
+                    "1|0|battery": -6.472492141999737,
+                    "1|1|battery": -6.472492142000192
                 }
             }
         ]
@@ -82,19 +86,19 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "solar_array_output": 79.99987599938203
+                    "solar_array_output": 79.94320675431142
                 },
                 "current": {
-                    "solar_array_output": 0.049999921874613766
+                    "solar_array_output": 22.733849136382307
                 }
             },
             {
                 "array_index": 1,
                 "voltage": {
-                    "solar_array_output": 80.00012599860078
+                    "solar_array_output": 80.05679524567526
                 },
                 "current": {
-                    "solar_array_output": 0.050000078124125484
+                    "solar_array_output": 22.7661508636139
                 }
             }
         ]
@@ -106,28 +110,28 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "1|1|panel_positive": 80.0001259989914,
-                    "1|1|panel_negative": 0.0,
+                    "1|1|panel_positive": 80.05687599999334,
+                    "1|1|panel_negative": -1.6940658945086007e-21,
                     "1|0|panel_positive": 40.0,
-                    "1|0|panel_negative": -2.5e-08,
-                    "0|1|panel_positive": 80.0001259989914,
-                    "0|1|panel_negative": 0.0,
+                    "1|0|panel_negative": -1.1374999999999999e-05,
+                    "0|1|panel_positive": 80.05687599999332,
+                    "0|1|panel_negative": -1.6940658945086007e-21,
                     "0|0|panel_positive": 40.0,
-                    "0|0|panel_negative": -2.5e-08
+                    "0|0|panel_negative": -1.1374999999999999e-05
                 },
                 "current": {}
             },
             {
                 "array_index": 1,
                 "voltage": {
-                    "1|1|panel_positive": 80.00037599860077,
-                    "1|1|panel_negative": 0.0,
+                    "1|1|panel_positive": 80.17054524567526,
+                    "1|1|panel_negative": -1.6940658945086007e-21,
                     "1|0|panel_positive": 40.0,
-                    "1|0|panel_negative": -2.5e-08,
-                    "0|1|panel_positive": 80.00037599860077,
-                    "0|1|panel_negative": 0.0,
+                    "1|0|panel_negative": -1.1374999999999999e-05,
+                    "0|1|panel_positive": 80.17054524567526,
+                    "0|1|panel_negative": -1.6940658945086007e-21,
                     "0|0|panel_positive": 40.0,
-                    "0|0|panel_negative": -2.5e-08
+                    "0|0|panel_negative": -1.1374999999999999e-05
                 },
                 "current": {}
             }
@@ -140,7 +144,7 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "balancing_load": 50.799949458397215
+                    "balancing_load": 51.67054368466788
                 },
                 "current": {
                     "balancing_load": 0.0
@@ -155,10 +159,10 @@
             {
                 "array_index": 0,
                 "voltage": {
-                    "torqeedo_cruise_4.0_load": 50.799949458397215
+                    "torqeedo_cruise_4.0_load": 51.67054368466788
                 },
                 "current": {
-                    "torqeedo_cruise_4.0_load": 50.14129101485014
+                    "torqeedo_cruise_4.0_load": 77.22007722000001
                 }
             }
         ]
