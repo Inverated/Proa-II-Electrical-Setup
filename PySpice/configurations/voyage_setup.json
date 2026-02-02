@@ -9,7 +9,7 @@
     {
       "name": "Morning Cruise",
       "duration_minutes": 100,
-      "throttle": 0.6,
+      "throttle": 0.0,
       "solar_power": 1.0
     },
     {
