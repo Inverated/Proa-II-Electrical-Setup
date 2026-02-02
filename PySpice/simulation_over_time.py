@@ -25,7 +25,7 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
     battery_max_voltage = battery_setup_info['max_voltage']
     
     current_capacity_Amin = current_soc * battery_capacity_Amin
-    print('Starting SOC:', current_soc, 'Capacity (Amin):', current_capacity_Amin)
+
     time_range_min = [0]
     results = []
     battery_capacity_list = [current_capacity_Amin]
@@ -82,11 +82,8 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             results.append(result)
             time_range_min.append(time_range_min[-1] + minues_to_empty)
         else:
-            print('before', current_capacity_Amin, time_range_min[-1])
-            print(discharge_current_A, duration_minutes)
             current_capacity_Amin += discharge_current_A * duration_minutes
-            print('after', current_capacity_Amin, time_range_min[-1] + duration_minutes)
-            current_soc = (current_capacity_Amin / battery_capacity_Amin)
+            current_soc = max(1.0, (current_capacity_Amin / battery_capacity_Amin))
             
             results.append(result)
             time_range_min.append(time_range_min[-1])
@@ -94,17 +91,11 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             results.append(result)
             time_range_min.append(time_range_min[-1] + duration_minutes)
 
-        print(current_capacity_Amin, battery_capacity_Amin)
-        print(battery_capacity_list)
         # Re-add the same time since capacity drains, not jump to value
         battery_capacity_list.append(battery_capacity_list[-1])
         current_capacity_Amin = min(battery_capacity_Amin, current_capacity_Amin)
         battery_capacity_list.append(current_capacity_Amin)
-        print('wtd', battery_capacity_list)
-    
-    print(len(time_range_min), len(results), len(battery_capacity_list))
-    print(time_range_min)
-    print(battery_capacity_list)
+
     results = [results[0]] + results
     generate_graph(results=results, x_axis=time_range_min, x_label="Time (minutes)",
                    voltage_display_choice=['battery_result', 'load_result', "mppt_result"],
@@ -129,4 +120,5 @@ def real_time_digital_simulation(circuit_config_loc: str, ngspice_available: boo
     
 def estimate_battery_voltage(soc, min_voltage, max_voltage):
     """Simple linear estimation"""
+    print('soc',soc)
     return min_voltage + (max_voltage - min_voltage) * soc

@@ -4,6 +4,7 @@ import numpy as np
 import os
 from typing import List, Dict
 
+from configurations.constants import EPSILON
 from configurations.simulation_config import SHOW_SWEEP_PLOT
 
 
@@ -68,7 +69,10 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
             voltages = extract_traces(results, category, 'voltage')
             
             for label, values in voltages.items():
-
+                """ if 'battery' in label:
+                    print(sum(values) / len(values))
+                    if sum(values) / len(values) < EPSILON:
+                        continue """
                 ax.plot(x_axis, values, marker=MARKER_STYLE, markersize=MARKER_SIZE, 
                        label=f"{category} - {label}", 
                        color=colors[color_idx % len(colors)])
