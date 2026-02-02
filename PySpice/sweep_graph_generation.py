@@ -68,6 +68,7 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
             voltages = extract_traces(results, category, 'voltage')
             
             for label, values in voltages.items():
+
                 ax.plot(x_axis, values, marker=MARKER_STYLE, markersize=MARKER_SIZE, 
                        label=f"{category} - {label}", 
                        color=colors[color_idx % len(colors)])

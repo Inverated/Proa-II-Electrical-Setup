@@ -25,14 +25,10 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
     battery_max_voltage = battery_setup_info['max_voltage']
     
     current_capacity_Amin = current_soc * battery_capacity_Amin
+    print('Starting SOC:', current_soc, 'Capacity (Amin):', current_capacity_Amin)
     time_range_min = [0]
     results = []
     battery_capacity_list = [current_capacity_Amin]
-    
-    #initial run at t=0
-    circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications={})
-    analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
-    results.append(result)
     
     segment_length = len(segments)
     for segment_idx in range(segment_length):
@@ -47,6 +43,12 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
         modifications['panel_power_setting'] = panel_power_setting
         modifications['throttle_setting'] = throttle_setting
 
+        """ if results == []:
+            circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications=modifications)
+            analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
+            results.append(result)
+            continue """
+                
         if current_capacity_Amin <= 0:
             modifications['max_discharge_current'] = 0
         
@@ -63,8 +65,8 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
         
         # add another step to setting  so load & panel/mppt current jump to setting
         # Keep battery calculation same so its slowly increases/decreases
-        if current_capacity_Amin > 0 and (current_capacity_Amin - discharge_current_A * duration_minutes <= 0): 
-            minues_to_empty = current_capacity_Amin / discharge_current_A
+        if current_capacity_Amin > 0 and (current_capacity_Amin + (discharge_current_A * duration_minutes) <= 0): 
+            minues_to_empty = abs(current_capacity_Amin / discharge_current_A)
             
             copy = deepcopy(segments[segment_idx])
             copy["duration_minutes"] = duration_minutes - minues_to_empty
@@ -74,28 +76,36 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             current_capacity_Amin = 0
             current_soc = 0
             
-            results.append(result)
-            results.append(result)
+            results.append(result)            
+            time_range_min.append(time_range_min[-1])
             
-            time_range_min.append(time_range_min[-1] + 1)
+            results.append(result)
             time_range_min.append(time_range_min[-1] + minues_to_empty)
-            
-            battery_capacity_list.append(battery_capacity_list[-1])
         else:
-            current_capacity_Amin -= discharge_current_A * duration_minutes
+            print('before', current_capacity_Amin, time_range_min[-1])
+            print(discharge_current_A, duration_minutes)
+            current_capacity_Amin += discharge_current_A * duration_minutes
+            print('after', current_capacity_Amin, time_range_min[-1] + duration_minutes)
             current_soc = (current_capacity_Amin / battery_capacity_Amin)
             
             results.append(result)
+            time_range_min.append(time_range_min[-1])
+            
             results.append(result)
-            
-            time_range_min.append(time_range_min[-1] + 1)
             time_range_min.append(time_range_min[-1] + duration_minutes)
-            
-            battery_capacity_list.append(battery_capacity_list[-1])
 
-            
-        battery_capacity_list.append(min(battery_capacity_Amin, current_capacity_Amin))
+        print(current_capacity_Amin, battery_capacity_Amin)
+        print(battery_capacity_list)
+        # Re-add the same time since capacity drains, not jump to value
+        battery_capacity_list.append(battery_capacity_list[-1])
+        current_capacity_Amin = min(battery_capacity_Amin, current_capacity_Amin)
+        battery_capacity_list.append(current_capacity_Amin)
+        print('wtd', battery_capacity_list)
     
+    print(len(time_range_min), len(results), len(battery_capacity_list))
+    print(time_range_min)
+    print(battery_capacity_list)
+    results = [results[0]] + results
     generate_graph(results=results, x_axis=time_range_min, x_label="Time (minutes)",
                    voltage_display_choice=['battery_result', 'load_result', "mppt_result"],
                    current_display_choice=['battery_result', 'load_result', "mppt_result"],

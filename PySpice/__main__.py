@@ -51,7 +51,3 @@ if __name__ == "__main__":
     else: 
         print("Invalid SIMULATION_TYPE selected.")
         exit(1)
-        
-    
-        
-        

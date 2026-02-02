@@ -10,7 +10,7 @@
       "name": "Morning Cruise",
       "duration_minutes": 100,
       "throttle": 0.6,
-      "solar_power": 0.4
+      "solar_power": 1.0
     },
     {
       "name": "Midday Full Speed",
@@ -21,19 +21,19 @@
     {
       "name": "Lunch Stop",
       "duration_minutes": 100,
-      "throttle": 0.0,
-      "solar_power": 0.0
+      "throttle": 0.3,
+      "solar_power": 1.0
     },
     {
       "name": "Afternoon Return",
       "duration_minutes": 50,
-      "throttle": 1.0,
+      "throttle": 0.2,
       "solar_power": 1.0
     },
     {
       "name": "Evening Approach",
       "duration_minutes": 100,
-      "throttle": 0.3,
+      "throttle": 0.0,
       "solar_power": 0.3
     }
   ]
