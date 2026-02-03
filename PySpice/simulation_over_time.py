@@ -40,15 +40,17 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
         panel_power_setting = segment['solar_power']
         
         modifications = {}
-        modifications['battery_voltage'] = estimate_battery_voltage(current_soc, battery_min_voltage, battery_max_voltage)
         modifications['panel_power_setting'] = panel_power_setting
         modifications['throttle_setting'] = throttle_setting
-                
+        modifications['current_soc'] = current_soc
         
         # Run with original circuit first
         circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications=modifications)
         analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
 
+        if results == []:
+            results.append(result)
+            
         if analysis is None:
             print(f"{BARF}Simulation Aborted{BARE}")
             break
@@ -118,35 +120,36 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
         
     #print(json.dumps(results, indent=4))
     print(len(results), len(time_range_min))
-    results = [results[0]] + results
+    #results = [results[0]] + results
     generate_graph(results=results, x_axis=time_range_min, x_label="Time (minutes)",
-                   voltage_display_choice=['battery_result', 'load_result', "mppt_result"],
-                   current_display_choice=['battery_result', 'load_result', "mppt_result"],
+                   voltage_display_choice=['load_result', "mppt_result"],
+                   current_display_choice=['battery_result', 'load_result'],
                    power_display_choice=['panel_result', 'load_result'],
                    battery_capacity=battery_capacity_list,
-                   save_path=save_path)
-
-    
-     
-    
-    
-    
-    
-    
-    
-    
+                   save_path=save_path)    
     None
     
 def real_time_digital_simulation(circuit_config_loc: str, ngspice_available: bool):
     None
-    
-def estimate_battery_voltage(soc, min_voltage, max_voltage):
-    """Simple linear estimation"""
-    print('soc',soc)
-    return min_voltage + (max_voltage - min_voltage) * soc
 
 def step_up_prev(results: list, time_range_min: list, battery_capacity_list: list):
-    results.append(results[-1])
+    prev = results[-2]
+    curr = results[-1]
+    
+    copy = deepcopy(curr)
+    """ for key in copy.keys():
+        if copy[key].get("data") is not None:
+            data = copy[key]["data"]
+            for idx, item in enumerate(data):
+                if type(item) is not dict:
+                    break
+                if item.get("current") is not None:
+                    item["current"] = curr[key]["data"][idx]["current"]
+    """                 
+    results.append(copy)
+    
+    
+    
     time_range_min.insert(-1, time_range_min[-2])
     
     # Keep the battery slanted

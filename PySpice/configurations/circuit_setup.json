@@ -55,8 +55,10 @@
             "battery_in_series": 2,
             "battery_in_parallel": 1,
             "max_charge_current": 100,
+            
             "max_discharge_current": 50,
-            "capacity_ah": 100
+            "capacity_ah": 100,
+            "current_soc": 1.0
         },
         "LiFePO4": {
             "battery_voltage": 24.9,
@@ -66,7 +68,8 @@
             "battery_in_parallel": 1,
             "max_charge_current": 50,
             "max_discharge_current": 50,
-            "capacity_ah": 50
+            "capacity_ah": 50,
+            "current_soc": 1.0
         }
     },
     "load_setup": {

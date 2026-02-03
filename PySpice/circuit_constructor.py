@@ -36,8 +36,8 @@ def build_circuit_from_json(circuit_config_loc: str, modifications: dict = {}):
     if modifications.get('max_charge_current') is not None:
         battery_config['max_charge_current'] = modifications['max_charge_current']
     
-    if modifications.get('battery_voltage') is not None:
-        battery_config['battery_voltage'] = modifications['battery_voltage']
+    if modifications.get('current_soc') is not None:
+        battery_config['current_soc'] = modifications['current_soc']
         
     battery_array = Battery_Array(circuit, components, **battery_config)
     err = battery_array.create_battery_array(log=COMPONENT_LOGGING)
@@ -120,3 +120,4 @@ def display_components(components):
 def display_netlist(circuit):
     print("\nCircuit Netlist:")
     print(circuit)
+    

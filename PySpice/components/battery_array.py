@@ -5,7 +5,14 @@ class Battery_Array:
         self.circuit = circuit
         self.BATTERY_IN_PARALLEL = kwargs.get("battery_in_parallel")
         self.BATTERY_IN_SERIES = kwargs.get("battery_in_series")
-        self.BATTERY_VOLTAGE = kwargs.get("battery_voltage")
+        
+        self.SOC = kwargs.get("current_soc", 1.0)
+        print("Initial SOC:", self.SOC)
+        if kwargs.get("min_voltage") is not None and kwargs.get("max_voltage") is not None:
+            self.BATTERY_VOLTAGE = self.__estimate_battery_voltage(self.SOC, kwargs.get("min_voltage"), kwargs.get("max_voltage"))
+        else:
+            self.BATTERY_VOLTAGE = kwargs.get("battery_voltage")
+            
         self.BATTERY_MAX_CHARGE_CURRENT = kwargs.get("max_charge_current")
         self.BATTERY_MAX_DISCHARGE_CURRENT = kwargs.get("max_discharge_current")
         self.terminal = None
@@ -69,7 +76,11 @@ class Battery_Array:
     
     def get_total_voltage(self):
         return self.BATTERY_IN_SERIES * self.BATTERY_VOLTAGE   
-            
+        
+    def __estimate_battery_voltage(self, soc, min_voltage, max_voltage):
+        """Simple linear estimation"""
+        return min_voltage + (max_voltage - min_voltage) * soc
+
     def __str__(self):
         return f"""
 {BARF}Battery Setup{BARE}

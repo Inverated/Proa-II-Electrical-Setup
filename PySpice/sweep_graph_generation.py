@@ -50,9 +50,9 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
                 'x': x_axis[i],
                 'warnings': result['warning']['data']
             })
-        for array in result['battery_result']['data']:
-            current_list = list(array['current'].values())
-            if abs(sum(current_list) / len(current_list) - 0) < 1:
+        for array in result['summary']['data']:
+            current = array['current']['total_battery_input_current']
+            if current < 1:
                 equilibrium_points.append(x_axis[i])
     
     # Color cycles for different traces
