@@ -68,13 +68,14 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             time_to_full = (battery_capacity_Amin - current_capacity_Amin) / battery_charge_current_A
             print("Time to full battery (minutes):", time_to_full)
             
-            # Run 2 simulations: to full, then rest of time with 0 charge current
-            results.append(result)
-            time_range_min.append(time_range_min[-1] + time_to_full)
-            current_capacity_Amin = battery_capacity_Amin
-            battery_capacity_list.append(current_capacity_Amin)
-            current_soc = 1.0
-            step_up_prev(results, time_range_min, battery_capacity_list)
+            if time_to_full > EPSILON:
+                # Run 2 simulations: to full, then rest of time with 0 charge current
+                results.append(result)
+                time_range_min.append(time_range_min[-1] + time_to_full)
+                current_capacity_Amin = battery_capacity_Amin
+                battery_capacity_list.append(current_capacity_Amin)
+                current_soc = 1.0
+                step_up_prev(results, time_range_min, battery_capacity_list)
             
             
             # Re-run with 0 charge current for rest of time
@@ -91,12 +92,13 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             time_to_empty = abs(current_capacity_Amin / battery_charge_current_A)
             print("Time to empty battery (minutes):", time_to_empty)
             
-            # Run 2 simulations: to empty, then rest of time with 0 discharge current
-            results.append(result)
-            time_range_min.append(time_range_min[-1] + time_to_empty)
-            current_capacity_Amin = 0
-            battery_capacity_list.append(current_capacity_Amin)
-            step_up_prev(results, time_range_min, battery_capacity_list)
+            if time_to_empty > EPSILON:
+                # Run 2 simulations: to empty, then rest of time with 0 discharge current
+                results.append(result)
+                time_range_min.append(time_range_min[-1] + time_to_empty)
+                current_capacity_Amin = 0
+                battery_capacity_list.append(current_capacity_Amin)
+                step_up_prev(results, time_range_min, battery_capacity_list)
             
             # Re-run with 0 discharge current for rest of time
             modifications['max_discharge_current'] = 0
@@ -117,17 +119,12 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             battery_capacity_list.append(current_capacity_Amin)
             step_up_prev(results, time_range_min, battery_capacity_list)
 
-        
-    #print(json.dumps(results, indent=4))
-    print(len(results), len(time_range_min))
-    #results = [results[0]] + results
     generate_graph(results=results, x_axis=time_range_min, x_label="Time (minutes)",
-                   voltage_display_choice=['load_result', "mppt_result"],
+                   voltage_display_choice=['load_result', "mppt_result", 'battery_result'],
                    current_display_choice=['battery_result', 'load_result'],
                    power_display_choice=['panel_result', 'load_result'],
                    battery_capacity=battery_capacity_list,
                    save_path=save_path)    
-    None
     
 def real_time_digital_simulation(circuit_config_loc: str, ngspice_available: bool):
     None
@@ -137,15 +134,11 @@ def step_up_prev(results: list, time_range_min: list, battery_capacity_list: lis
     curr = results[-1]
     
     copy = deepcopy(curr)
-    """ for key in copy.keys():
-        if copy[key].get("data") is not None:
-            data = copy[key]["data"]
-            for idx, item in enumerate(data):
-                if type(item) is not dict:
-                    break
-                if item.get("current") is not None:
-                    item["current"] = curr[key]["data"][idx]["current"]
-    """                 
+    """ if copy.get('battery_result') is not None:
+        if copy['battery_result'].get("data") is not None:
+            data = copy['battery_result']["data"]
+            data[0]["voltage"] = prev['battery_result']["data"][0]["voltage"]
+     """
     results.append(copy)
     
     

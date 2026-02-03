@@ -1,40 +1,92 @@
 {
   "voyage_info": {
-    "name": "Day Trip Simulation",
-    "duration_minutes": 8,
-    "time_step_minutes": 15
+    "name": "Mixed Solar with High-Throttle Stress Voyage"
   },
-  "initial_battery_soc": 0.0,
+  "initial_battery_soc": 0.8,
   "segments": [
     {
-      "name": "Morning Cruise",
-      "duration_minutes": 100,
-      "throttle": 0.0,
-      "solar_power": 1.0
+      "name": "Early Morning Departure",
+      "duration_minutes": 25,
+      "throttle": 0.6,
+      "solar_power": 0.7
     },
     {
-      "name": "Midday Full Speed",
-      "duration_minutes": 100,
+      "name": "Harbor Exit Push",
+      "duration_minutes": 20,
+      "throttle": 0.25,
+      "solar_power": 0.4
+    },
+    {
+      "name": "Acceleration Sprint",
+      "duration_minutes": 15,
       "throttle": 1.0,
+      "solar_power": 0.2
+    },
+    {
+      "name": "Open Water High-Speed Run",
+      "duration_minutes": 60,
+      "throttle": 0.9,
+      "solar_power": 0.3
+    },
+    {
+      "name": "Sun Window Cruise",
+      "duration_minutes": 60,
+      "throttle": 0.0,
       "solar_power": 0.0
     },
     {
-      "name": "Lunch Stop",
-      "duration_minutes": 100,
-      "throttle": 0.0,
-      "solar_power": 1.0
+      "name": "Against Current Throttle-Up",
+      "duration_minutes": 45,
+      "throttle": 0.85,
+      "solar_power": 0.25
     },
     {
-      "name": "Afternoon Return",
-      "duration_minutes": 100,
+      "name": "Midday Solar Harvest",
+      "duration_minutes": 50,
+      "throttle": 0.3,
+      "solar_power": 0.95
+    },
+    {
+      "name": "Sustained Fast Transit",
+      "duration_minutes": 70,
+      "throttle": 0.9,
+      "solar_power": 0.35
+    },
+    {
+      "name": "Cloud Break Sprint",
+      "duration_minutes": 30,
+      "throttle": 0.95,
+      "solar_power": 0.6
+    },
+    {
+      "name": "Idle Drift Charging",
+      "duration_minutes": 35,
+      "throttle": 0.0,
+      "solar_power": 0.9
+    },
+    {
+      "name": "Afternoon Full Power Push",
+      "duration_minutes": 55,
       "throttle": 1.0,
-      "solar_power": 0.0
+      "solar_power": 0.2
     },
     {
-      "name": "Evening Approach",
-      "duration_minutes": 100,
-      "throttle": 0.0,
-      "solar_power": 1.0
+      "name": "Late-Day Solar Boost",
+      "duration_minutes": 120,
+      "throttle": 0.4,
+      "solar_power": 0.85
+    },
+    {
+      "name": "Final High-Speed Return",
+      "duration_minutes": 60,
+      "throttle": 0.4,
+      "solar_power": 0.25
+    },
+    {
+      "name": "Evening Approach and Charge",
+      "duration_minutes": 40,
+      "throttle": 0.2,
+      "solar_power": 0.7
     }
   ]
 }
