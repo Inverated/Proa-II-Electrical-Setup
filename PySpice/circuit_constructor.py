@@ -33,6 +33,8 @@ def build_circuit_from_json(circuit_config_loc: str, modifications: dict = {}):
     battery_config = battery_array[battery_choice]
     if modifications.get('max_discharge_current') is not None:
         battery_config['max_discharge_current'] = modifications['max_discharge_current']
+    if modifications.get('max_charge_current') is not None:
+        battery_config['max_charge_current'] = modifications['max_charge_current']
     
     if modifications.get('battery_voltage') is not None:
         battery_config['battery_voltage'] = modifications['battery_voltage']

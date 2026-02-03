@@ -10,6 +10,9 @@ def begin_simulation(circuit, component_object, errors, pyspice_availablility=Fa
     
     # Errors cannot be ignored for actual run
     has_error = len(errors) > 0
+    analysis = None
+    result = None
+    
     if not has_error or IGNORE_ERROR:
         if START_SIMULATION:
             simulation_started = True

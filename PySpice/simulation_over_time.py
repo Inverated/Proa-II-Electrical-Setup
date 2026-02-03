@@ -31,74 +31,92 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
     battery_capacity_list = [current_capacity_Amin]
     
     segment_length = len(segments)
+    
     for segment_idx in range(segment_length):
-        print(segment_length)
         segment = segments[segment_idx]
         
         duration_minutes = segment['duration_minutes']
         throttle_setting = segment['throttle']
         panel_power_setting = segment['solar_power']
+        
         modifications = {}
-
         modifications['battery_voltage'] = estimate_battery_voltage(current_soc, battery_min_voltage, battery_max_voltage)
         modifications['panel_power_setting'] = panel_power_setting
         modifications['throttle_setting'] = throttle_setting
-
-        """ if results == []:
-            circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications=modifications)
-            analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
-            results.append(result)
-            continue """
                 
-        if current_capacity_Amin <= EPSILON:
-            modifications['max_discharge_current'] = 0
         
+        # Run with original circuit first
         circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications=modifications)
         analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
 
-        #if result[battery discharge] * voyage time > current capacity, 
-        # calculate how huch time to reach 0, remainding time of the segment modify to 0 discharge
-        battery_charge_current_A = result["summary"]["data"][0]["current"]["total_battery_input_current"]        
-        print("Battery charge current (A):", battery_charge_current_A)
-        print(duration_minutes)
-        # add another step to setting  so load & panel/mppt current jump to setting
-        # Keep battery calculation same so its slowly increases/decreases
-        if current_capacity_Amin >= 0 and (current_capacity_Amin + (battery_charge_current_A * duration_minutes) <= 0): 
-            minues_to_empty = abs(current_capacity_Amin / battery_charge_current_A)
-            print("Minutes to empty battery:", minues_to_empty)
-            copy = deepcopy(segments[segment_idx])
-            copy["duration_minutes"] = duration_minutes - minues_to_empty
-            segments[segment_idx]["duration_minutes"] = minues_to_empty
-            segments.insert(segment_idx + 1, copy)
-            segment_length += 1      
-                  
+        if analysis is None:
+            print(f"{BARF}Simulation Aborted{BARE}")
+            break
+        
+        # +ve -> Battery charging, -ve -> discharging
+        battery_charge_current_A = result["summary"]["data"][0]["current"]["total_battery_input_current"]  
+        
+        # Excess current balanced by balancing load
+        # Excess discharge current restricted by spice
+        
+        # If battery is full and charging, set max charge current to 0
+        # If battery is empty and discharging, set max discharge current to 0
+        # If battery is empty, set max discharge current to 0 to prevent further discharge
+        if current_capacity_Amin + (battery_charge_current_A * duration_minutes) > battery_capacity_Amin:
+            time_to_full = (battery_capacity_Amin - current_capacity_Amin) / battery_charge_current_A
+            print("Time to full battery (minutes):", time_to_full)
+            
+            # Run 2 simulations: to full, then rest of time with 0 charge current
+            results.append(result)
+            time_range_min.append(time_range_min[-1] + time_to_full)
+            current_capacity_Amin = battery_capacity_Amin
+            battery_capacity_list.append(current_capacity_Amin)
+            current_soc = 1.0
+            step_up_prev(results, time_range_min, battery_capacity_list)
+            
+            
+            # Re-run with 0 charge current for rest of time
+            modifications['max_charge_current'] = 0
+            circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications=modifications)
+            analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
+            
+            results.append(result)
+            time_range_min.append(time_range_min[-1] + (duration_minutes - time_to_full))
+            battery_capacity_list.append(current_capacity_Amin)
+            step_up_prev(results, time_range_min, battery_capacity_list)
+        
+        elif current_capacity_Amin + (battery_charge_current_A * duration_minutes) < 0:
+            time_to_empty = abs(current_capacity_Amin / battery_charge_current_A)
+            print("Time to empty battery (minutes):", time_to_empty)
+            
+            # Run 2 simulations: to empty, then rest of time with 0 discharge current
+            results.append(result)
+            time_range_min.append(time_range_min[-1] + time_to_empty)
             current_capacity_Amin = 0
-            current_soc = 0
+            battery_capacity_list.append(current_capacity_Amin)
+            step_up_prev(results, time_range_min, battery_capacity_list)
             
-            results.append(result)            
-            time_range_min.append(time_range_min[-1])
-            
-            results.append(result)
-            time_range_min.append(time_range_min[-1] + minues_to_empty)
-        else:
-            print(segment, battery_charge_current_A )
-            calculated_capacity = current_capacity_Amin + (battery_charge_current_A * duration_minutes)
-            print(battery_capacity_Amin, calculated_capacity)
-            current_capacity_Amin = min(battery_capacity_Amin, calculated_capacity)
-            print("Current capacity_Amin:", current_capacity_Amin)
-            current_soc = current_capacity_Amin / battery_capacity_Amin
+            # Re-run with 0 discharge current for rest of time
+            modifications['max_discharge_current'] = 0
+            circuit, component_object, errors = build_circuit_from_json(circuit_config_loc=circuit_config_loc, modifications=modifications)
+            analysis, result = begin_simulation(circuit, component_object, errors, ngspice_available)
             
             results.append(result)
-            time_range_min.append(time_range_min[-1])
-            
+            time_range_min.append(time_range_min[-1] + (duration_minutes - time_to_empty))
+            battery_capacity_list.append(current_capacity_Amin)
+            current_soc = 0.0
+            step_up_prev(results, time_range_min, battery_capacity_list)
+        
+        else:          
             results.append(result)
             time_range_min.append(time_range_min[-1] + duration_minutes)
+            current_capacity_Amin = current_capacity_Amin + (battery_charge_current_A * duration_minutes)
+            current_soc = current_capacity_Amin / battery_capacity_Amin
+            battery_capacity_list.append(current_capacity_Amin)
+            step_up_prev(results, time_range_min, battery_capacity_list)
 
-        # Re-add the same time since capacity drains, not jump to value
-        battery_capacity_list.append(battery_capacity_list[-1])
-        battery_capacity_list.append(current_capacity_Amin)
-        print(battery_capacity_list)
-
+        
+    #print(json.dumps(results, indent=4))
     print(len(results), len(time_range_min))
     results = [results[0]] + results
     generate_graph(results=results, x_axis=time_range_min, x_label="Time (minutes)",
@@ -126,3 +144,10 @@ def estimate_battery_voltage(soc, min_voltage, max_voltage):
     """Simple linear estimation"""
     print('soc',soc)
     return min_voltage + (max_voltage - min_voltage) * soc
+
+def step_up_prev(results: list, time_range_min: list, battery_capacity_list: list):
+    results.append(results[-1])
+    time_range_min.insert(-1, time_range_min[-2])
+    
+    # Keep the battery slanted
+    battery_capacity_list.insert(-1, battery_capacity_list[-2])
