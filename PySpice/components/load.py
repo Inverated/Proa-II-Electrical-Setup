@@ -22,7 +22,6 @@ class Load:
         
         
         self.circuit.V(f"{self.load_name}", POWER_SOURCE, f"{self.load_name}", GROUNDING_RESISTANCE)
-        #self.circuit.R(f"{self.load_name}", f"{self.load_name}_negative", self.circuit.gnd, MOTOR_RESISTANCE)
         self.circuit.raw_spice += f"B{self.load_name} {self.load_name} 0 I = I(V{POWER_SOURCE_ID})<-{BATTERY_MAX_DISCHARGE_CURRENT} ? {MOTOR_CURRENT_DEMAND}+(I(V{POWER_SOURCE_ID})+{BATTERY_MAX_DISCHARGE_CURRENT})*{RAWSPICE_ITERATIONS} : {MOTOR_CURRENT_DEMAND}\n"
         
         self.components["load"].append(f"{self.load_name}")

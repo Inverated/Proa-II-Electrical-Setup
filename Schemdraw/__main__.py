@@ -9,8 +9,8 @@ from configurations.constants import TERMINATING_DISTANCE
 drawing = schemdraw.Drawing()
 drawing.config(unit=2)  # default .length( units )
 
-drawing, (top, bottom) = draw_array(drawing=drawing, element=elm.Solar, \
-    terminateDist=TERMINATING_DISTANCE, series=20, parallel=2, isRight=True)
+drawing, (top, bottom) = draw_array(drawing=drawing, element=elm.Battery, \
+    terminateDist=TERMINATING_DISTANCE, series=2, parallel=2, isRight=True)
 
 
 solar_mppt_point = Point((bottom.end.x, bottom.end.y - TERMINATING_DISTANCE / 2))

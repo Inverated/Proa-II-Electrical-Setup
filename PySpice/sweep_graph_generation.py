@@ -96,7 +96,6 @@ def generate_graph(results: list, x_axis: list, x_label: str = "",
         
         for category in current_display_choice:
             currents = extract_traces(results, category, 'current')
-            
             for label, values in currents.items():
                 ax.plot(x_axis, values, marker=MARKER_STYLE, markersize=MARKER_SIZE,
                        label=f"{category} - {label}",
@@ -236,7 +235,7 @@ def extract_traces(results: list, category: str, data_type: str) -> Dict[str, Li
                     # Initialize trace if needed
                     if trace_name not in traces:
                         traces[trace_name] = []
-                    
+                        
                     # Append value
                     traces[trace_name].append(value)
     

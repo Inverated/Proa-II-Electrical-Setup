@@ -37,6 +37,7 @@ def begin_simulation(circuit, component_object, errors, pyspice_availablility=Fa
         for warning in result["warning"]["data"]:
             print(f"\t{warning}")
         print()
+    
     return analysis, result
 
 def __simulate__(circuit, meta_data, errors, NGSPICE_AVAILABLE):

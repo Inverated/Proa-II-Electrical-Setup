@@ -7,11 +7,11 @@ class Battery_Array:
         self.BATTERY_IN_SERIES = kwargs.get("battery_in_series")
         
         self.SOC = kwargs.get("current_soc", 1.0)
-        print("Initial SOC:", self.SOC)
         if kwargs.get("min_voltage") is not None and kwargs.get("max_voltage") is not None:
             self.BATTERY_VOLTAGE = self.__estimate_battery_voltage(self.SOC, kwargs.get("min_voltage"), kwargs.get("max_voltage"))
         else:
             self.BATTERY_VOLTAGE = kwargs.get("battery_voltage")
+        print("Estimated Battery Voltage:", self.BATTERY_VOLTAGE, "SOC:", self.SOC)
             
         self.BATTERY_MAX_CHARGE_CURRENT = kwargs.get("max_charge_current")
         self.BATTERY_MAX_DISCHARGE_CURRENT = kwargs.get("max_discharge_current")

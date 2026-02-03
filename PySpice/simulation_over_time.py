@@ -66,7 +66,7 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
         # If battery is empty, set max discharge current to 0 to prevent further discharge
         if current_capacity_Amin + (battery_charge_current_A * duration_minutes) > battery_capacity_Amin:
             time_to_full = (battery_capacity_Amin - current_capacity_Amin) / battery_charge_current_A
-            print("Time to full battery (minutes):", time_to_full)
+            #print("Time to full battery (minutes):", time_to_full)
             
             if time_to_full > EPSILON:
                 # Run 2 simulations: to full, then rest of time with 0 charge current
@@ -90,7 +90,7 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
         
         elif current_capacity_Amin + (battery_charge_current_A * duration_minutes) < 0:
             time_to_empty = abs(current_capacity_Amin / battery_charge_current_A)
-            print("Time to empty battery (minutes):", time_to_empty)
+            #print("Time to empty battery (minutes):", time_to_empty)
             
             if time_to_empty > EPSILON:
                 # Run 2 simulations: to empty, then rest of time with 0 discharge current
@@ -118,10 +118,11 @@ def start_voyage(circuit_config_loc: str, voyage_config_loc: str, save_path: str
             current_soc = current_capacity_Amin / battery_capacity_Amin
             battery_capacity_list.append(current_capacity_Amin)
             step_up_prev(results, time_range_min, battery_capacity_list)
-
+    
+    #print(json.dumps(results, indent=4))
     generate_graph(results=results, x_axis=time_range_min, x_label="Time (minutes)",
-                   voltage_display_choice=['load_result', "mppt_result", 'battery_result'],
-                   current_display_choice=['battery_result', 'load_result'],
+                   voltage_display_choice=['load_result', "mppt_result"],
+                   current_display_choice=['summary', 'load_result'],
                    power_display_choice=['panel_result', 'load_result'],
                    battery_capacity=battery_capacity_list,
                    save_path=save_path)    
@@ -140,7 +141,6 @@ def step_up_prev(results: list, time_range_min: list, battery_capacity_list: lis
             data[0]["voltage"] = prev['battery_result']["data"][0]["voltage"]
      """
     results.append(copy)
-    
     
     
     time_range_min.insert(-1, time_range_min[-2])

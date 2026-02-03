@@ -105,7 +105,6 @@ def build_circuit_from_json(circuit_config_loc: str, modifications: dict = {}):
     if SHOW_NETLIST:
         display_netlist(circuit)
 
-    
     return circuit, component_object, errors
 
 

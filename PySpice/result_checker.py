@@ -9,6 +9,22 @@ def cross_check_result(analysis, component_object, result):
     load = result["load_result"]
     load_balancer = result["load_balancer"]
     
+    # --Error analysis---
+    total_mppt_output = result["summary"]["data"][0]["current"]["total_mppt_output_current"]
+    total_battery_input = result["summary"]["data"][0]["current"]["total_battery_input_current"]
+    total_load_current = 0.0
+    for each in load["data"]:
+        for key in each["current"]:
+            total_load_current += each["current"][key]
+            
+    if total_mppt_output - total_battery_input - total_load_current > EPSILON:
+        result["error"]["data"].append(f"Kirchhoff's Law violated. MPPT Output Current ({total_mppt_output} A) \
+does not equal Battery Input Current ({total_battery_input} A) + Load Current ({total_load_current} A)")
+    
+    result["error"]["array_count"] = len(result["error"]["data"])
+    
+    
+    # ---Warning analysis---
     # Check solar array power into mppt
     set_count = solar["array_count"]
     solar_data = solar["data"]
@@ -33,9 +49,9 @@ Total Input Power: {input_power:.2f} W, restricted to: {actual_voltage_output*ac
         result["warning"]["data"].append(f"Battery is overcharged by {excess_current} A")
         
     # Check battery discharge
-    for load in load["data"]:
-        voltage = float(list(load["voltage"].values())[0])
-        current = float(list(load["current"].values())[0])
+    for each in load["data"]:
+        voltage = float(list(each["voltage"].values())[0])
+        current = float(list(each["current"].values())[0])
         actual_power = voltage * current
 
         mppt_count = len(component_object.get("mppt", []))
@@ -44,7 +60,7 @@ Total Input Power: {input_power:.2f} W, restricted to: {actual_voltage_output*ac
             temp_eff_calculation += component_object["mppt"][i].get_efficiency()
         average_efficiency = temp_eff_calculation / mppt_count if mppt_count > 0 else 1.0
             
-        index = load["array_index"]
+        index = each["array_index"]
         power_rating = component_object["load"][index].power_rating() * average_efficiency
         throttle_setting = component_object["load"][index].throttle_setting()
         actual_throttle = actual_power / power_rating if power_rating > 0 else 0.0
@@ -54,8 +70,7 @@ Total Input Power: {input_power:.2f} W, restricted to: {actual_voltage_output*ac
             result["warning"]["data"].append(f"Battery array is being over-discharged. Motor {index} \
 has been restricted to {actual_throttle*100:.2f}% instead of {throttle_setting*100:.2f}% throttle level.")
         
-        
-    
+
     result["warning"]["array_count"] = len(result["warning"]["data"])
     return None
         
