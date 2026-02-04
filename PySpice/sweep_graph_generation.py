@@ -230,7 +230,7 @@ def extract_traces(results: list, category: str, data_type: str) -> Dict[str, Li
                     # Create trace name
                     trace_name = key
                     if 'array_index' in array_item:
-                        trace_name = f"Array{array_item['array_index']}_{key}"
+                        trace_name = f"Arr{array_item['array_index']}_{key}"
                     
                     # Initialize trace if needed
                     if trace_name not in traces:
@@ -266,7 +266,7 @@ def extract_power_traces(results: list, category: str) -> Dict[str, List[float]]
                     if c_key in currents:
                         trace_name = v_key
                         if 'array_index' in array_item:
-                            trace_name = f"Array{array_item['array_index']}_{v_key}"
+                            trace_name = f"Arr{array_item['array_index']}_{v_key}"
                         
                         if trace_name not in power_traces:
                             power_traces[trace_name] = []

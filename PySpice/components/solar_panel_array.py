@@ -18,7 +18,7 @@ class Solar_Array:
         for p in range(self.PANEL_IN_PARALLEL):
             panel_row = []
             for s in range(self.PANEL_IN_SERIES):
-                panel_name = f"{array_number}:{p}|{s}|panel"
+                panel_name = f"arr{array_number}_p{p}_{s}_panel"
                 panel_row.append(panel_name)
                 
                 panel_pos = f"{panel_name}_positive"
@@ -31,7 +31,7 @@ class Solar_Array:
                 self.circuit.R(f"{panel_name}_leak_to_gnd", panel_neg, self.circuit.gnd, GROUNDING_RESISTANCE)
 
                 if s != 0:
-                    prev_panel_name = f"{array_number}:{p}|{s-1}|panel"
+                    prev_panel_name = f"arr{array_number}_p{p}_s{s-1}_panel"
                     # Internal resistance
                     self.circuit.R(f"{panel_name}_internal", panel_neg, f"{prev_panel_name}_positive", self.PANEL_INTERNAL_R)
 
@@ -40,15 +40,15 @@ class Solar_Array:
         for index, row in enumerate(self.components["panel"]):
             solar_row_end = row[-1]
             positive_node = f"{solar_row_end}_positive"
-            panel_wire = f"{array_number}:panel_wire|{index}"
-            self.circuit.R(panel_wire, positive_node, f"{array_number}:solar_array_output", WIRE_RESISTANCE)
+            panel_wire = f"arr{array_number}_panel_wire_{index}"
+            self.circuit.R(panel_wire, positive_node, f"arr{array_number}_solar_array_output", WIRE_RESISTANCE)
             self.components["wire"].append(panel_wire)
             # Small resistance to model wiring losses
         
-        self.terminal = f"{array_number}:solar_array_output_measured"
+        self.terminal = f"arr{array_number}_solar_array_output_measured"
         
-        self.circuit.V(f"{array_number}:solar_array_output", 
-                       f"{array_number}:solar_array_output",
+        self.circuit.V(f"arr{array_number}_solar_array_output", 
+                       f"arr{array_number}_solar_array_output",
                        f"{self.terminal}", 
                        GROUNDING_RESISTANCE)
         

@@ -31,8 +31,10 @@ def build_circuit_from_json(circuit_config_loc: str, modifications: dict = {}):
     battery_array = input_data['battery_setup']
     battery_choice = battery_array['choice']
     battery_config = battery_array[battery_choice]
+    
     if modifications.get('max_discharge_current') is not None:
         battery_config['max_discharge_current'] = modifications['max_discharge_current']
+        
     if modifications.get('max_charge_current') is not None:
         battery_config['max_charge_current'] = modifications['max_charge_current']
     
@@ -78,7 +80,7 @@ def build_circuit_from_json(circuit_config_loc: str, modifications: dict = {}):
     for key in input_data["load_setup"].keys():
         if key == "description":
             continue
-        load_name = f"{index}:{key}_load"
+        load_name = f"{key}_load_i{index}"
         
         if modifications.get('throttle_setting') is not None:
             if type(modifications['throttle_setting']) == list:

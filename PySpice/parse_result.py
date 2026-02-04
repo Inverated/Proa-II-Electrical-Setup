@@ -1,4 +1,5 @@
-from configurations.constants import BARE, BARF
+from configurations.constants import ARRAY_DECODER_PATTERN, BARE, BARF
+import re
 
 def parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING=False, SHOW_PANELS=False):
     if analysis is None:
@@ -17,14 +18,15 @@ def parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING=False, S
                 break
             if dic.get("keyword", 'None') in node_name:
                 matched = True
-                if ":" in node_name and node_name[0:node_name.index(":")].isdigit():
-                    prefix = int(node_name[0:node_name.index(":")])
-                    if prefix + 1 > len(dic["data"]):
-                        dic["data"].extend(eval(struc) for _ in range(prefix - len(dic["data"]) + 1))
+                matches = dict(re.findall(ARRAY_DECODER_PATTERN, node_name))
+                if matches.get('arr') is not None:
+                    arr_no = int(matches['arr'])
+                    if arr_no + 1 > len(dic["data"]):
+                        dic["data"].extend(eval(struc) for _ in range(arr_no - len(dic["data"]) + 1))
                         dic["array_count"] = len(dic["data"])
 
-                    dic["data"][prefix]["voltage"][node_name.replace(f"{prefix}:", "")] = float(node.as_ndarray()[0])
-                    dic["data"][prefix]["array_index"] = prefix
+                    dic["data"][arr_no]["voltage"][node_name.replace(f"arr{arr_no}_", "")] = float(node.as_ndarray()[0])
+                    dic["data"][arr_no]["array_index"] = arr_no
                 else:
                     if len(dic["data"]) == 0:
                         dic["data"].append(eval(struc))
@@ -48,15 +50,16 @@ def parse_simulation_result(analysis, result, struc, SIMULATION_LOGGING=False, S
             if dic.get("keyword", 'None') in branch_name:
                 matched = True
                 
-                if ":" in branch_name and branch_name[0:branch_name.index(":")].isdigit():
-                    prefix = int(branch_name[0:branch_name.index(":")])
+                matches = dict(re.findall(ARRAY_DECODER_PATTERN, branch_name))
+                if matches.get('arr') is not None:
+                    arr_no = int(matches['arr'])
                     # Add to data list at index i of i:name
-                    if prefix + 1 > len(dic["data"]):
-                        dic["data"].extend(eval(struc) for _ in range(prefix - len(dic["data"]) + 1))
+                    if arr_no + 1 > len(dic["data"]):
+                        dic["data"].extend(eval(struc) for _ in range(arr_no - len(dic["data"]) + 1))
                         dic["array_count"] = len(dic["data"])
                         
-                    dic["data"][prefix]["current"][branch_name.replace(f"{prefix}:", "")] = float(branch.as_ndarray()[0])
-                    dic["data"][prefix]["array_index"] = prefix
+                    dic["data"][arr_no]["current"][branch_name.replace(f"arr{arr_no}_", "")] = float(branch.as_ndarray()[0])
+                    dic["data"][arr_no]["array_index"] = arr_no
                 else:
                     if len(dic["data"]) == 0:
                         dic["data"].append(eval(struc))

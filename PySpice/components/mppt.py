@@ -26,22 +26,22 @@ class MPPT:
         MPPT_OUTPUT_CURRENT = MPPT_OUTPUT_POWER / self.MPPT_OUTPUT_VOLTAGE
 
         SOLAR_POWER_RAIL = solar_array.get_terminal()
-        self.circuit.R(f"{array_number}:mppt_input_load", 
+        self.circuit.R(f"arr{array_number}_mppt_input_load", 
                  f"{SOLAR_POWER_RAIL}", self.circuit.gnd, 
                  MPPT_INPUT_RESISTANCE)
 
         # Regulate output current to calculated amount
-        self.circuit.raw_spice += f"""B{array_number}:mppt_current_reg 0 {array_number}:mppt_output I = min({self.MPPT_MAX_OUTPUT_CURRENT}, {MPPT_OUTPUT_CURRENT})\n"""
+        self.circuit.raw_spice += f"""Barr{array_number}_mppt_current_reg 0 arr{array_number}_mppt_output I = min({self.MPPT_MAX_OUTPUT_CURRENT}, {MPPT_OUTPUT_CURRENT})\n"""
         
-        self.circuit.V(f"{array_number}:mppt_output", f"{array_number}:mppt_output", f"{array_number}:mppt_output_measured", GROUNDING_RESISTANCE)
+        self.circuit.V(f"arr{array_number}_mppt_output", f"arr{array_number}_mppt_output", f"arr{array_number}_mppt_output_measured", GROUNDING_RESISTANCE)
         
         self.terminal = "total_mppt_output"
         # Connect MPPT output to DC bus
-        self.circuit.R(f"{array_number}:mppt_out_wire", f"{array_number}:mppt_output_measured", self.terminal, WIRE_RESISTANCE)
+        self.circuit.R(f"arr{array_number}_mppt_out_wire", f"arr{array_number}_mppt_output_measured", self.terminal, WIRE_RESISTANCE)
         #dc_bus is shared positive node for battery and load
 
-        self.components["mppt"].append(f"{array_number}:mppt_current_reg")
-        self.components["wire"].append(f"{array_number}:mppt_out_wire")
+        self.components["mppt"].append(f"arr{array_number}_mppt_current_reg")
+        self.components["wire"].append(f"arr{array_number}_mppt_out_wire")
         if log:
             print(self.__str__(array_number, MPPT_INPUT_VOLTAGE, MPPT_MAX_INPUT_POWER, MPPT_OUTPUT_POWER, MPPT_OUTPUT_CURRENT))
             
