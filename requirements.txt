@@ -2,6 +2,7 @@ PySpice==1.5
 
 schemdraw
 
+flask
 ## OPtional dependencies for extra features
 # schemdraw[matplotlib]
 # schemdraw[svgmath]
