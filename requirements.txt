@@ -3,6 +3,7 @@ PySpice==1.5
 schemdraw
 
 flask
+ngrok
 ## OPtional dependencies for extra features
 # schemdraw[matplotlib]
 # schemdraw[svgmath]

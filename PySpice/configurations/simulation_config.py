@@ -5,7 +5,7 @@ SAVE_OUTPUT             = 1     # Save json output for operating point simulatio
 IGNORE_ERROR            = 1
 START_SIMULATION        = 1
 SIMULATION_LOGGING      = 0
-SHOW_SWEEP_PLOT         = 0
+SHOW_SWEEP_PLOT         = 1
 RAWSPICE_ITERATIONS     = 1e6
 
 

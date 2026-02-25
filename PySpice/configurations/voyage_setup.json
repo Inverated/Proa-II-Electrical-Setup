@@ -6,13 +6,7 @@
   "segments": [
     {
       "name": "Early Morning Departure",
-      "duration_minutes": 25,
-      "throttle": 1.0,
-      "solar_power": 0.0
-    },
-    {
-      "name": "Midday Cruising",
-      "duration_minutes": 90,
+      "duration_minutes": 120,
       "throttle": 1.0,
       "solar_power": 0.0
     },
