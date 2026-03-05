@@ -4,6 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+host = "0.0.0.0"
 CSV_FILE = "data_log.csv"
 
 if not os.path.exists(CSV_FILE):
@@ -17,6 +18,10 @@ if not os.path.exists(CSV_FILE):
                          "Voltage", 
                          "Lost Data"])
 
+@app.before_request
+def log_all_requests():
+    print(f"Incoming request: {request.method} {request.path}")
+    
 @app.route("/", methods=['GET'])
 def home():
     return "ESP8266 Sensor Data Receiver is running."   
@@ -68,4 +73,4 @@ def receive_data():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host=host, port=5000, debug=False)
