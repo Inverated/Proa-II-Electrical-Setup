@@ -4,18 +4,16 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-host = "0.0.0.0"
-CSV_FILE = "data_log.csv"
+host = "192.168.50.63"
+CSV_FILE = datetime.now().date().isoformat() + "_data_log.csv"
 
 if not os.path.exists(CSV_FILE):
     with open(CSV_FILE, mode='w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(["date", "time", "time_passed_since_start", 
-                         "Volt Reading 1", "Current Out 1", 
-                         "Volt Reading 2", "Current Out 2",
-                         "Volt Reading 3", "Current In 1",
-                         "Volt Reading 4", "Current In 2",
-                         "Voltage", 
+        writer.writerow(["Date", "Time", "time_passed_since_start", 
+                         "ADS Reading 1", "Current 1", 
+                         "ADS Reading 2", "Current 2",
+                         "ADS Reading 3", "Volts 1",
                          "Lost Data"])
 
 @app.before_request
@@ -51,19 +49,14 @@ def receive_data():
                 time_now,
                 entry.get("time_passed"),
                 
-                entry.get("volts0_1"),
-                entry.get("current_out_1"),
+                entry.get("ads_1"),
+                entry.get("current_1"),
                 
-                entry.get("volts1_1"),
-                entry.get("current_out_2"),
+                entry.get("ads_2"),
+                entry.get("current_2"),
                 
-                entry.get("volts2_1"),
-                entry.get("current_in_1"),
-                
-                entry.get("volts3_1"),
-                entry.get("current_in_2"),
-                
-                entry.get("volts3_2"),
+                entry.get("ads_3"),
+                entry.get("volts_1"),
                 
                 entry.get("data_lost", 0)
             ])
