@@ -4,7 +4,10 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-host = "192.168.50.63"
+hosts = ["192.168.50.63", "10.50.178.194"]
+connected_devices = {}
+
+
 CSV_FILE = datetime.now().date().isoformat() + "_data_log.csv"
 
 if not os.path.exists(CSV_FILE):
@@ -22,7 +25,7 @@ def log_all_requests():
     
 @app.route("/", methods=['GET'])
 def home():
-    return "ESP8266 Sensor Data Receiver is running."   
+    return str(connected_devices)
     
 @app.route('/sensordata', methods=['GET', 'POST'])
 def receive_data():
@@ -35,6 +38,14 @@ def receive_data():
     if not data or "data" not in data:
         return jsonify({"error": "Invalid JSON"}), 400
 
+    addr = data.get("address")
+    if addr:
+        mac_addr = addr.get("mac_address", "Unknown")
+        if mac_addr not in connected_devices:
+            connected_devices[mac_addr] = 1
+        else:
+            connected_devices[mac_addr] += 1
+    
     records = data["data"]
 
     date_now = datetime.now().date().isoformat()
@@ -61,9 +72,22 @@ def receive_data():
                 entry.get("data_lost", 0)
             ])
 
-    print(f"Saved {len(records)} records")
+    print(f"Saved {len(records)} records")    
     return jsonify({"status": "success"}), 200
 
 
 if __name__ == '__main__':
-    app.run(host=host, port=5000, debug=False)
+    connected = False
+    for host in hosts:
+        try:
+            app.run(host=host, port=5000, debug=False)
+            print(f"Server started on {host}")
+            connected = True
+            break
+        except:
+            print(f"Failed to start server on {host}\n")
+        
+    if not connected:
+        app.run(host="0.0.0.0", port=5000, debug=False)
+        print("Server started on default host")
+        

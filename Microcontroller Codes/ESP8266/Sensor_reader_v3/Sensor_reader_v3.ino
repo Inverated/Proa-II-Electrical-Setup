@@ -4,15 +4,24 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 
-const char ssid[] = "Kor";
-const char password[] = "idontknow";
+const char* ssids[] = {
+  "POCO F6 Pro",
+  "Kor"
+};
 
-const char* localServerUrl = "http://192.168.50.63:5000/sensordata";
-const String googleSheetServerUrl = "https://script.google.com/macros/s/AKfycbwTF-j0_1ifUQyCx8KKQ7NFb5gFfi3tLa4N7o9kkCUj_8Ca0-g85azr8-9nkby-oT1y/exec";
+const char* passwords[] = {
+  "FeckingP@ssword84267256",
+  "idontknow"
+};
+
+const char* localServerUrls[] = {
+  "http://192.168.50.63:5000/sensordata",
+  "http://10.50.178.194:5000/sensordata"
+};
+int foundServerIndex = -1;
 
 WiFiClient client;
-WiFiClientSecure clientSecure;
-
+bool wifiIsConnected = false;
 
 unsigned long start_time;
 unsigned long time_passed = 0;
@@ -50,8 +59,7 @@ const uint8_t V_READER_R2 = 10;  // kOhms
 const int SCALING = (V_READER_R2 + V_READER_R1) / V_READER_R2;
 const float ERROR_CORRECTION = 1.00;  //multiply by a factor
 
-void setup(void)
-{
+void setup(void) {
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT);
 
@@ -62,18 +70,38 @@ void setup(void)
   }
   Serial.println("Connected to ASDS1115");
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.println("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print("Failed to connect. WiFi status: "); Serial.println(WiFi.status());
-    delay(500);
-  }
-  Serial.println("Connected to WiFi");
+  connectToWifi();
 
   start_time = millis();
   Serial.println("Setup Complete Successfully\n");
 }
+
+void connectToWifi() {
+  WiFi.mode(WIFI_STA);
+
+  while (!wifiIsConnected) {
+    for (int i = 0; i < sizeof(ssids) / sizeof(ssids[0]); i++) {
+      if (wifiIsConnected) {
+        break;
+      }
+      
+      WiFi.begin(ssids[i], passwords[i]);
+      Serial.print("Connecting to "); Serial.println(ssids[i]);
+
+      for (int j = 0; j < 10; j++) {
+        if (WiFi.status() != WL_CONNECTED) {
+          Serial.print("Failed to connect. WiFi status: "); Serial.println(WiFi.status());
+          delay(1000);
+        } else {
+          Serial.println("Connected to "); Serial.println(ssids[i]);
+          wifiIsConnected = true;
+          break;
+        }
+      }
+    }
+  }
+}
+
 
 void loop(void) {
   time_passed = millis() - start_time;
@@ -132,18 +160,19 @@ void loop(void) {
     digitalWrite(LED_PIN, LED_status);
   }
 
-  delay(1000);
+  delay(500);
 }
 
 bool uploadData() {
-  if (WiFi.status() != WL_CONNECTED) return false;
+  if (WiFi.status() != WL_CONNECTED) {
+    connectToWifi();
+  }
 
-  HTTPClient http1;
-  http1.begin(client, localServerUrl);
-  http1.addHeader("Content-Type", "application/json");
-  
   StaticJsonDocument<1024> doc;
   JsonArray arr = doc.createNestedArray("data");
+
+  JsonObject address = doc.createNestedObject("address");
+  address["mac_address"] = WiFi.macAddress();
 
   for (int i = 0; i < indexPos; i++) {
     JsonObject obj = arr.createNestedObject();
@@ -163,29 +192,41 @@ bool uploadData() {
   String jsonString;
   serializeJson(doc, jsonString);
 
-  int response = http1.POST(jsonString);
+  HTTPClient http1;
 
-  /* 
-  HTTPClient http2;
-  clientSecure.setInsecure();
-  http2.begin(clientSecure, googleSheetServerUrl);
-  http2.addHeader("Content-Type", "application/json");
+  if (foundServerIndex == -1) {
+    int arrSize = sizeof(localServerUrls) / sizeof(localServerUrls[0]);
+    for (int i = 0; i < arrSize; i++) {
+      http1.begin(client, localServerUrls[i]);
+      http1.addHeader("Content-Type", "application/json");
+      int response = http1.POST(jsonString);
 
-  int response2 = http2.POST(jsonString);
-  Serial.print("Google Script server response: ");
-  Serial.println(response2);
-  http2.end();
-  */
+      Serial.print("Local server ("); Serial.print(localServerUrls[i]); Serial.println(") response: ");
+      Serial.println(response);
 
-  Serial.print("Local server response: ");
-  Serial.println(response);
-  http1.end();
+      http1.end();
 
-  if (response == 200) {
-    indexPos = 0;
-    lostData = 0;
-    return true;
+      if (response == 200) {
+        foundServerIndex = i;
+        indexPos = 0;
+        lostData = 0;
+        return true;
+      }
+    }
   } else {
-    return false;
-  };
+    http1.begin(client, localServerUrls[foundServerIndex]);
+    http1.addHeader("Content-Type", "application/json");
+    int response = http1.POST(jsonString);
+
+    Serial.print("Local server response: ");
+    Serial.println(response);
+
+    http1.end();
+    if (response == 200) {
+      indexPos = 0;
+      lostData = 0;
+      return true;
+    }
+  }
+  return false;
 }
