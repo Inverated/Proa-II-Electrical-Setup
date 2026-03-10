@@ -1,14 +1,39 @@
 from flask import Flask, jsonify, jsonify, request
 import csv, os
 from datetime import datetime
+from pathlib import Path
+
+import socket
+import threading
+
+DISCOVERY_PORT = 4210
+
+def discovery_server():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(("", DISCOVERY_PORT))
+
+    print("Discovery service running...")
+
+    while True:
+        data, addr = sock.recvfrom(1024)
+        message = data.decode()
+
+        if message == "WHO_IS_SERVER_PROA_II":
+            print(f"Discovery request from {addr}")
+            sock.sendto(b"SERVER_HERE", addr)
+
+print("Starting discovery server thread...")
+threading.Thread(target=discovery_server, daemon=True).start()
+
+
 
 app = Flask(__name__)
 
-hosts = ["192.168.50.63", "10.50.178.194"]
+#hosts = ["192.168.50.63", "10.50.178.194"]
+hosts = ["0.0.0.0"]
 connected_devices = {}
 
-
-CSV_FILE = datetime.now().date().isoformat() + "_data_log.csv"
+CSV_FILE = Path(__file__).parent / (datetime.now().date().isoformat() + "_data_log.csv")
 
 if not os.path.exists(CSV_FILE):
     with open(CSV_FILE, mode='w', newline='') as f:
@@ -18,6 +43,8 @@ if not os.path.exists(CSV_FILE):
                          "ADS Reading 2", "Current 2",
                          "ADS Reading 3", "Volts 1",
                          "Lost Data"])
+    print(CSV_FILE, "created successfully")
+
 
 @app.before_request
 def log_all_requests():

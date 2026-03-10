@@ -4,25 +4,33 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 
+#include <WiFiUdp.h>
+
+// Flask IP discovery
+WiFiUDP udp;
+
+const int DISCOVERY_PORT = 4210;
+char incomingPacket[255];
+
+IPAddress serverIP;
+
+String localServerUrl;
+bool foundServer = false;
+
+// WiFi connection attempt
 const char* ssids[] = {
-  "POCO F6 Pro",
-  "Kor"
+  "Kor_LP"
 };
 
 const char* passwords[] = {
-  "FeckingP@ssword84267256",
-  "idontknow"
+  "12345678"
 };
-
-const char* localServerUrls[] = {
-  "http://192.168.50.63:5000/sensordata",
-  "http://10.50.178.194:5000/sensordata"
-};
-int foundServerIndex = -1;
 
 WiFiClient client;
 bool wifiIsConnected = false;
 
+
+// Sensor data
 unsigned long start_time;
 unsigned long time_passed = 0;
 
@@ -71,6 +79,7 @@ void setup(void) {
   Serial.println("Connected to ASDS1115");
 
   connectToWifi();
+  discoverServer();
 
   start_time = millis();
   Serial.println("Setup Complete Successfully\n");
@@ -102,6 +111,45 @@ void connectToWifi() {
   }
 }
 
+void discoverServer() {
+  udp.begin(DISCOVERY_PORT);
+
+  while (!foundServer) {
+    if (WiFi.status() != WL_CONNECTED) {
+      wifiIsConnected = false;
+      connectToWifi();
+    }
+    
+    // Broadcast discovery
+    udp.beginPacket(IPAddress(255,255,255,255), DISCOVERY_PORT);
+    udp.print("WHO_IS_SERVER_PROA_II");
+    udp.endPacket();
+
+    Serial.println("Discovery broadcast sent");
+
+    unsigned long start = millis();
+    while (millis() - start < 3000) { // 3 sec timeout
+
+      int packetSize = udp.parsePacket();
+      if (packetSize) {
+        int len = udp.read(incomingPacket, sizeof(incomingPacket)-1);
+        if (len > 0) incomingPacket[len] = 0;
+
+        String msg = String(incomingPacket);
+        if (msg == "SERVER_HERE") {
+          serverIP = udp.remoteIP();
+          Serial.print("Server found: ");
+          Serial.println(serverIP);
+
+          localServerUrl = "http://" + serverIP.toString() + ":5000/sensordata";
+          return;
+        }
+      }
+    }
+
+    Serial.println("Server not found, retrying...");
+  }
+}
 
 void loop(void) {
   time_passed = millis() - start_time;
@@ -194,39 +242,24 @@ bool uploadData() {
 
   HTTPClient http1;
 
-  if (foundServerIndex == -1) {
-    int arrSize = sizeof(localServerUrls) / sizeof(localServerUrls[0]);
-    for (int i = 0; i < arrSize; i++) {
-      http1.begin(client, localServerUrls[i]);
-      http1.addHeader("Content-Type", "application/json");
-      int response = http1.POST(jsonString);
+  http1.begin(client, localServerUrl);
+  http1.addHeader("Content-Type", "application/json");
+  int response = http1.POST(jsonString);
+  
+  Serial.println("-----------------------------------------------------------");
+  Serial.print("Local server ("); Serial.print(localServerUrl); Serial.print(") response: ");
+  Serial.println(response);
 
-      Serial.print("Local server ("); Serial.print(localServerUrls[i]); Serial.println(") response: ");
-      Serial.println(response);
+  http1.end();
 
-      http1.end();
-
-      if (response == 200) {
-        foundServerIndex = i;
-        indexPos = 0;
-        lostData = 0;
-        return true;
-      }
-    }
+  if (response == 200) {
+    foundServer = true;
+    indexPos = 0;
+    lostData = 0;
+    return true;
   } else {
-    http1.begin(client, localServerUrls[foundServerIndex]);
-    http1.addHeader("Content-Type", "application/json");
-    int response = http1.POST(jsonString);
-
-    Serial.print("Local server response: ");
-    Serial.println(response);
-
-    http1.end();
-    if (response == 200) {
-      indexPos = 0;
-      lostData = 0;
-      return true;
-    }
+    foundServer = false;
+    discoverServer();
   }
   return false;
 }
