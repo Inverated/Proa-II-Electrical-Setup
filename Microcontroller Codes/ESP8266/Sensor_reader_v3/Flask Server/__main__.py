@@ -1,31 +1,9 @@
-from flask import Flask, jsonify, jsonify, request
-import csv, os
+from flask import Flask, jsonify, jsonify, request, render_template, Response
+import csv, os, time
 from datetime import datetime
 from pathlib import Path
-
-import socket
+from ipBroadcast import discovery_server
 import threading
-
-DISCOVERY_PORT = 4210
-
-def discovery_server():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(("", DISCOVERY_PORT))
-
-    print("Discovery service running...")
-
-    while True:
-        data, addr = sock.recvfrom(1024)
-        message = data.decode()
-
-        if message == "WHO_IS_SERVER_PROA_II":
-            print(f"Discovery request from {addr}")
-            sock.sendto(b"SERVER_HERE", addr)
-
-print("Starting discovery server thread...")
-threading.Thread(target=discovery_server, daemon=True).start()
-
-
 
 app = Flask(__name__)
 
@@ -48,12 +26,28 @@ if not os.path.exists(CSV_FILE):
 
 @app.before_request
 def log_all_requests():
-    print(f"Incoming request: {request.method} {request.path}")
+    if request.path == "/sensordata":
+        print(f"Incoming request: {request.method} {request.path}")
     
-@app.route("/", methods=['GET'])
-def home():
-    return str(connected_devices)
     
+
+def generate_messages():
+    count = 0
+    while True:
+        time.sleep(2)  # simulate delay
+        count += 1
+        yield f"data: Message {count}\n\n"
+
+@app.route('/stream')
+def stream():
+    return Response(generate_messages(), mimetype='text/event-stream')
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+
 @app.route('/sensordata', methods=['GET', 'POST'])
 def receive_data():
     print(f"Received {request.method} request at /sensordata")
@@ -104,6 +98,8 @@ def receive_data():
 
 
 if __name__ == '__main__':
+    threading.Thread(target=discovery_server, daemon=True).start()
+
     connected = False
     for host in hosts:
         try:
