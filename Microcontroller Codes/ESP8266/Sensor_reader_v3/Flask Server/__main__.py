@@ -38,6 +38,8 @@ def generate_messages():
         count += 1
         yield f"data: Message {count}\n\n"
 
+# Utilising EventSource instead of Ajax for real-time updates
+# Just one way communication to webpage only
 @app.route('/stream')
 def stream():
     return Response(generate_messages(), mimetype='text/event-stream')

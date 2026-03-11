@@ -19,10 +19,12 @@ bool foundServer = false;
 
 // WiFi connection attempt
 const char* ssids[] = {
+  "Kor",
   "Kor_LP"
 };
 
 const char* passwords[] = {
+  "idontknow",
   "12345678"
 };
 
@@ -102,7 +104,7 @@ void connectToWifi() {
           Serial.print("Failed to connect. WiFi status: "); Serial.println(WiFi.status());
           delay(1000);
         } else {
-          Serial.println("Connected to "); Serial.println(ssids[i]);
+          Serial.print("Connected to "); Serial.println(ssids[i]);
           wifiIsConnected = true;
           break;
         }
