@@ -19,11 +19,13 @@ bool foundServer = false;
 
 // WiFi connection attempt
 const char* ssids[] = {
+  "DESKTOP-Kor",
   "Kor",
   "Kor_LP"
 };
 
 const char* passwords[] = {
+  "75Vb83*9",
   "idontknow",
   "12345678"
 };
@@ -51,12 +53,12 @@ struct Sensor_Data {
 };
 
 // Data Transmission
-const uint8_t MAX_LENGTH = 70;
+const uint8_t MAX_LENGTH = 80;
 Sensor_Data cachedData[MAX_LENGTH];
-const uint8_t SEND_INTERVAL = 5;  
+const uint8_t SEND_INTERVAL = 20;  
 //send the data array after every interval of data read
-uint8_t indexPos = 0;
-uint8_t lostData = 0;
+uint16_t indexPos = 0;
+uint16_t lostData = 0;
 bool uploadStatus = 0;
 
 // WiFi status LED Pin
@@ -170,10 +172,13 @@ void loop(void) {
   current_2 = adc2 / (80000 / 3.0) * 100;    
   volts_1 = ads.computeVolts(adc3) * SCALING * ERROR_CORRECTION;
 
-  Serial.println("-----------------------------------------------------------");
-  Serial.print("AIN0_1: "); Serial.print(adc1); Serial.print("  "); Serial.print(current_1); Serial.println("A");
-  Serial.print("AIN1_1: "); Serial.print(adc2); Serial.print("  "); Serial.print(current_2); Serial.println("A");
-  Serial.print("AIN2_1: "); Serial.print(adc3); Serial.print("  "); Serial.print(volts_1); Serial.println("V");
+  // Interval logging as it is too fast
+  if (indexPos > 0 && indexPos % SEND_INTERVAL == 0) {
+    Serial.println("-----------------------------------------------------------");
+    Serial.print("AIN0_1: "); Serial.print(adc1); Serial.print("  "); Serial.print(current_1); Serial.println("A");
+    Serial.print("AIN1_1: "); Serial.print(adc2); Serial.print("  "); Serial.print(current_2); Serial.println("A");
+    Serial.print("AIN2_1: "); Serial.print(adc3); Serial.print("  "); Serial.print(volts_1); Serial.println("V");
+  }
 
   cachedData[indexPos].time_passed = time_passed;
   cachedData[indexPos].ads_1 = adc1;
@@ -183,11 +188,12 @@ void loop(void) {
   cachedData[indexPos].current_2 = current_2;
   cachedData[indexPos].volts_1 = volts_1;
 
-  if (lostData > 0 || indexPos + 1 == MAX_LENGTH) {
+  if (indexPos + 1 >= MAX_LENGTH) {
     // Lost data continues to accumulate once the first data starts to be overridden
     // Stops counting once upload resumed
     lostData += 1;
-    Serial.println("Data being overidden");
+  } else if (lostData > 0) {
+    lostData += 1;
   }
 
   indexPos = (indexPos + 1) % MAX_LENGTH;
@@ -197,7 +203,8 @@ void loop(void) {
       Serial.println("Data upload successful");
       uploadStatus = 1;
     } else {
-      Serial.println("Data upload failed");
+      Serial.print(indexPos); Serial.println(" Data upload failed");
+      Serial.print(lostData); Serial.println(" Data lost");
       uploadStatus = 0;
     }
   }
@@ -210,12 +217,12 @@ void loop(void) {
     digitalWrite(LED_PIN, LED_status);
   }
 
-  delay(00);
+  delayMicroseconds(1000);
 }
 
 bool uploadData() {
   if (WiFi.status() != WL_CONNECTED) {
-    connectToWifi();
+    return false;
   }
 
   StaticJsonDocument<1024> doc;
@@ -236,7 +243,7 @@ bool uploadData() {
     obj["current_2"] = cachedData[i].current_2;
     obj["volts_1"] = cachedData[i].volts_1;
     
-    obj["data_lost"] = lostData > 0 ? lostData + MAX_LENGTH : 0;
+    obj["data_lost"] = (lostData > 0 && i == 0) ? lostData + MAX_LENGTH : 0;
   }
 
   String jsonString;
@@ -256,12 +263,11 @@ bool uploadData() {
 
   if (response == 200) {
     foundServer = true;
+    // Move index back to start. Does not delete old data
     indexPos = 0;
     lostData = 0;
     return true;
   } else {
-    foundServer = false;
-    discoverServer();
+    return false;
   }
-  return false;
 }

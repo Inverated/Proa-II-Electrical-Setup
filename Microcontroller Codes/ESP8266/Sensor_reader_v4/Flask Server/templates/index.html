@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask SSE Example</title>
+</head>
+<body>
+    <h1>Real-Time Updates</h1>
+    <div id="messages"></div>
+
+    <script>
+        const eventSource = new EventSource('/stream');
+
+        eventSource.onmessage = function(event) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<p>${event.data}</p>`;
+        };
+    </script>
+</body>
+</html>
