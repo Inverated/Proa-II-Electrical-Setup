@@ -173,7 +173,7 @@ void loop(void) {
   volts_1 = ads.computeVolts(adc3) * SCALING * ERROR_CORRECTION;
 
   // Interval logging as it is too fast
-  if (indexPos > 0 && indexPos % SEND_INTERVAL == 0) {
+  if (indexPos % SEND_INTERVAL == 0) {
     Serial.println("-----------------------------------------------------------");
     Serial.print("AIN0_1: "); Serial.print(adc1); Serial.print("  "); Serial.print(current_1); Serial.println("A");
     Serial.print("AIN1_1: "); Serial.print(adc2); Serial.print("  "); Serial.print(current_2); Serial.println("A");
@@ -217,7 +217,7 @@ void loop(void) {
     digitalWrite(LED_PIN, LED_status);
   }
 
-  delayMicroseconds(1000);
+  delayMicroseconds(2000);
 }
 
 bool uploadData() {
