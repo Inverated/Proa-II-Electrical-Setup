@@ -78,6 +78,7 @@ def receive_data():
         writer = csv.writer(f)
 
         for entry in records:
+            print(entry)
             writer.writerow([
                 date_now,
                 time_now,
