@@ -1,0 +1,2 @@
+ADS1115 Set at 2/3 Gain
+1 unit = 0.0001875 V
