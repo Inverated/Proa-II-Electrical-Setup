@@ -49,3 +49,13 @@
 <script src="../../plugins/flot/plugins/jquery.flot.pie.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Initialize PushMenu Widget -->
+<script>
+    $(document).ready(function() {
+        $('[data-widget="pushmenu"]').on('click', function(e) {
+            e.preventDefault();
+            $('body').toggleClass('sidebar-collapse');
+        });
+    });
+</script>
