@@ -1,0 +1,151 @@
+<html lang="en">
+
+<%- include('header', { title: "Power Management" }) %>
+
+    <body class="hold-transition sidebar-mini layout-fixed">
+        <div class="wrapper">
+            <%- include('sidebar') %>
+                <%- include('navbar') %>
+                    <div class="content-wrapper">
+                        <div class="content-header">
+                            <div class="container-fluid">
+                                <div class="row mb-2">
+                                    <div class="col-sm-6">
+                                        <h1 class="m-0">Power Management</h1>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <ol class="breadcrumb float-sm-right">
+                                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                                            <li class="breadcrumb-item active">Power Management</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <!-- Main content -->
+                                <section class="content">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card card-primary card-outline">
+                                                    <div class="card-header d-flex justify-content-between">
+                                                        <h3 class="card-title">
+                                                            <i class="far fa-chart-bar"></i>
+                                                            SoC vs Time
+                                                        </h3>
+                                                        <button class="btn btn-primary btn-sm ml-auto" id="btnToggle"
+                                                            onclick="togglePolling()">Stop</button>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <canvas id="liveChart" height="100"></canvas>
+                                                    </div>
+                                                    <!-- /.card-body-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+        </div>
+        <%- include('script') %>
+        <script>
+            // Power Management Chart
+            let intervalId = null;
+            let isRunning = true;
+            let pauseCount = 0;
+
+            const ctx = document.getElementById('liveChart').getContext('2d');
+
+            const chartData = {
+                labels: [],   // formatted timestamps for display
+                datasets: [{
+                    label: 'Value',
+                    data: [],   // raw numeric values
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#6366f1',
+                    tension: 0.35,
+                    fill: true,
+                }]
+            };
+
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    animation: { duration: 0 },   // disable animation for smooth live updates
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.parsed.y.toFixed(2)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#64748b', maxTicksLimit: 8, maxRotation: 0 },
+                            grid: { color: '#1e2235' }
+                        },
+                        y: {
+                            ticks: { color: '#64748b' },
+                            grid: { color: '#1e2235' }
+                        }
+                    }
+                }
+            });
+            async function getData() {
+                const timestamp = new Date() / 1000;
+                const value = Math.random() * 100 + 100;
+                return [timestamp, value];
+            }
+            function fmtTimestamp(ts) {
+                const d = new Date(ts * 1000);
+                return d.toLocaleTimeString('en-GB'); // 24-hour HH:MM:SS
+            }
+            async function tick() {
+                const [ts, value] = await getData();
+                const maxPoints = 30;
+
+                // Append
+                chartData.labels.push(fmtTimestamp(ts));
+                chartData.datasets[0].data.push(value);
+
+                // Shift oldest point off once we exceed maxPoints
+                if (chartData.labels.length > maxPoints) {
+                    chartData.labels.shift();
+                    chartData.datasets[0].data.shift();
+                }
+
+                if (isRunning) {
+                    chart.update();
+                }
+            }
+
+            function startPolling() {
+                const ms = 500
+                clearInterval(intervalId);
+                intervalId = setInterval(tick, ms);
+            }
+
+            function togglePolling() {
+                const btn = document.getElementById('btnToggle');
+                if (isRunning) {
+                    btn.textContent = 'Start';
+                    clearInterval(intervalId);
+                } else {
+                    btn.textContent = 'Stop';
+                    startPolling();
+                }
+                isRunning = !isRunning;
+            }
+            // ─── Kick things off ──────────────────────────────────────────────────────
+            tick();           // immediate first point
+            startPolling();   // then start regular polling
+        </script>
+    </body>
+
+</html>

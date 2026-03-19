@@ -7,3 +7,5 @@ __pycache__/
 
 # Diagram
 *.autosave.xopp
+
+node_modules/
