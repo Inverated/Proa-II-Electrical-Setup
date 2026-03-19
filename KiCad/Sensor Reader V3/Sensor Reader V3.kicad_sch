@@ -3229,7 +3229,7 @@
 	)
 	(wire
 		(pts
-			(xy 129.54 107.95) (xy 134.62 107.95)
+			(xy 128.27 107.95) (xy 133.35 107.95)
 		)
 		(stroke
 			(width 0)
@@ -3469,7 +3469,7 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 124.46) (xy 133.35 123.19)
+			(xy 132.08 124.46) (xy 132.08 123.19)
 		)
 		(stroke
 			(width 0)
@@ -3569,7 +3569,7 @@
 	)
 	(wire
 		(pts
-			(xy 110.49 124.46) (xy 133.35 124.46)
+			(xy 110.49 124.46) (xy 132.08 124.46)
 		)
 		(stroke
 			(width 0)
@@ -3899,7 +3899,7 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 110.49) (xy 134.62 110.49)
+			(xy 132.08 110.49) (xy 133.35 110.49)
 		)
 		(stroke
 			(width 0)
@@ -4119,7 +4119,7 @@
 	)
 	(wire
 		(pts
-			(xy 105.41 127) (xy 129.54 127)
+			(xy 105.41 127) (xy 128.27 127)
 		)
 		(stroke
 			(width 0)
@@ -4129,7 +4129,7 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 110.49) (xy 133.35 115.57)
+			(xy 132.08 110.49) (xy 132.08 115.57)
 		)
 		(stroke
 			(width 0)
@@ -4459,7 +4459,7 @@
 	)
 	(wire
 		(pts
-			(xy 129.54 107.95) (xy 129.54 127)
+			(xy 128.27 107.95) (xy 128.27 127)
 		)
 		(stroke
 			(width 0)
@@ -4467,7 +4467,7 @@
 		)
 		(uuid "ffca6a85-c0c4-45bb-a1b9-06c3a9010944")
 	)
-	(label "PV+_2"
+	(label "solar_array_output_2"
 		(at 252.73 36.83 0)
 		(effects
 			(font
@@ -4497,7 +4497,7 @@
 		)
 		(uuid "11b0e968-dd11-4e94-a7bc-01e1b18abe16")
 	)
-	(label "MPPT-_1"
+	(label "GND"
 		(at 111.76 107.95 0)
 		(effects
 			(font
@@ -4517,8 +4517,8 @@
 		)
 		(uuid "2471a405-c72e-4fa5-a748-ac900b1977f0")
 	)
-	(label "MPPT+_2"
-		(at 134.62 110.49 0)
+	(label "mppt_output_2"
+		(at 133.35 110.49 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4567,7 +4567,7 @@
 		)
 		(uuid "40a6ea24-e2d8-49d2-addf-5bb2d0a359bc")
 	)
-	(label "MPPT+_1"
+	(label "mppt_output_1"
 		(at 111.76 110.49 0)
 		(effects
 			(font
@@ -4577,7 +4577,7 @@
 		)
 		(uuid "525872c0-1cc5-4dc1-baa8-c14cf85e27cf")
 	)
-	(label "PV-_1"
+	(label "GND"
 		(at 110.49 31.75 0)
 		(effects
 			(font
@@ -4597,7 +4597,7 @@
 		)
 		(uuid "61958c60-6dc4-4fc8-ad16-a4a125bab82c")
 	)
-	(label "MPPT+_1"
+	(label "mppt_output_1"
 		(at 200.66 30.48 0)
 		(effects
 			(font
@@ -4607,7 +4607,7 @@
 		)
 		(uuid "61d23ded-f65d-4c38-af6a-5258a347d95a")
 	)
-	(label "PV+_2"
+	(label "solar_array_output_2"
 		(at 110.49 52.07 0)
 		(effects
 			(font
@@ -4617,7 +4617,7 @@
 		)
 		(uuid "6eaa4e73-da02-41c6-af80-b5d8780bb040")
 	)
-	(label "PV+_1"
+	(label "solar_array_output_1"
 		(at 110.49 29.21 0)
 		(effects
 			(font
@@ -4647,7 +4647,7 @@
 		)
 		(uuid "7aedd7b3-17da-4a77-a495-6a8dab1b6b12")
 	)
-	(label "PV-_2"
+	(label "GND"
 		(at 252.73 39.37 0)
 		(effects
 			(font
@@ -4657,7 +4657,7 @@
 		)
 		(uuid "814cd9e4-bcb9-43a6-bdbd-987eb918f4a5")
 	)
-	(label "MPPT+_2"
+	(label "mppt_output_2"
 		(at 252.73 30.48 0)
 		(effects
 			(font
@@ -4677,7 +4677,7 @@
 		)
 		(uuid "84c9d88a-b5bd-489b-b13a-c3a192afc93c")
 	)
-	(label "MPPT-_1"
+	(label "GND"
 		(at 200.66 33.02 0)
 		(effects
 			(font
@@ -4727,7 +4727,7 @@
 		)
 		(uuid "9996d34a-9244-4347-a7bd-a8f578f7ab08")
 	)
-	(label "PV-_2"
+	(label "GND"
 		(at 110.49 54.61 0)
 		(effects
 			(font
@@ -4797,8 +4797,8 @@
 		)
 		(uuid "ae22ae9c-0770-4f50-ac46-44f4856eb850")
 	)
-	(label "MPPT-_2"
-		(at 134.62 107.95 0)
+	(label "GND"
+		(at 133.35 107.95 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4817,7 +4817,7 @@
 		)
 		(uuid "c4275625-5151-4dac-ae42-71aa706b889b")
 	)
-	(label "PV+_1"
+	(label "solar_array_output_1"
 		(at 200.66 36.83 0)
 		(effects
 			(font
@@ -4907,7 +4907,7 @@
 		)
 		(uuid "f7812d46-1651-4450-ac90-4660f2b813da")
 	)
-	(label "MPPT-_2"
+	(label "GND"
 		(at 252.73 33.02 0)
 		(effects
 			(font
@@ -4957,7 +4957,7 @@
 		)
 		(uuid "fdebd97b-a8de-45b1-83ae-44fc1b20ac9e")
 	)
-	(label "PV-_1"
+	(label "GND"
 		(at 200.66 39.37 0)
 		(effects
 			(font
@@ -5518,7 +5518,7 @@
 	)
 	(symbol
 		(lib_id "Device:Fuse")
-		(at 133.35 119.38 180)
+		(at 132.08 119.38 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5526,7 +5526,7 @@
 		(dnp no)
 		(uuid "41a63782-d879-4801-bd6a-fb2b9461e1f5")
 		(property "Reference" "Fuse_3"
-			(at 138.43 118.364 0)
+			(at 137.16 118.364 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5534,7 +5534,7 @@
 			)
 		)
 		(property "Value" "60A"
-			(at 138.43 120.142 0)
+			(at 137.16 120.142 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5542,7 +5542,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 135.128 119.38 90)
+			(at 133.858 119.38 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5551,7 +5551,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 133.35 119.38 0)
+			(at 132.08 119.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5560,7 +5560,7 @@
 			)
 		)
 		(property "Description" "Fuse"
-			(at 133.35 119.38 0)
+			(at 132.08 119.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
