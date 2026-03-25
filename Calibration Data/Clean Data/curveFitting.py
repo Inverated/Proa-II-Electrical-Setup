@@ -28,7 +28,7 @@ equation = []
 for file in file_list:
     try:
         df = pd.read_csv(
-            f'Calibration Data/Clean Data/Resting curve fitting/{file}')
+            f'Resting curve fitting/{file}')
     except FileNotFoundError:
         print(f"File not found: {file}")
         continue

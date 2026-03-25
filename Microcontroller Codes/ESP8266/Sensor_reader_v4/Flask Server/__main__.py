@@ -39,7 +39,7 @@ x_axis = deque(maxlen=max_points)
 incoming = Queue()  # buffer between Flask and plot
 counter = 0
 fig, ax = plt.subplots()
-ax.set_ylim(0, 60)
+ax.set_ylim(45, 60)
 line, = ax.plot([], [])
 counter = 0
 last_t = None
