@@ -49,3 +49,4 @@ Voltage Reading Sensor Value
 24.3 10683
 24.8 10866
 24.5 10775
+24.7 10852
