@@ -229,7 +229,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "error",
+      "pin_to_pin": "warning",
       "power_pin_not_driven": "error",
       "same_local_global_label": "warning",
       "similar_label_and_power": "warning",
@@ -247,10 +247,13 @@
   },
   "libraries": {
     "pinned_footprint_libs": [],
-    "pinned_symbol_libs": []
+    "pinned_symbol_libs": [
+      "PCM_JLCPCB-Diodes",
+      "PCM_JLCPCB-Capacitors"
+    ]
   },
   "meta": {
-    "filename": "Sensor Reader V4.kicad_pro",
+    "filename": "Sensor Reader V4_JLC.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -396,14 +399,6 @@
       "version": 1
     },
     "net_format_name": "",
-    "ngspice": {
-      "fix_include_paths": true,
-      "meta": {
-        "version": 0
-      },
-      "model_mode": 4,
-      "workbook_filename": ""
-    },
     "page_layout_descr_file": "",
     "plot_directory": "",
     "space_save_all_events": true,
@@ -418,7 +413,7 @@
   },
   "sheets": [
     [
-      "8c7c8ba2-3f68-4d84-900e-3f3ae04ebb94",
+      "67ca1654-a862-467a-a4ec-462fc0f8bc63",
       "Root"
     ]
   ],
