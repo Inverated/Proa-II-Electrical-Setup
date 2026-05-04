@@ -9226,7 +9226,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_Wire:SolderWire-0.5sqmm_1x06_P4.8mm_D0.9mm_OD2.3mm"
 			(at 236.22 81.28 0)
 			(effects
 				(font
@@ -13336,7 +13336,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_Wire:SolderWire-0.1sqmm_1x06_P3.6mm_D0.4mm_OD1mm"
 			(at 259.08 81.28 0)
 			(effects
 				(font
@@ -14507,7 +14507,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_1.00mm:PinHeader_1x06_P1.00mm_Vertical"
 			(at 158.75 181.61 0)
 			(effects
 				(font
