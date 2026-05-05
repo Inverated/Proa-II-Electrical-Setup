@@ -6804,7 +6804,7 @@
 	(footprint "PCM_JLCPCB:R_0603"
 		(layer "F.Cu")
 		(uuid "7322d620-2129-4669-a671-6cab71359796")
-		(at 101 100.69 90)
+		(at 104 97.5 90)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R2"
@@ -9604,7 +9604,7 @@
 	(footprint "PCM_JLCPCB:C_0805"
 		(layer "F.Cu")
 		(uuid "8e8d2424-1ec9-4365-9418-ab0b88ff48b7")
-		(at 104 102 -90)
+		(at 103.5 102 -90)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C1"
@@ -10009,7 +10009,7 @@
 	(footprint "Diode_SMD:D_SOD-323"
 		(layer "F.Cu")
 		(uuid "91562e55-6f44-4e01-ba07-0e4cdcd6f73a")
-		(at 104 106 -90)
+		(at 103.5 106 -90)
 		(descr "SOD-323")
 		(tags "SOD-323")
 		(property "Reference" "D1"
@@ -13083,7 +13083,7 @@
 	(footprint "PCM_JLCPCB:R_0603"
 		(layer "F.Cu")
 		(uuid "c9ab32bd-2b80-43df-b1a5-be94a70216c4")
-		(at 99.25 100.69 90)
+		(at 102.25 97.5 90)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R1"
@@ -15429,7 +15429,7 @@
 	(footprint "Package_TO_SOT_SMD:SOT-666"
 		(layer "F.Cu")
 		(uuid "dfa54881-006a-4168-9bb8-976ac252fdd8")
-		(at 100.4625 96.85 -90)
+		(at 103.4625 93.66 -90)
 		(descr "SOT666")
 		(tags "SOT-666")
 		(property "Reference" "U2"
@@ -17490,12 +17490,12 @@
 		(start 81.5 62)
 		(end 124.5 124.5)
 		(stroke
-			(width 0.2)
+			(width 0.05)
 			(type default)
 		)
 		(fill no)
-		(layer "F.Cu")
-		(uuid "c5409001-be2f-4512-814a-5d77453752ac")
+		(layer "Edge.Cuts")
+		(uuid "a4b718fb-5efb-49b8-90dc-126db2d00db8")
 	)
 	(dimension
 		(type orthogonal)
