@@ -14,6 +14,7 @@ from queue import Queue
 
 app = Flask(__name__)
 
+
 # hosts = ["192.168.50.63", "10.50.178.194"]
 hosts = ["0.0.0.0"]
 connected_devices = {}
