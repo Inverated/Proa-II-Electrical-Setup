@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from ipBroadcast import discovery_server
 import threading
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from queue import Queue
@@ -33,13 +34,13 @@ if not os.path.exists(CSV_FILE):
 
 
 # Graph
-max_points = 500
+max_points = 50000
 voltage = deque(maxlen=max_points)
 x_axis = deque(maxlen=max_points)
 incoming = Queue()  # buffer between Flask and plot
 counter = 0
 fig, ax = plt.subplots()
-ax.set_ylim(0, 60)
+ax.set_ylim(20, 35)
 line, = ax.plot([], [])
 counter = 0
 last_t = None
