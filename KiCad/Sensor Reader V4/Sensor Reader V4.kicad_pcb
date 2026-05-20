@@ -20853,8 +20853,8 @@
 		(uuid "c79996c5-6fd9-4ff5-8a54-83c339a5bd1a")
 	)
 	(gr_rect
-		(start 117.5 38)
-		(end 169 101)
+		(start 117.75 38)
+		(end 169.25 100.5)
 		(stroke
 			(width 0.05)
 			(type default)
