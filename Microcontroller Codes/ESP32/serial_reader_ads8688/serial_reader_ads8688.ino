@@ -10,6 +10,9 @@
 #define DEFAULT_OFFSET 16
 #define DIVIDER_OFFSET 288
 
+#define SAMPLING_RATE 0	// 1000 a bit overkill for BMS haha
+#define PACKET_SIZE 8800
+
 ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
 
 // Speed Test
@@ -20,29 +23,19 @@ ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
 struct __attribute__((packed)) Packet {
 	uint16_t header;
 	uint32_t counter;
-	uint32_t timediff_us;		// Use micros. Sampling 1 / ms, use us for precision; 32bit -> ~70 min
+	uint32_t timediff_us;  // Use micros. Sampling 1 / ms, use us for precision; 32bit -> ~70 min
 	uint16_t readings[8];
 	uint16_t crc;
 };
 
-uint16_t crc16(const uint8_t* data, uint16_t len) {
-    uint16_t crc = 0xFFFF;
-
-    for (uint16_t i = 0; i < len; i++) {
-        crc ^= data[i];
-
-        for (uint8_t j = 0; j < 8; j++) {
-        if (crc & 0x0001)
-            crc = (crc >> 1) ^ 0xA001;
-        else
-            crc >>= 1;
-        }
-    }
-
-    return crc;
+uint16_t additive_cksum(uint16_t* readings, uint16_t counter) {
+	uint16_t sum = counter;
+	for (int i = 0; i < 8; i++) {
+		sum += readings[i];
+	}
+	return sum;
 }
 
-const uint16_t PACKET_SIZE = 1000;
 Packet bulkPackets[PACKET_SIZE];
 
 // Default Vref = 4.096V
@@ -70,6 +63,8 @@ void checkForStart() {
 	}
 }
 
+uint16_t timer_start = millis();
+const uint16_t TIME_TO_ALERT = PACKET_SIZE * 8;
 void setup() {
 	//Serial.begin(921600);
 	Serial.begin(2000000);  // Jtag should ignore the set rate and just do maximum
@@ -84,16 +79,20 @@ void setup() {
 
 	// Enable all 8 channels in auto scan
 	adc.setChannelSequence(0xFF);  // or 0b11111111 (not x but b)
-	adc.setSampleRate(0);
+	adc.setSampleRate(SAMPLING_RATE);
 
 	// Start auto scan mode
 	adc.autoRst();
 	adc.autoRst();
 
 	prevTime_us = micros();
+	SPI.beginTransaction(SPISettings(ADS8688_SPI_CLOCK, MSBFIRST, SPI_MODE1));
+
 }
 
-void loop() {
+uint16_t raw_readings[8];
+
+IRAM_ATTR void loop() {
 	if (!streamEnabled) {
 		checkForStart();
 		return;
@@ -101,45 +100,58 @@ void loop() {
 
 	adc.waitForSample();
 
-	SPI.beginTransaction(SPISettings(ADS8688_SPI_CLOCK, MSBFIRST, SPI_MODE1));
+	while (packet_position < PACKET_SIZE) {
+		uint32_t now_us = adc.readAllChannels(raw_readings);
+		//uint32_t now_us = micros();
 
-	for (int i = 0; i < R1_SIZE; i++) {
-		uint8_t idx = r1_pins[i];
-		uint16_t raw = adc.noOpRaw() - DEFAULT_OFFSET;
-		bulkPackets[packet_position].readings[idx] = raw;
-	}
+		Packet& currPkt = bulkPackets[packet_position];
+		currPkt.header = HEADER;
+		currPkt.counter = counter;
+		currPkt.timediff_us = now_us - prevTime_us;
 
-	for (int i = 0; i < R5_SIZE; i++) {
-		uint8_t idx = r5_pins[i];
-		uint16_t raw = adc.noOpRaw();
-		if (raw < DIVIDER_OFFSET) {
-			raw = 0;
-		} else {
-			raw -= DIVIDER_OFFSET;
-		}
-		bulkPackets[packet_position].readings[idx] = raw;
-	}
-	SPI.endTransaction();
-
-	uint32_t now_us = micros();
-
-	Packet& currPkt = bulkPackets[packet_position];
-	currPkt.header = HEADER;
-	currPkt.counter = counter;
-	currPkt.timediff_us = now_us - prevTime_us;
-	currPkt.crc = crc16((uint8_t*)&currPkt, sizeof(Packet) - sizeof(uint16_t));
-
-	prevTime_us = now_us;
-	counter += 1;
-	packet_position += 1;
-
-	if ((counter - 1) % PACKET_SIZE == 0) {
-		if (!Serial) {
-			streamEnabled = false;
-			return;
+		for (int i = 0; i < R1_SIZE; i++) {
+			uint8_t idx = r1_pins[i];
+			uint16_t raw = raw_readings[idx] - DEFAULT_OFFSET;
+			//uint16_t raw = adc.noOpRaw();
+			bulkPackets[packet_position].readings[idx] = raw;
+			//Serial.printf("CH%d: Raw -> %d  ", idx, raw);
 		}
 
-		Serial.write((uint8_t*)&bulkPackets, sizeof(bulkPackets));
-		packet_position = 0;
+		for (int i = 0; i < R5_SIZE; i++) {
+			uint8_t idx = r5_pins[i];
+			uint16_t raw = raw_readings[idx];
+			//uint16_t raw = adc.noOpRaw();
+			if (raw < DIVIDER_OFFSET) {
+				raw = 0;
+			} else {
+				raw -= DIVIDER_OFFSET;
+			}
+			bulkPackets[packet_position].readings[idx] = raw;
+			//Serial.printf("CH%d: Raw -> %d  \n", idx, raw);
+		}
+		
+		currPkt.crc = additive_cksum(currPkt.readings, counter);
+
+		prevTime_us = now_us;
+		counter += 1;
+		packet_position += 1;
+		//Serial.println("=======================");
 	}
+
+	if (counter % TIME_TO_ALERT == 1) {
+		uint16_t time_now = millis();
+		Serial.printf("Time taken to process %d rows * 8 channel = %d\n", TIME_TO_ALERT, time_now - timer_start);
+		timer_start = time_now;
+	}
+
+	//SPI.endTransaction();
+
+	/* if (!Serial) {
+		streamEnabled = false;
+		return;
+	} 
+	Serial.write((uint8_t*)&bulkPackets, sizeof(bulkPackets));
+	*/
+	
+	packet_position = 0;
 }
