@@ -4,30 +4,31 @@
 // Max rate on board = 297kSPS
 // Max rate transfering via serial = 80kSPS
 
-#define PIN_CS 		7
-#define PIN_SCK 	6
-#define PIN_MOSI 	5
-#define PIN_MISO 	4
+#define PIN_CS 7
+#define PIN_SCK 6
+#define PIN_MOSI 5
+#define PIN_MISO 4
 
-#define HEADER 					0xACDC
-#define DEFAULT_OFFSET 	16
-#define DIVIDER_OFFSET 	288
+#define HEADER 0xACDC
+#define DEFAULT_OFFSET 16
+#define DIVIDER_OFFSET 288
 
-#define SAMPLING_RATE 	8000
-#define PACKET_SIZE 		4000
+#define SAMPLING_RATE 0
+#define PACKET_SIZE 8000
 
-#define LOGGING 					0
-#define TRANSMITTING 			1
-#define BAUD_RATE 				2000000
-#define ADS8688_SPI_CLOCK 20000000 // Overide library. Datasheet max 17M; Stable until 30M
+#define LOGGING 0
+#define TRANSMITTING 1
+#define BAUD_RATE 2000000
+#define ADS8688_SPI_CLOCK 30000000  // Overide library. Datasheet max 17M; Stable until 30M
 
 ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
 
-// _attribute_((packed)) forces packet size to be whatever I set. Used prev when 8bit was used but not sure if required now
+#define HEADER 0xDEADBEEF
+
 struct __attribute__((packed)) Packet {
-	uint16_t header;
+	uint32_t header;
 	uint32_t counter;
-	uint32_t timediff_us;  // Use micros. Sampling 1 / ms, use us for precision; 32bit -> ~70 min
+	uint32_t timediff_us;
 	uint16_t readings[8];
 	uint16_t chksum;
 };
@@ -50,9 +51,9 @@ const uint8_t R1_SIZE = 6;
 const uint8_t R5_SIZE = 2;
 const uint8_t r1_pins[R1_SIZE] = { 0, 1, 2, 3, 4, 5 };  // Direct HE sensor reading
 const uint8_t r5_pins[R5_SIZE] = { 6, 7 };              // Battery voltage stepped down
-uint16_t raw_readings[8];
 const uint16_t TIME_TO_ALERT = PACKET_SIZE * 4;
 
+uint16_t raw_readings[8];
 uint32_t prevTime_us;
 uint32_t counter = 1;
 uint16_t packet_position = 0;
@@ -71,7 +72,7 @@ void checkForStart() {
 
 
 void setup() {
-	Serial.begin(BAUD_RATE);  // Jtag should ignore the set rate and just do maximum
+	Serial.begin(BAUD_RATE);
 
 	for (int i = 0; i < R1_SIZE; i++) {
 		adc.setChannelRange(r1_pins[i], R1);
@@ -89,7 +90,7 @@ void setup() {
 	adc.autoRst();
 
 	SPI.beginTransaction(SPISettings(ADS8688_SPI_CLOCK, MSBFIRST, SPI_MODE1));
-	
+
 	prevTime_us = micros();
 	timer_start = millis();
 }
@@ -102,12 +103,11 @@ IRAM_ATTR void loop() {
 	}
 
 	while (packet_position < PACKET_SIZE) {
-		adc.waitForSample();	// Limit sampling rate. If sampling rate set to 0, no effect
+		adc.waitForSample();  // Limit sampling rate. If sampling rate set to 0, no effect
 
 		uint32_t now_us = adc.readAllChannels(raw_readings);
 
 		Packet& currPkt = bulkPacket[packet_position];
-		currPkt.header = HEADER;
 		currPkt.counter = counter;
 		currPkt.timediff_us = now_us - prevTime_us;
 
@@ -121,7 +121,7 @@ IRAM_ATTR void loop() {
 		for (int i = 0; i < R5_SIZE; i++) {
 			uint8_t idx = r5_pins[i];
 			uint16_t raw = raw_readings[idx];
-			
+
 			if (raw < DIVIDER_OFFSET) {
 				raw = 0;
 			} else {
@@ -130,8 +130,9 @@ IRAM_ATTR void loop() {
 			currPkt.readings[idx] = raw;
 			if (LOGGING && !TRANSMITTING) Serial.printf("CH%d: Raw -> %d  \n", idx, raw);
 		}
-		
+
 		currPkt.chksum = additive_chksum(currPkt.readings, counter);
+		currPkt.header = HEADER;
 
 		prevTime_us = now_us;
 		counter += 1;
@@ -148,12 +149,13 @@ IRAM_ATTR void loop() {
 	if (TRANSMITTING && !Serial) {
 		streamEnabled = false;
 		return;
-	} 
+	}
 
 	if (TRANSMITTING) {
-    Serial.write((uint8_t*)bulkPacket, sizeof(bulkPacket));
+		//Serial.write((uint8_t*)&frame, sizeof(frame));
+		Serial.write((uint8_t*)bulkPacket, sizeof(bulkPacket));
 		Serial.flush();
 	}
-	
+
 	packet_position = 0;
 }
