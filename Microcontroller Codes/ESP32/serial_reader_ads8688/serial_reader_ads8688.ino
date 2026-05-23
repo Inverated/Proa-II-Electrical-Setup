@@ -1,29 +1,27 @@
 #include <ADS8688.h>
 
-// Speed Test
-// Max rate on board = 297kSPS
-// Max rate transfering via serial = 80kSPS
 
 #define PIN_CS 7
 #define PIN_SCK 6
 #define PIN_MOSI 5
 #define PIN_MISO 4
 
-#define HEADER 0xACDC
 #define DEFAULT_OFFSET 16
 #define DIVIDER_OFFSET 288
 
-#define SAMPLING_RATE 0
-#define PACKET_SIZE 8000
+#define SAMPLING_RATE 8000
+#define PACKET_SIZE 1000
+// Stupid ESP32 C3. CDC doesent work, takes 120ms for 1000 packet size
+// Since single core, cannot read from adc while writing
 
 #define LOGGING 0
 #define TRANSMITTING 1
 #define BAUD_RATE 2000000
-#define ADS8688_SPI_CLOCK 30000000  // Overide library. Datasheet max 17M; Stable until 30M
-
-ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
+#define ADS8688_SPI_CLOCK 20000000  // Overide library. Datasheet max 17M; Stable until 30M
 
 #define HEADER 0xDEADBEEF
+
+ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
 
 struct __attribute__((packed)) Packet {
 	uint32_t header;
@@ -57,8 +55,8 @@ uint16_t raw_readings[8];
 uint32_t prevTime_us;
 uint32_t counter = 1;
 uint16_t packet_position = 0;
-bool streamEnabled = false;
 uint16_t timer_start;
+bool streamEnabled = false;
 
 void checkForStart() {
 	if (Serial.available()) {
@@ -114,7 +112,11 @@ IRAM_ATTR void loop() {
 		for (int i = 0; i < R1_SIZE; i++) {
 			uint8_t idx = r1_pins[i];
 			uint16_t raw = raw_readings[idx] - DEFAULT_OFFSET;
-			if (LOGGING && !TRANSMITTING) Serial.printf("CH%d: Raw -> %d  ", idx, raw);
+
+#if LOGGING && !TRANSMITTING
+			Serial.printf("CH%d: Raw -> %d  ", idx, raw);
+#endif
+
 			currPkt.readings[idx] = raw;
 		}
 
@@ -128,7 +130,10 @@ IRAM_ATTR void loop() {
 				raw -= DIVIDER_OFFSET;
 			}
 			currPkt.readings[idx] = raw;
-			if (LOGGING && !TRANSMITTING) Serial.printf("CH%d: Raw -> %d  \n", idx, raw);
+
+#if LOGGING && !TRANSMITTING
+			Serial.printf("CH%d: Raw -> %d  \n", idx, raw);
+#endif
 		}
 
 		currPkt.chksum = additive_chksum(currPkt.readings, counter);
@@ -137,7 +142,9 @@ IRAM_ATTR void loop() {
 		prevTime_us = now_us;
 		counter += 1;
 		packet_position += 1;
-		if (LOGGING && !TRANSMITTING) Serial.println("=======================");
+#if LOGGING && !TRANSMITTING
+		Serial.println("=======================");
+#endif
 	}
 
 	if (!LOGGING && !TRANSMITTING && counter % TIME_TO_ALERT == 1) {
@@ -151,11 +158,9 @@ IRAM_ATTR void loop() {
 		return;
 	}
 
-	if (TRANSMITTING) {
-		//Serial.write((uint8_t*)&frame, sizeof(frame));
-		Serial.write((uint8_t*)bulkPacket, sizeof(bulkPacket));
-		Serial.flush();
-	}
+#if TRANSMITTING
+	Serial.write((uint8_t*)bulkPacket, sizeof(bulkPacket));
+#endif
 
 	packet_position = 0;
 }
