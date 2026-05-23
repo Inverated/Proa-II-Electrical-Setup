@@ -25,8 +25,8 @@ if not exists:
             'ch3', 'ch4', 'ch5', 'ch6', 'ch7'])
     csv_file.flush()
 
-HEADER1 = 0x14
-HEADER2 = 0x11
+HEADER1 = 0xAC
+HEADER2 = 0xDC
 HEADER = (HEADER2 << 8) | HEADER1  # Little-endian header value
 
 broken_packet_count = 0
@@ -80,7 +80,10 @@ def read_packet(ser):
             raise e
 
 def additive_cksum(data, counter):
-    return (sum(data) + counter) % 65536
+    sum = 0
+    for index, value in enumerate(data):
+        sum += value * (index + 1)
+    return (sum + (counter & 0xFFFF)) % 65536
 
 while True:
     try:
