@@ -1,6 +1,5 @@
 #include <ADS8688.h>
 
-
 #define PIN_CS 7
 #define PIN_SCK 6
 #define PIN_MOSI 5
@@ -9,13 +8,18 @@
 #define DEFAULT_OFFSET 16
 #define DIVIDER_OFFSET 288
 
-#define SAMPLING_RATE 8000
-#define PACKET_SIZE 1000
+#define SAMPLING_RATE 0
+#define PACKET_SIZE 5
 // Stupid ESP32 C3. CDC doesent work, takes 120ms for 1000 packet size
 // Since single core, cannot read from adc while writing
+// Max recorded transfer speed 630KB/s (163kSPS)
+// Pkt size = 5, Flushing into CSV at 1000 count, reading at 5-50 packets
+// Max benchmark without serial write 5000 rows * 8 ch = 155ms (258kSPS)
 
-#define LOGGING 0
-#define TRANSMITTING 1
+#define TIME_TO_ALERT PACKET_SIZE	// Logging speed test (LOGGING & TRANSNMITTING = 0)
+
+#define LOGGING 			0
+#define TRANSMITTING 	1
 #define BAUD_RATE 2000000
 #define ADS8688_SPI_CLOCK 20000000  // Overide library. Datasheet max 17M; Stable until 30M
 
@@ -25,7 +29,7 @@ ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
 
 struct __attribute__((packed)) Packet {
 	uint32_t header;
-	uint32_t counter;
+	uint16_t counter;
 	uint32_t timediff_us;
 	uint16_t readings[8];
 	uint16_t chksum;
@@ -49,11 +53,10 @@ const uint8_t R1_SIZE = 6;
 const uint8_t R5_SIZE = 2;
 const uint8_t r1_pins[R1_SIZE] = { 0, 1, 2, 3, 4, 5 };  // Direct HE sensor reading
 const uint8_t r5_pins[R5_SIZE] = { 6, 7 };              // Battery voltage stepped down
-const uint16_t TIME_TO_ALERT = PACKET_SIZE * 4;
 
 uint16_t raw_readings[8];
 uint32_t prevTime_us;
-uint32_t counter = 1;
+uint16_t counter = 1;
 uint16_t packet_position = 0;
 uint16_t timer_start;
 bool streamEnabled = false;
@@ -140,7 +143,11 @@ IRAM_ATTR void loop() {
 		currPkt.header = HEADER;
 
 		prevTime_us = now_us;
-		counter += 1;
+		if (counter == 65535) {
+			counter = 1;
+		} else {
+			counter += 1;
+		}
 		packet_position += 1;
 #if LOGGING && !TRANSMITTING
 		Serial.println("=======================");

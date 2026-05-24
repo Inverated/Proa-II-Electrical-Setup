@@ -5,14 +5,19 @@ import csv
 from pathlib import Path
 import time
 
-PACKET_BYTES = 4 + 4 + 4 + (8 * 2) + 2   # 30 bytes
+PACKET_BYTES = 4 + 2 + 4 + (8 * 2) + 2
+FORMAT = '<H I 8H H' 
+
 COUNT_BEFORE_FLUSH = 10000
-PACKETS_PER_BULK = 8000
-MAX_BUFFER_BYTES = PACKETS_PER_BULK * PACKET_BYTES
-HEADER = b'\xEF\xBE\xAD\xDE'    # DEADBEEF
+PACKETS_PER_BULK = 5
+SAMPLING_RATE = 80000
+BULK_READ_TIMEOUT = ((PACKET_BYTES * PACKETS_PER_BULK) / SAMPLING_RATE) + 0.5   # seconds — generous, ESP sends one bulk per 0.5s
+
+BULK_DATA_BYTES = PACKETS_PER_BULK * PACKET_BYTES
+
+HEADER = b'\xEF\xBE\xAD\xDE'
 HEADER_INT = 0xDEADBEEF
-BULK_READ_TIMEOUT = 5.0  # seconds — generous, ESP sends one bulk per 0.5s
-BULK_DATA_BYTES = PACKETS_PER_BULK * PACKET_BYTES  # 104,000 — fixed, known
+
 
 cwd = Path(__file__).parent
 csv_file_path = Path(cwd) / "data.csv"
@@ -22,7 +27,7 @@ csv_file = open(csv_file_path, mode='a', newline='')
 writer = csv.writer(csv_file)
 if not exists:
     writer.writerow(['counter', 'timediff_us', 'ch0', 'ch1', 'ch2',
-                     'ch3', 'ch4', 'ch5', 'ch6', 'ch7'])
+                    'ch3', 'ch4', 'ch5', 'ch6', 'ch7'])
     csv_file.flush()
 
 broken_packet_count = 0
@@ -58,7 +63,8 @@ def read_bulk(ser):
         print("Timed out waiting for bulk header.\t\t\t\t")
         return []
 
-    raw = read_exact(ser, BULK_DATA_BYTES)
+    # Header was consumed by sync_to_header, so only read the remaining bytes
+    raw = read_exact(ser, BULK_DATA_BYTES - len(HEADER))
     if raw is None:
         print("Short read on bulk data.\t\t\t\t")
         return []
@@ -72,15 +78,14 @@ def read_bulk(ser):
         header_chunk = raw[l_ptr:l_ptr+4]
         header = struct.unpack('<I', header_chunk)[0]
         if header != HEADER_INT:
-            #print(f"Header mismatch. Expected DEADBEEF, got {header:08X}. Resyncing.")
             ser.reset_input_buffer()
-            #broken_packet_count += 1    # Re-alignment. Do not need to count towards broken
+            # Re-alignment. Do not need to count towards broken
             l_ptr += 1
             r_ptr += 1
             continue
         
         body_chunk = raw[l_ptr+4:r_ptr]
-        data = struct.unpack('<II8HH', body_chunk)
+        data = struct.unpack(FORMAT, body_chunk)
         counter, timediff = data[0], data[1]
         readings, chksum = data[2:10], data[10]
 
@@ -92,11 +97,15 @@ def read_bulk(ser):
             l_ptr += 1
             r_ptr += 1
             continue
-
-        if last_counter != -1 and counter < last_counter:
-            offset_counter = last_counter + 1 - counter
-        if offset_counter != 0:
-            counter += offset_counter
+        
+        
+        # Realign counter when there is a wraparround
+        # Do not realign on broken packet, keep the jump
+        if last_counter != -1:
+            if counter < last_counter and (last_counter - counter) > 2**15: # Counter is 16 bit
+                offset_counter = (last_counter + 1) - counter
+        counter += offset_counter          
+            
         last_counter = counter
             
         packets.append((counter, timediff, *readings))
@@ -201,10 +210,14 @@ while True:
                 missing_packets = 0
 
                 # Stagger alert notification
-                print(
-                    f"Received bulk of {len(packet_list)} packets. Counter range: {packet_list[0][0]} - {packet_list[-1][0]}")
+                
+                reading_chunk += len(packet_list)
+                total_packets += len(packet_list)
+                if PACKETS_PER_BULK >= 1000 and SAMPLING_RATE <= 20000:
+                    print(f"Received bulk of {len(packet_list)} packets. Counter range: {packet_list[0][0]} - {packet_list[-1][0]}")
+                
                 waiting = serial_device.in_waiting
-                if waiting > MAX_BUFFER_BYTES:
+                if waiting > BULK_DATA_BYTES:
                     buffered_alert_counter += 1
                     if buffered_alert_counter % 5000 == 0:
                         print(
@@ -213,10 +226,8 @@ while True:
                     buffered_alert_counter = 0
 
                 writer.writerows(packet_list)
-                reading_chunk += len(packet_list)
-                total_packets += len(packet_list)
 
-                if reading_chunk > COUNT_BEFORE_FLUSH:
+                if reading_chunk >= COUNT_BEFORE_FLUSH:
                     csv_file.flush()
                     print(
                         f"Saved {reading_chunk} packets. Total packets saved: {total_packets}", end="\r")
@@ -225,7 +236,8 @@ while True:
 
     except KeyboardInterrupt:
         print("Exiting...")
-        print(f"Flushing remaining {reading_chunk} packets before exit.")
+        if "reading_chunk" in locals():
+            print(f"Flushing remaining {reading_chunk} packets before exit.")
         csv_file.flush()
         csv_file.close()
         break
@@ -238,7 +250,7 @@ while True:
         print(f"Serial exception: {e}. Attempting to reconnect...")
         serial_device.reset_input_buffer()
         serial_device.reset_output_buffer()
-        serial_device.cancel_read()
+        #serial_device.cancel_read()
         serial_device.close()
         reconnect_time = time.monotonic() - reconnect_start_time
         print(f"Reconnection took {reconnect_time:.2f} seconds.")
@@ -246,14 +258,16 @@ while True:
         time.sleep(0.5)
     finally:
         print("\n--- Session Summary ---")
-        print(f"Session duration: {time.monotonic() - time_start:.2f} seconds")
+        time_end = time.monotonic()
+        print(f"Session duration: {time_end - time_start:.2f} seconds")
         print(f"Total broken packets encountered: {broken_packet_count}")
         print(f"Total reconnections: {total_reconnection}")
         print(f"Total packets received: {total_packets}")
         print(
-            f"Average packets per second: {total_packets / (time.monotonic() - time_start):.2f}")
+            f"Average packets per second: {total_packets / (time_end - time_start):.2f}")
+        print(f"Net throughput: {((total_packets * PACKET_BYTES) / (time_end - time_start)) / 1024:.2f} KB/s")
         print(f"Total time spent reconnecting: {total_reconnect_time:.2f} seconds")
-        print
+        
         try:
             print(
                 f"Flushing remaining {len(packets_cache)} packets to CSV before exit.")
@@ -269,8 +283,9 @@ while True:
                     f"Remaining bytes in buffer before closing: {serial_device.in_waiting}")
                 serial_device.read(serial_device.in_waiting)
                 serial_device.flush()
+                serial_device.reset_input_buffer()
+                serial_device.reset_output_buffer()
                 serial_device.cancel_read()
-
                 serial_device.close()
             except:
                 print("Serial device already closed.")
