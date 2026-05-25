@@ -8,7 +8,7 @@
 #define DEFAULT_OFFSET 16
 #define DIVIDER_OFFSET 288
 
-#define SAMPLING_RATE 0
+#define SAMPLING_RATE 1100
 #define PACKET_SIZE 5
 // Stupid ESP32 C3. CDC doesent work, takes 120ms for 1000 packet size
 // Since single core, cannot read from adc while writing

@@ -8,19 +8,21 @@ import time
 PACKET_BYTES = 4 + 2 + 4 + (8 * 2) + 2
 FORMAT = '<H I 8H H' 
 
-COUNT_BEFORE_FLUSH = 10000
+COUNT_BEFORE_FLUSH = 2000
 PACKETS_PER_BULK = 5
-SAMPLING_RATE = 80000
-BULK_READ_TIMEOUT = ((PACKET_BYTES * PACKETS_PER_BULK) / SAMPLING_RATE) + 0.5   # seconds — generous, ESP sends one bulk per 0.5s
-
+SAMPLING_RATE = 1100
+BULK_READ_TIMEOUT = ((PACKET_BYTES * PACKETS_PER_BULK) / SAMPLING_RATE) + 0.1   # seconds — generous, ESP sends one bulk per 0.5s
+TIME_BETWEEN_SAMPLES_ALERT = 5000 # 2ms
 BULK_DATA_BYTES = PACKETS_PER_BULK * PACKET_BYTES
 
 HEADER = b'\xEF\xBE\xAD\xDE'
 HEADER_INT = 0xDEADBEEF
 
 
+date_now = time.strftime("%Y%m%d-%H%M%S")
+print(f"Data will be saved to data_{date_now}.csv")
 cwd = Path(__file__).parent
-csv_file_path = Path(cwd) / "data.csv"
+csv_file_path = Path(cwd) / f"data_{date_now}.csv"
 exists = csv_file_path.exists()
 
 csv_file = open(csv_file_path, mode='a', newline='')
@@ -107,6 +109,9 @@ def read_bulk(ser):
         counter += offset_counter          
             
         last_counter = counter
+        
+        if timediff > TIME_BETWEEN_SAMPLES_ALERT:
+            print(f"Large time gap detected: {timediff} us at counter {counter}\t\t\t\t")
             
         packets.append((counter, timediff, *readings))
         packets_cache.append((counter, timediff, *readings))
