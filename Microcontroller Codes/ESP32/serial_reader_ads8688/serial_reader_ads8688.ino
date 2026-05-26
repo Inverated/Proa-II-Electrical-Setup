@@ -8,20 +8,19 @@
 #define DEFAULT_OFFSET 0
 #define DIVIDER_OFFSET 0
 
-#define SAMPLING_RATE 0
-#define PACKET_SIZE 5
-// Stupid ESP32 C3. CDC doesent work, takes 120ms for 1000 packet size
+#define SAMPLING_RATE 1200
+#define PACKET_SIZE 3
 // Since single core, cannot read from adc while writing
 // Max recorded transfer speed 630KB/s (163kSPS)
 // Pkt size = 5, Flushing into CSV at 1000 count, reading at 5-50 packets
 // Max benchmark without serial write 5000 rows * 8 ch = 155ms (258kSPS)
 
-#define TIME_TO_ALERT PACKET_SIZE	// Logging speed test (LOGGING & TRANSNMITTING = 0)
-
 #define LOGGING 			0
 #define TRANSMITTING 	1
 #define BAUD_RATE 2000000
-#define ADS8688_SPI_CLOCK 3000000  // Overide library. Datasheet max 17M; Stable until 30M
+#define ADS8688_SPI_CLOCK 20000000  
+// Overide library. Datasheet max 17M; Stable until 30M
+// Over serial, no point going higher
 
 #define HEADER 0xDEADBEEF
 
@@ -38,7 +37,7 @@ struct __attribute__((packed)) Packet {
 uint16_t additive_chksum(uint16_t* readings, uint16_t counter) {
 	uint16_t sum = counter;
 	for (int i = 0; i < 8; i++) {
-		sum += readings[i] * (i + 1);
+		sum ^= readings[i] << (i + 1);
 	}
 	return sum;
 }
@@ -88,7 +87,6 @@ void setup() {
 
 	// Start auto scan mode
 	adc.autoRst();
-	adc.autoRst();
 
 	SPI.beginTransaction(SPISettings(ADS8688_SPI_CLOCK, MSBFIRST, SPI_MODE1));
 
@@ -97,7 +95,7 @@ void setup() {
 }
 
 
-IRAM_ATTR void loop() {
+void IRAM_ATTR loop() {
 	if (!streamEnabled) {
 		checkForStart();
 		return;
@@ -119,7 +117,6 @@ IRAM_ATTR void loop() {
 #if LOGGING && !TRANSMITTING
 			Serial.printf("CH%d: Raw -> %d  ", idx, raw);
 #endif
-
 			currPkt.readings[idx] = raw;
 		}
 
@@ -138,34 +135,34 @@ IRAM_ATTR void loop() {
 			Serial.printf("CH%d: Raw -> %d  \n", idx, raw);
 #endif
 		}
-
 		currPkt.chksum = additive_chksum(currPkt.readings, counter);
 		currPkt.header = HEADER;
 
 		prevTime_us = now_us;
+
 		if (counter == 65535) {
 			counter = 1;
 		} else {
 			counter += 1;
 		}
 		packet_position += 1;
+
 #if LOGGING && !TRANSMITTING
 		Serial.println("=======================");
 #endif
 	}
 
-	if (!LOGGING && !TRANSMITTING && counter % TIME_TO_ALERT == 1) {
+	if (!LOGGING && !TRANSMITTING) {
 		uint16_t time_now = millis();
-		Serial.printf("Time taken to process %d rows * 8 channel = %d\n", TIME_TO_ALERT, time_now - timer_start);
+		Serial.printf("Time taken to process %d rows * 8 channel = %d\n", PACKET_SIZE, time_now - timer_start);
 		timer_start = time_now;
 	}
 
-	if (TRANSMITTING && !Serial) {
+#if TRANSMITTING
+	if (!Serial) {
 		streamEnabled = false;
 		return;
 	}
-
-#if TRANSMITTING
 	Serial.write((uint8_t*)bulkPacket, sizeof(bulkPacket));
 #endif
 

@@ -13,11 +13,11 @@ import time
 PACKET_BYTES = 4 + 2 + 4 + (8 * 2) + 2
 FORMAT = '<H I 8H H' 
 
-COUNT_BEFORE_FLUSH = 10000
-PACKETS_PER_BULK = 10
-SAMPLING_RATE = 20000
+COUNT_BEFORE_FLUSH = 1000
+PACKETS_PER_BULK = 30
+SAMPLING_RATE = 1200
 #BULK_READ_TIMEOUT = ((PACKET_BYTES * PACKETS_PER_BULK) / SAMPLING_RATE) + 0.1   # seconds — generous, ESP sends one bulk per 0.5s
-BULK_READ_TIMEOUT = 1.5
+BULK_READ_TIMEOUT = 1.0
 TIME_BETWEEN_SAMPLES_ALERT = 5000 # 5ms
 BULK_DATA_BYTES = PACKETS_PER_BULK * PACKET_BYTES
 
@@ -25,6 +25,7 @@ HEADER = b'\xEF\xBE\xAD\xDE'
 HEADER_INT = 0xDEADBEEF
 
 packets_cache = []
+
 
 # Voltage (in raw adc values) plotter
 MAX_POINTS = 5000
@@ -45,7 +46,6 @@ def update(frame):
     return line,
     
 date_now = time.strftime("%Y%m%d-%H%M%S")
-
 print(f"Data will be saved to data_{date_now}.csv")
 cwd = Path(__file__).parent
 csv_file_path = Path(cwd) / f"data_{date_now}.csv"
@@ -160,10 +160,10 @@ def sync_to_header(ser, timeout=BULK_READ_TIMEOUT):
 
 
 def additive_cksum(data, counter):
-    sum = 0
+    sum = counter & 0xFFFF
     for index, value in enumerate(data):
-        sum += value * (index + 1)
-    return (sum + (counter & 0xFFFF)) % 65536
+        sum ^= value << (index + 1)
+    return sum % 65536
 
 def begin_serial():
     global packets_cache
