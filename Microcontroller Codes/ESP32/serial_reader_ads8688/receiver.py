@@ -1,5 +1,4 @@
 from collections import deque
-from queue import Queue
 import threading
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -14,18 +13,18 @@ import time
 PACKET_BYTES = 4 + 2 + 4 + (8 * 2) + 2
 FORMAT = '<H I 8H H' 
 
-COUNT_BEFORE_FLUSH = 2000
-PACKETS_PER_BULK = 5
-SAMPLING_RATE = 1100
-BULK_READ_TIMEOUT = ((PACKET_BYTES * PACKETS_PER_BULK) / SAMPLING_RATE) + 0.1   # seconds — generous, ESP sends one bulk per 0.5s
-TIME_BETWEEN_SAMPLES_ALERT = 5000 # 2ms
+COUNT_BEFORE_FLUSH = 10000
+PACKETS_PER_BULK = 10
+SAMPLING_RATE = 20000
+#BULK_READ_TIMEOUT = ((PACKET_BYTES * PACKETS_PER_BULK) / SAMPLING_RATE) + 0.1   # seconds — generous, ESP sends one bulk per 0.5s
+BULK_READ_TIMEOUT = 1.5
+TIME_BETWEEN_SAMPLES_ALERT = 5000 # 5ms
 BULK_DATA_BYTES = PACKETS_PER_BULK * PACKET_BYTES
 
 HEADER = b'\xEF\xBE\xAD\xDE'
 HEADER_INT = 0xDEADBEEF
 
 packets_cache = []
-
 
 # Voltage (in raw adc values) plotter
 MAX_POINTS = 5000
@@ -46,6 +45,7 @@ def update(frame):
     return line,
     
 date_now = time.strftime("%Y%m%d-%H%M%S")
+
 print(f"Data will be saved to data_{date_now}.csv")
 cwd = Path(__file__).parent
 csv_file_path = Path(cwd) / f"data_{date_now}.csv"
@@ -74,6 +74,7 @@ def read_exact(ser, n, timeout=BULK_READ_TIMEOUT):
 
 last_counter = -1
 offset_counter = 0
+broken_packet_count = 0
 
 def read_bulk(ser):
     global packets_cache
@@ -282,13 +283,20 @@ def begin_serial():
             reconnect_start_time = time.monotonic()
             total_reconnection += 1
             print(f"Serial exception: {e}. Attempting to reconnect...")
-            serial_device.reset_input_buffer()
-            serial_device.reset_output_buffer()
-            #serial_device.cancel_read()
-            serial_device.close()
-            reconnect_time = time.monotonic() - reconnect_start_time
-            print(f"Reconnection took {reconnect_time:.2f} seconds.")
-            total_reconnect_time += reconnect_time
+            try:
+                print(
+                    f"Remaining bytes in buffer before closing: {serial_device.in_waiting}")
+                #serial_device.read(serial_device.in_waiting)
+                #serial_device.flush()
+                #serial_device.reset_input_buffer()
+                #serial_device.reset_output_buffer()
+                #serial_device.cancel_read()
+                #serial_device.close()
+                reconnect_time = time.monotonic() - reconnect_start_time
+                print(f"Reconnection took {reconnect_time:.2f} seconds.")
+                total_reconnect_time += reconnect_time
+            except:
+                print("Serial device already closed.")
             time.sleep(0.5)
         finally:
             print("\n--- Session Summary ---")
@@ -316,11 +324,11 @@ def begin_serial():
                     print(
                         f"Remaining bytes in buffer before closing: {serial_device.in_waiting}")
                     serial_device.read(serial_device.in_waiting)
-                    serial_device.flush()
-                    serial_device.reset_input_buffer()
-                    serial_device.reset_output_buffer()
-                    serial_device.cancel_read()
-                    serial_device.close()
+                    #serial_device.flush()
+                    #serial_device.reset_input_buffer()
+                    #serial_device.reset_output_buffer()
+                    #serial_device.cancel_read()
+                    #serial_device.close()
                 except:
                     print("Serial device already closed.")
             print("--- End of Session ---\n")
@@ -328,12 +336,15 @@ def begin_serial():
 
 if __name__ == "__main__":
     try:
-        threading.Thread(target=begin_serial, daemon=True).start()
-        anim = FuncAnimation(fig, update, interval=100)
+        begin_serial()
+        #threading.Thread(target=begin_serial, daemon=True).start()
+        """ anim = FuncAnimation(fig, update, interval=100)
         plt.xlabel('Counter')
         plt.ylabel('Voltage (raw ADC)')
         plt.title('Real-time Voltage Plot')
         plt.show()
+        """
+        
     except Exception as e:
         print(f"Error in main thread: {e}")
         print("Exiting main thread.")

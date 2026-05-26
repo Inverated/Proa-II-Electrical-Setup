@@ -5,10 +5,10 @@
 #define PIN_MOSI 5
 #define PIN_MISO 4
 
-#define DEFAULT_OFFSET 16
-#define DIVIDER_OFFSET 288
+#define DEFAULT_OFFSET 0
+#define DIVIDER_OFFSET 0
 
-#define SAMPLING_RATE 1100
+#define SAMPLING_RATE 0
 #define PACKET_SIZE 5
 // Stupid ESP32 C3. CDC doesent work, takes 120ms for 1000 packet size
 // Since single core, cannot read from adc while writing
@@ -21,7 +21,7 @@
 #define LOGGING 			0
 #define TRANSMITTING 	1
 #define BAUD_RATE 2000000
-#define ADS8688_SPI_CLOCK 20000000  // Overide library. Datasheet max 17M; Stable until 30M
+#define ADS8688_SPI_CLOCK 3000000  // Overide library. Datasheet max 17M; Stable until 30M
 
 #define HEADER 0xDEADBEEF
 
