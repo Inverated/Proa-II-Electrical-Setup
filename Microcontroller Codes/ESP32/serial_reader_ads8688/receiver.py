@@ -14,17 +14,17 @@ PACKET_BYTES = 4 + 2 + 4 + (8 * 2) + 2
 FORMAT = '<H I 8H H' 
 
 COUNT_BEFORE_FLUSH = 1000
-PACKETS_PER_BULK = 30
+PACKETS_PER_BULK = 8*5
 SAMPLING_RATE = 1200
-#BULK_READ_TIMEOUT = ((PACKET_BYTES * PACKETS_PER_BULK) / SAMPLING_RATE) + 0.1   # seconds — generous, ESP sends one bulk per 0.5s
-BULK_READ_TIMEOUT = 1.0
-TIME_BETWEEN_SAMPLES_ALERT = 5000 # 5ms
+BULK_READ_TIMEOUT = (500000 / SAMPLING_RATE) * PACKETS_PER_BULK / 1000
+TIME_BETWEEN_SAMPLES_ALERT = 1000 # 5ms
 BULK_DATA_BYTES = PACKETS_PER_BULK * PACKET_BYTES
 
-HEADER = b'\xEF\xBE\xAD\xDE'
-HEADER_INT = 0xDEADBEEF
+HEADER = b'PWER'
+HEADER_INT = int(hex(struct.unpack('<I', HEADER)[0]), 16)
 
 packets_cache = []
+broken_packet_count = 0
 
 
 # Voltage (in raw adc values) plotter
@@ -35,7 +35,6 @@ fig, ax = plt.subplots()
 ax.set_ylim(0, 54000)
 line, = ax.plot([], [], lw=0.5)
 last_time = 0
-
 
 def update(frame):
     if len(x_axis) == 0:
@@ -111,9 +110,8 @@ def read_bulk(ser):
         counter, timediff = data[0], data[1]
         readings, chksum = data[2:10], data[10]
 
-
         if chksum != additive_cksum(readings, counter):
-            print(f"Checksum fail, counter {counter}. Resyncing.\t\t\t\t")
+            print(f"Checksum fail, counter {counter}. Resyncing.\t\t\t\t\t\t\t")
             ser.reset_input_buffer()
             broken_packet_count += 1
             l_ptr += 1
@@ -128,6 +126,12 @@ def read_bulk(ser):
                 offset_counter = (last_counter + 1) - counter
             
         counter += offset_counter          
+        if last_counter != -1 and counter != last_counter + 1:
+            print(f"Packet loss detected: counter jumped from {last_counter} to {counter}\t\t\t\t")
+            broken_packet_count += counter - last_counter - 1
+            
+            
+
         last_counter = counter
                 
         if timediff > TIME_BETWEEN_SAMPLES_ALERT:
@@ -166,10 +170,10 @@ def additive_cksum(data, counter):
     return sum % 65536
 
 def begin_serial():
+    global broken_packet_count
     global packets_cache
     global csv_file
     
-    broken_packet_count = 0
     total_reconnection = 0
     total_reconnect_time = 0.0
     total_packets = 0

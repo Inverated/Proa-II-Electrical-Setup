@@ -15,14 +15,12 @@
 // Pkt size = 5, Flushing into CSV at 1000 count, reading at 5-50 packets
 // Max benchmark without serial write 5000 rows * 8 ch = 155ms (258kSPS)
 
-#define LOGGING 			0
-#define TRANSMITTING 	1
+#define LOGGING 0
+#define TRANSMITTING 1
 #define BAUD_RATE 2000000
-#define ADS8688_SPI_CLOCK 20000000  
+#define ADS8688_SPI_CLOCK 20000000
 // Overide library. Datasheet max 17M; Stable until 30M
 // Over serial, no point going higher
-
-#define HEADER 0xDEADBEEF
 
 ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
 
@@ -33,6 +31,12 @@ struct __attribute__((packed)) Packet {
 	uint16_t readings[8];
 	uint16_t chksum;
 };
+
+uint32_t str_to_u32(const char s[4]) {
+	return ((uint32_t)s[3] << 24) | ((uint32_t)s[2] << 16) | ((uint32_t)s[1] << 8) | ((uint32_t)s[0]);
+}
+uint32_t header;	 // 1347896658
+char role[4] = {'P', 'W', 'E', 'R'};
 
 uint16_t additive_chksum(uint16_t* readings, uint16_t counter) {
 	uint16_t sum = counter;
@@ -73,6 +77,8 @@ void checkForStart() {
 
 void setup() {
 	Serial.begin(BAUD_RATE);
+
+	header = str_to_u32(role);
 
 	for (int i = 0; i < R1_SIZE; i++) {
 		adc.setChannelRange(r1_pins[i], R1);
@@ -136,7 +142,7 @@ void IRAM_ATTR loop() {
 #endif
 		}
 		currPkt.chksum = additive_chksum(currPkt.readings, counter);
-		currPkt.header = HEADER;
+		currPkt.header = header;
 
 		prevTime_us = now_us;
 
