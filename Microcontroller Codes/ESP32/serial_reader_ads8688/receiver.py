@@ -14,7 +14,7 @@ PACKET_BYTES = 4 + 2 + 4 + (8 * 2) + 2
 FORMAT = '<H I 8H H' 
 
 COUNT_BEFORE_FLUSH = 1000
-PACKETS_PER_BULK = 8*5
+PACKETS_PER_BULK = 5*5
 SAMPLING_RATE = 1200
 BULK_READ_TIMEOUT = (500000 / SAMPLING_RATE) * PACKETS_PER_BULK / 1000
 TIME_BETWEEN_SAMPLES_ALERT = 1000 # 5ms
@@ -27,22 +27,73 @@ packets_cache = []
 broken_packet_count = 0
 
 
-# Voltage (in raw adc values) plotter
 MAX_POINTS = 5000
-voltage = deque(maxlen=MAX_POINTS)
+CURRENT_CHANNELS = [0, 1, 2, 3, 4, 5]
+VOLTAGE_CHANNELS = [6, 7]
+
 x_axis = deque(maxlen=MAX_POINTS)
-fig, ax = plt.subplots()
-ax.set_ylim(0, 54000)
-line, = ax.plot([], [], lw=0.5)
+voltage_data = {ch: deque(maxlen=MAX_POINTS) for ch in VOLTAGE_CHANNELS}
+current_data = {ch: deque(maxlen=MAX_POINTS) for ch in CURRENT_CHANNELS}
+
+# Voltage plotter (channels 6-7)
+fig_voltage, ax_voltage = plt.subplots()
+ax_voltage.set_ylim(0, 60)
+voltage_lines = []
+for ch in VOLTAGE_CHANNELS:
+    line, = ax_voltage.plot([], [], lw=0.5, label=f"ch{ch}")
+    voltage_lines.append(line)
+ax_voltage.legend(loc="upper right")
 last_time = 0
 
-def update(frame):
-    if len(x_axis) == 0:
-        return line,
-    ax.set_xlim(max(0, x_axis[-1] - MAX_POINTS), x_axis[-1] + 100)
+# Current plotter (channels 0-5)
+fig_current, ax_current = plt.subplots()
+ax_current.set_ylim(-100, 100)
+current_lines = []
+for ch in CURRENT_CHANNELS:
+    line, = ax_current.plot([], [], lw=0.5, label=f"ch{ch}")
+    current_lines.append(line)
+ax_current.legend(loc="upper right")
 
-    line.set_data(x_axis, voltage)
-    return line,
+def adc_to_voltage(adc_value, selected = 5):
+    if selected == 5:
+        min_v = 0
+        max_v = 10.24
+        divider = 6
+    else:
+        min_v = -5.12
+        max_v = 5.12
+        divider = 1
+    raw_v = adc_value * (max_v - min_v) / 65535 + min_v
+    return raw_v * divider
+
+def adc_to_current(adc_value):
+    # fitted_ended = lambda x: -0.00012324 * x**2 + 0.06268987*x
+    voltage = adc_to_voltage(adc_value, selected=1)
+    
+    a=-0.0001232378890506735
+    b=0.06268986789356691
+    mid_point = 2**16 / 2
+    if adc_value > mid_point:
+        return (-b + (b**2 + 4*a*voltage)**0.5) / (2*a)
+    else:
+        return -(-b + (b**2 - 4*a*voltage)**0.5) / (2*a)
+
+
+def update_voltage(frame):
+    if len(x_axis) == 0:
+        return tuple(voltage_lines)
+    ax_voltage.set_xlim(max(0, x_axis[-1] - MAX_POINTS), x_axis[-1] + 100)
+    for ch, line in zip(VOLTAGE_CHANNELS, voltage_lines):
+        line.set_data(x_axis, voltage_data[ch])
+    return tuple(voltage_lines)
+
+def update_current(frame):
+    if len(x_axis) == 0:
+        return tuple(current_lines)
+    ax_current.set_xlim(max(0, x_axis[-1] - MAX_POINTS), x_axis[-1] + 100)
+    for ch, line in zip(CURRENT_CHANNELS, current_lines):
+        line.set_data(x_axis, current_data[ch])
+    return tuple(current_lines)
     
 date_now = time.strftime("%Y%m%d-%H%M%S")
 print(f"Data will be saved to data_{date_now}.csv")
@@ -194,7 +245,6 @@ def begin_serial():
                     print(f"Trying {port.device}...")
                     if 'serial_device' in locals():
                         print("Closing previous serial connection...")
-                        serial_device.close()
                         del serial_device
                         time.sleep(1)
                     serial_device = serial.Serial(port.device, 2000000, timeout=1)
@@ -250,9 +300,15 @@ def begin_serial():
                     if PACKETS_PER_BULK >= 1000 and SAMPLING_RATE <= 20000:
                         print(f"Received bulk of {len(packet_list)} packets. Counter range: {packet_list[0][0]} - {packet_list[-1][0]}")
                     
-                    # Plot voltage over current time using just the last value from each bulk
-                    voltage.append(packet_list[-1][8]) # ch6
-                    x_axis.append(packet_list[-1][0]) # counter              
+                    # Plot using just the last value from each bulk
+                    last_packet = packet_list[-1]
+                    x_axis.append(last_packet[0]) # counter
+                    for ch in CURRENT_CHANNELS:
+                        current_data[ch].append(adc_to_current(last_packet[2 + ch]))
+                    for ch in VOLTAGE_CHANNELS:
+                        voltage_data[ch].append(
+                            adc_to_voltage(last_packet[2 + ch])
+                        )
                     #print(f"Voltage: {packet_list[-1][8]} at counter {packet_list[-1][0]}\t\t\t\t")      
                     
                     waiting = serial_device.in_waiting
@@ -340,14 +396,17 @@ def begin_serial():
 
 if __name__ == "__main__":
     try:
-        begin_serial()
-        #threading.Thread(target=begin_serial, daemon=True).start()
-        """ anim = FuncAnimation(fig, update, interval=100)
-        plt.xlabel('Counter')
-        plt.ylabel('Voltage (raw ADC)')
-        plt.title('Real-time Voltage Plot')
+        #begin_serial()
+        threading.Thread(target=begin_serial, daemon=True).start()
+        anim_voltage = FuncAnimation(fig_voltage, update_voltage, interval=100)
+        anim_current = FuncAnimation(fig_current, update_current, interval=100)
+        ax_voltage.set_xlabel('Counter')
+        ax_voltage.set_ylabel('Voltage (V)')
+        ax_voltage.set_title('Real-time Voltage Plot (ch6-7)')
+        ax_current.set_xlabel('Counter')
+        ax_current.set_ylabel('Current (A)')
+        ax_current.set_title('Real-time Current Plot (ch0-5)')
         plt.show()
-        """
         
     except Exception as e:
         print(f"Error in main thread: {e}")

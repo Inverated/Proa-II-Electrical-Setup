@@ -1,4 +1,5 @@
 #include <esp_now.h>
+#include <esp_wifi.h>
 #include <WiFi.h>
 #include <ADS8688.h>
 
@@ -13,7 +14,7 @@
 
 #define ADS8688_SPI_CLOCK 20000000
 #define SAMPLING_RATE     1200
-#define PACKET_SIZE       8
+#define PACKET_SIZE       6
 
 ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
 
@@ -92,6 +93,9 @@ uint8_t LMK[16] = {
 };
 
 bool init_ESP_NOW() {
+  esp_wifi_set_max_tx_power(56);
+  esp_wifi_config_espnow_rate(WIFI_IF_STA, WIFI_PHY_RATE_24M);
+
   if (esp_now_init() != ESP_OK) {
     Serial.println("ESP now failed to initialise");
     return false;

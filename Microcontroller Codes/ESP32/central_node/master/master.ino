@@ -3,13 +3,15 @@
 #include <MUIU8g2.h>
 #include <WiFi.h>
 #include <esp_now.h>
+#include <esp_wifi.h>
 
 // This MAC Addr: ac:eb:e6:49:c7:cc
 
 // Serial setup
 #define BAUD_RATE 2000000
 bool streamEnabled = false;
-uint32_t prev_tick;
+volatile uint32_t prev_tick;
+volatile uint32_t last_received_tick;
 
 // Only enable 1 at a time
 #define LOGGING       0
@@ -30,9 +32,10 @@ uint32_t prev_time;
 // Connected device
 #define SEEN_TABLE_SIZE 16  // User power of 2 to use & operator
 
+uint8_t last_count_displayed = 0;
 uint8_t mac_addr_table[SEEN_TABLE_SIZE][6];
 bool filled[SEEN_TABLE_SIZE];
-uint8_t total_seen = 0;
+volatile uint8_t total_seen = 0;
 
 static inline uint32_t mac_hash(const uint8_t mac[6]) {
   uint32_t h;
@@ -49,6 +52,8 @@ static inline uint32_t mac_hash(const uint8_t mac[6]) {
   return h;
 }
 
+static volatile bool oled_to_update = false;
+
 static inline int find_or_insert(const uint8_t mac[6]) {
   uint32_t hash_idx = mac_hash(mac) & (SEEN_TABLE_SIZE - 1);  // & and operator; 8 - 1 == b111
 
@@ -58,7 +63,7 @@ static inline int find_or_insert(const uint8_t mac[6]) {
       memcpy(mac_addr_table[pos], mac, 6);
       filled[pos] = true;
       total_seen += 1;
-      update_connected_dev(total_seen);
+      oled_to_update = true;
       return pos;
     }
 
@@ -76,6 +81,7 @@ void OnDataRecv(const esp_now_recv_info_t *recv_info, const uint8_t *incomingDat
 #if TRANSMITTING
   Serial.write(incomingData, len);
 #endif
+
   find_or_insert(mac_cpy);  // Assuming the number of connection will always be less than set       //3a:93:ca:3f:34:93
 
 #if LOGGING
@@ -84,7 +90,6 @@ void OnDataRecv(const esp_now_recv_info_t *recv_info, const uint8_t *incomingDat
   Serial.printf("Total connected: %d\n", total_seen);
   prev_time = now_us;
 #endif
-  prev_tick = xTaskGetTickCount();
 }
 
 inline void checkForStart() {
@@ -98,10 +103,14 @@ inline void checkForStart() {
 }
 
 inline bool init_esp_now() {
+  esp_wifi_set_max_tx_power(56);
+  esp_wifi_config_espnow_rate(WIFI_IF_STA, WIFI_PHY_RATE_24M);
+
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
     return false;
   }
+
 
   esp_now_set_pmk(PMK);
   esp_now_register_recv_cb(OnDataRecv);
@@ -132,6 +141,7 @@ inline void update_connected_dev(uint8_t count) {
   sprintf(buf, "%d", count);
   u8g2.drawStr(0, 22, buf);
   u8g2.sendBuffer();
+  last_count_displayed = count;
 }
 
 void setup() {
@@ -149,17 +159,30 @@ void setup() {
 #if LOGGING
   prev_time = micros();
 #endif
-  prev_tick = xTaskGetTickCount();
 }
 
 void loop() {
-  uint32_t now_tick = xTaskGetTickCount();
-  if (now_tick - prev_tick > 1000) {
+  TickType_t now_tick = xTaskGetTickCount();
+  TickType_t last_tick = prev_tick;
+
+  TickType_t elapsed = now_tick - last_tick;
+  
+  // Couldnt get interupt to work. On connect, will lose a few ms
+  if (now_tick > last_tick && elapsed > pdMS_TO_TICKS(2000)) {
     memset(mac_addr_table, 0, sizeof(mac_addr_table));
     memset(filled, 0, sizeof(filled));
     total_seen = 0;
-    update_connected_dev(0);
     prev_tick = now_tick;
+  }
+
+
+  if (oled_to_update) {
+    update_connected_dev(total_seen);
+    oled_to_update = false;
+  }
+  
+  if (last_count_displayed != total_seen) {
+    oled_to_update = true;
   }
   
   if (!streamEnabled) {
