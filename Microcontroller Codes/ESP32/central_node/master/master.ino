@@ -103,8 +103,8 @@ inline void checkForStart() {
 }
 
 inline bool init_esp_now() {
-  esp_wifi_set_max_tx_power(56);
-  esp_wifi_config_espnow_rate(WIFI_IF_STA, WIFI_PHY_RATE_24M);
+  //esp_wifi_set_max_tx_power(56);
+  //esp_wifi_config_espnow_rate(WIFI_IF_STA, WIFI_PHY_RATE_24M);
 
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
