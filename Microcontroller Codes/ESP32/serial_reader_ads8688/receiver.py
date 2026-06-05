@@ -27,7 +27,7 @@ packets_cache = []
 broken_packet_count = 0
 
 
-MAX_POINTS = 5000
+MAX_POINTS = 50000
 CURRENT_CHANNELS = [0, 1, 2, 3, 4, 5]
 VOLTAGE_CHANNELS = [6, 7]
 
@@ -38,7 +38,8 @@ current_data = {ch: deque(maxlen=MAX_POINTS) for ch in CURRENT_CHANNELS}
 # Voltage plotter (channels 6-7)
 fig_voltage, ax_voltage = plt.subplots()
 #ax_voltage.set_ylim(0, 60)
-ax_voltage.set_ylim(45, 60)
+#ax_voltage.set_ylim(45, 60)
+ax_voltage.set_ylim(20, 30)
 voltage_lines = []
 for ch in VOLTAGE_CHANNELS:
     line, = ax_voltage.plot([], [], lw=0.5, label=f"ch{ch}")
@@ -49,7 +50,7 @@ last_time = 0
 # Current plotter (channels 0-5)
 fig_current, ax_current = plt.subplots()
 #ax_current.set_ylim(-100, 100)
-ax_current.set_ylim(-40, 40)
+ax_current.set_ylim(-15, 15)
 current_lines = []
 for ch in CURRENT_CHANNELS:
     line, = ax_current.plot([], [], lw=0.5, label=f"ch{ch}")
