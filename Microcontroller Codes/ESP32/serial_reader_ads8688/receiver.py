@@ -28,7 +28,7 @@ broken_packet_count = 0
 
 
 MAX_POINTS = 50000
-CURRENT_CHANNELS = [0, 1, 2, 3, 4, 5]
+CURRENT_CHANNELS = [0, 1, 2, 3]
 VOLTAGE_CHANNELS = [6, 7]
 
 x_axis = deque(maxlen=MAX_POINTS)
@@ -50,7 +50,7 @@ last_time = 0
 # Current plotter (channels 0-5)
 fig_current, ax_current = plt.subplots()
 #ax_current.set_ylim(-100, 100)
-ax_current.set_ylim(-10, 40)
+ax_current.set_ylim(-10, 15)
 current_lines = []
 for ch in CURRENT_CHANNELS:
     line, = ax_current.plot([], [], lw=0.5, label=f"ch{ch}")
@@ -308,6 +308,7 @@ def begin_serial():
                     x_axis.append(last_packet[0]) # counter
                     for ch in CURRENT_CHANNELS:
                         current_data[ch].append(adc_to_current(last_packet[2 + ch]))
+                        #print(f"Current ch{ch}: {current_data[ch][-1]:.2f} A at counter {last_packet[0]}\t\t\t\t")
                     for ch in VOLTAGE_CHANNELS:
                         voltage_data[ch].append(
                             adc_to_voltage(last_packet[2 + ch])

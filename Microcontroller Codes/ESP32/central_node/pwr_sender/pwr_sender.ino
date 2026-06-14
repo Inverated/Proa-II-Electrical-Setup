@@ -129,6 +129,12 @@ void onESPNowSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   }
 }
 
+uint16_t channel_offsets[8] = { 0 };
+uint16_t offset_calibration_arr[8] = { 0 };
+const uint16_t R1_OFFSET_THRESHOLD = 100;
+const uint16_t R5_OFFSET_THRESHOLD = 200;
+const uint8_t OFFSET_DIFF_THRESHOLD = 30;
+
 void setup() {
   Serial.begin(2000000);
 
@@ -156,7 +162,17 @@ void IRAM_ATTR loop() {
 
 		for (int i = 0; i < R1_SIZE; i++) {
 			uint8_t idx = r1_pins[i];
-			uint16_t raw = raw_readings[idx] - DEFAULT_OFFSET;
+
+            if (raw_reading[idx] < R1_OFFSET_THRESHOLD) { 
+                if (channel_offsets[idx] == 0) {
+                    channel_offsets[idx] = raw_readings[idx];
+                } else if (abs((int)raw_readings[idx] - channel_offsets[idx]) < OFFSET_DIFF_THRESHOLD) {
+                    // Update offset if the new reading is close to the current offset
+                    channel_offsets[idx] = (channel_offsets[idx] + raw_readings[idx] - DEFAULT_OFFSET) / 2;
+                }
+            }
+
+			uint16_t raw = raw_readings[idx] - DEFAULT_OFFSET - channel_offsets[idx];
       // Ranges from -5.12 to +5.12V
       // Add a function to recalculate offset when close to 0 reading
       currPkt.readings[idx] = raw;
@@ -164,7 +180,17 @@ void IRAM_ATTR loop() {
 
     for (int i = 0; i < R5_SIZE; i++) {
 			uint8_t idx = r5_pins[i];
-			uint16_t raw = raw_readings[idx] - DEFAULT_OFFSET;
+
+            if (raw_readings[idx] < R5_OFFSET_THRESHOLD) { 
+                if (channel_offsets[idx] == 0) {
+                    channel_offsets[idx] = raw_readings[idx];
+                } else if (abs((int)raw_readings[idx] - channel_offsets[idx]) < OFFSET_DIFF_THRESHOLD) {
+                    // Update offset if the new reading is close to the current offset
+                    channel_offsets[idx] = (channel_offsets[idx] + raw_readings[idx] - DEFAULT_OFFSET) / 2;
+                }
+            }
+
+			uint16_t raw = raw_readings[idx] - DEFAULT_OFFSET - channel_offsets[idx];
       if (raw < DIVIDER_OFFSET) { 
         // Ranges from 0 to 10.24V
         // Anything too low assume is 0
@@ -177,7 +203,7 @@ void IRAM_ATTR loop() {
 
     currPkt.chksum = additive_chksum(currPkt.readings, counter);
     currPkt.header = header;
-    prevTime_us = now_us;
+    prevTime_us = now_us;       
 
     if (counter == 65535) { // Needs to restart from 1
       counter = 1;
