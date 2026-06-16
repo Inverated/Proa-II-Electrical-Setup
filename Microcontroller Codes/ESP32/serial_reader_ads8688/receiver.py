@@ -49,8 +49,8 @@ last_time = 0
 
 # Current plotter (channels 0-5)
 fig_current, ax_current = plt.subplots()
-#ax_current.set_ylim(-100, 100)
-ax_current.set_ylim(-10, 15)
+ax_current.set_ylim(-100, 100)
+#ax_current.set_ylim(-10, 15)
 current_lines = []
 for ch in CURRENT_CHANNELS:
     line, = ax_current.plot([], [], lw=0.5, label=f"ch{ch}")
