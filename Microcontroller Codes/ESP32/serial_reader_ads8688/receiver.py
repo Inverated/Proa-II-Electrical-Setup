@@ -15,6 +15,8 @@ FORMAT = '<H I 8H H'
 
 COUNT_BEFORE_FLUSH = 1000
 PACKETS_PER_BULK = 5*5
+#COUNT_BEFORE_FLUSH = 5
+#PACKETS_PER_BULK = 1
 SAMPLING_RATE = 1200
 BULK_READ_TIMEOUT = (500000 / SAMPLING_RATE) * PACKETS_PER_BULK / 1000
 TIME_BETWEEN_SAMPLES_ALERT = 1000 # 5ms
@@ -38,8 +40,8 @@ current_data = {ch: deque(maxlen=MAX_POINTS) for ch in CURRENT_CHANNELS}
 # Voltage plotter (channels 6-7)
 fig_voltage, ax_voltage = plt.subplots()
 #ax_voltage.set_ylim(0, 60)
-#ax_voltage.set_ylim(45, 60)
-ax_voltage.set_ylim(15, 30)
+ax_voltage.set_ylim(45, 60)
+#ax_voltage.set_ylim(15, 30)
 voltage_lines = []
 for ch in VOLTAGE_CHANNELS:
     line, = ax_voltage.plot([], [], lw=0.5, label=f"ch{ch}")

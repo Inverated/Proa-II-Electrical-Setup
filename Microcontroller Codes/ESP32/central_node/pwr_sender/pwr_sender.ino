@@ -14,6 +14,7 @@
 
 #define ADS8688_SPI_CLOCK 20000000
 #define SAMPLING_RATE 1200
+//#define SAMPLING_RATE 10
 #define PACKET_SIZE 6
 
 ADS8688 adc(PIN_CS, PIN_SCK, PIN_MOSI, PIN_MISO);
@@ -129,11 +130,10 @@ void onESPNowSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   }
 }
 
-int16_t channel_offsets[8] = { 0 };
-int16_t offset_calibration_arr[8] = { 0 };
-const uint16_t R1_OFFSET_THRESHOLD = 100;
+int channel_offsets[8] = { 0 };
+const uint16_t R1_OFFSET_THRESHOLD = 200;
 const uint16_t R5_OFFSET_THRESHOLD = 200;
-const uint8_t OFFSET_DIFF_THRESHOLD = 30;
+const uint8_t OFFSET_DIFF_THRESHOLD = 50;
 
 void setup() {
   Serial.begin(2000000);
@@ -162,8 +162,8 @@ void IRAM_ATTR loop() {
 
     for (int i = 0; i < R1_SIZE; i++) {
       uint8_t idx = r1_pins[i];
-      int16_t diff = raw_readings[idx] - 32768;
-      if (diff > -R1_OFFSET_THRESHOLD && diff < R1_OFFSET_THRESHOLD) {
+      int diff = raw_readings[idx] - 32768;
+      if (abs(diff) < R1_OFFSET_THRESHOLD) {
         if (channel_offsets[idx] == 0) {
           channel_offsets[idx] = diff;
         } else if (abs(diff - channel_offsets[idx]) < OFFSET_DIFF_THRESHOLD) {
@@ -173,7 +173,7 @@ void IRAM_ATTR loop() {
       }
 
       uint16_t raw = raw_readings[idx];
-      uint16_t total_offset = DEFAULT_OFFSET + channel_offsets[idx];
+      int total_offset = DEFAULT_OFFSET + channel_offsets[idx];
       if (raw < total_offset) {
         raw = 0;
       } else if (raw > 65535 - total_offset) {
