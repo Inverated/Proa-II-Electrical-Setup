@@ -247,6 +247,8 @@ def begin_serial():
 
             for port in ports:
                 try:
+                    if "USB Serial Device" not in port.description:
+                        continue
                     print(f"Trying {port.device}...")
                     if 'serial_device' in locals():
                         print("Closing previous serial connection...")
